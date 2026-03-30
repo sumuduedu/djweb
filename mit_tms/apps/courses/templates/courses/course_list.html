@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Courses</h2>
+
+<a href="{% url 'course_create' %}">➕ Add New Course</a>
+
+<hr>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Title</th>
+        <th>Code</th>
+        <th>Level</th>
+        <th>Duration</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for course in courses %}
+    <tr>
+        <td>{{ course.title }}</td>
+        <td>{{ course.code }}</td>
+        <td>{{ course.level }}</td>
+        <td>{{ course.duration_hours }} hrs</td>
+        <td>
+            <a href="{% url 'course_detail' course.pk %}">View</a> |
+            <a href="{% url 'course_update' course.pk %}">Edit</a> |
+            <a href="{% url 'course_delete' course.pk %}">Delete</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No courses available</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

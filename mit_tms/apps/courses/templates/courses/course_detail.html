@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ object.title }}</h2>
+
+<p><strong>Code:</strong> {{ object.code }}</p>
+<p><strong>Description:</strong> {{ object.description }}</p>
+<p><strong>Duration:</strong> {{ object.duration_hours }} hours</p>
+<p><strong>Level:</strong> {{ object.level }}</p>
+
+<hr>
+
+<a href="{% url 'course_update' object.pk %}">✏️ Edit</a> |
+<a href="{% url 'course_delete' object.pk %}">🗑 Delete</a> |
+<a href="{% url 'course_list' %}">⬅ Back</a>
+
+{% endblock %}
