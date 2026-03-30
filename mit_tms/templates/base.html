@@ -11,7 +11,10 @@
     <a href="/">Home</a> |
     <a href="/dashboard/">Dashboard</a> |
     <a href="/courses/">Courses</a> |
-    <a href="/logout/">Logout</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
 </nav>
 
 <hr>
