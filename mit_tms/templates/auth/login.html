@@ -1,0 +1,31 @@
+{% extends 'auth/base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+
+<form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button class="w-full bg-blue-600 text-white py-2 rounded">
+        Login
+    </button>
+</form>
+
+<div class="text-center my-4 text-gray-500">OR</div>
+
+<a href="/accounts/google/login/"
+   class="block w-full bg-red-500 text-white py-2 rounded text-center hover:bg-red-600">
+   🔴 Continue with Google
+</a>
+
+<div class="mt-4 text-center space-y-2">
+    <a href="{% url 'home' %}" class="text-blue-600 underline block">
+        ⬅ Back to Home
+    </a>
+
+    <a href="{% url 'signup' %}" class="text-blue-600 underline block">
+        Create an account
+    </a>
+</div>
+{% endblock %}
