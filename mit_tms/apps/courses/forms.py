@@ -7,7 +7,7 @@ from .models import Course, Module, Task, Unit, Element, PerformanceCriteria
 # =========================================================
 # 🔷 COURSE FORM
 # =========================================================
-from django import forms
+
 from .models import Course
 
 class CourseForm(forms.ModelForm):
@@ -215,3 +215,4 @@ CriteriaFormSet = inlineformset_factory(
     extra=2,
     can_delete=True
 )
+

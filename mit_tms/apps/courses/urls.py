@@ -17,6 +17,9 @@ urlpatterns = [
     path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
 
 
+# 🔷 AJAX
+path('ajax/get-module-details/', get_module_details, name='get_module_details'),
+
     # 🔥 Task CRUD
 path('tasks/add/<int:module_id>/', TaskCreateView.as_view(), name='task_create'),
 path('tasks/<int:pk>/edit/', TaskUpdateView.as_view(), name='task_update'),

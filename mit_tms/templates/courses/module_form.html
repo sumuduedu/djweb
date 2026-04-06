@@ -32,5 +32,48 @@
     </form>
 
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
 
+    const codeField = document.getElementById("id_code");
+    const url = "{% url 'get_module_details' %}";
+
+    if (codeField) {
+        codeField.addEventListener("change", function() {
+
+            let code = this.value;
+
+            fetch(url + "?code=" + code)
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.title) {
+
+                        document.getElementById("id_title").value = data.title || "";
+                        document.getElementById("id_description").value = data.description || "";
+                        document.getElementById("id_module_type").value = data.module_type || "";
+
+                        document.getElementById("id_total_hours").value = data.total_hours || "";
+                        document.getElementById("id_theory_hours").value = data.theory_hours || "";
+                        document.getElementById("id_practical_hours").value = data.practical_hours || "";
+
+                        document.getElementById("id_learning_outcomes").value = data.learning_outcomes || "";
+                        document.getElementById("id_theory_content").value = data.theory_content || "";
+                        document.getElementById("id_practical_content").value = data.practical_content || "";
+
+                        document.getElementById("id_teaching_methods").value = data.teaching_methods || "";
+                        document.getElementById("id_assessment_methods").value = data.assessment_methods || "";
+
+                        document.getElementById("id_order").value = data.order || "";
+
+                    }
+
+                })
+                .catch(error => console.error("Error:", error));
+
+        });
+    }
+
+});
+</script>
 {% endblock %}
