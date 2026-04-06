@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- 🔷 HEADER -->
+    <div>
+        <h2 class="text-3xl font-bold text-gray-800">
+            NCS Structure - {{ course.title }}
+        </h2>
+    </div>
+
+
+    <!-- 🔥 UNITS -->
+    <div>
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Units</h3>
+
+            <a href="{% url 'unit_create' course.pk %}"
+               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+               + Add Unit
+            </a>
+        </div>
+
+        {% for unit in course.units.all %}
+            <div class="bg-white shadow rounded-xl p-5 mb-4">
+
+                <!-- Unit Header -->
+                <div class="flex justify-between items-center border-b pb-2 mb-3">
+
+                    <div>
+                        <h4 class="font-semibold text-lg">
+                            {{ unit.code }} - {{ unit.title }}
+                        </h4>
+                        <p class="text-sm text-gray-500">
+                            Level: {{ unit.level|default:"-" }}
+                        </p>
+                    </div>
+
+                    <div class="space-x-2 text-sm">
+
+                        <a href="{% url 'unit_detail' unit.pk %}"
+                        class="text-blue-600 hover:underline font-medium">
+                        View
+                        </a>
+
+                        <a href="{% url 'unit_update' unit.pk %}"
+                        class="text-yellow-600 hover:underline">
+                        Edit
+                        </a>
+
+                        <a href="{% url 'unit_delete' unit.pk %}"
+                        class="text-red-600 hover:underline">
+                        Delete
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 🔥 ELEMENTS -->
+                {% for element in unit.elements.all %}
+                    <div class="ml-4 mb-3">
+
+                        <!-- Element Title -->
+                        <div class="flex justify-between items-center">
+
+                            <p class="font-medium text-gray-800">
+                                ▸ {{ element.title }}
+                            </p>
+
+                            <!-- (Optional future buttons) -->
+                            <!--
+                            <a href="#" class="text-blue-600 text-sm">+ Criteria</a>
+                            -->
+                        </div>
+
+                        <!-- 🔥 PERFORMANCE CRITERIA -->
+                        {% if element.criteria.all %}
+                            <ul class="ml-6 mt-2 text-sm text-gray-600 list-disc space-y-1">
+                                {% for pc in element.criteria.all %}
+                                    <li>{{ pc.description }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="ml-6 text-gray-400 text-sm">
+                                No performance criteria
+                            </p>
+                        {% endif %}
+
+                    </div>
+                {% empty %}
+                    <p class="text-gray-400 text-sm">
+                        No elements available
+                    </p>
+                {% endfor %}
+
+            </div>
+        {% empty %}
+            <div class="text-gray-500 text-center p-6 bg-white rounded shadow">
+                No units available
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔥 ASSESSMENTS -->
+    <div>
+
+        <h3 class="text-xl font-semibold mb-3 text-gray-800">Assessments</h3>
+
+        {% for a in course.assessment_set.all %}
+            <div class="bg-white p-4 shadow rounded mb-2">
+                <p class="font-medium text-gray-800">
+                    {{ a.title }}
+                </p>
+                <p class="text-sm text-gray-500">
+                    {{ a.type }} | {{ a.max_marks }} Marks
+                </p>
+            </div>
+        {% empty %}
+            <p class="text-gray-400 text-sm">No assessments available</p>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔥 RESOURCES -->
+    <div>
+
+        <h3 class="text-xl font-semibold mb-3 text-gray-800">Resources</h3>
+
+        {% for r in course.resource_set.all %}
+            <div class="bg-white p-4 shadow rounded mb-2">
+                <p class="font-medium text-gray-800">{{ r.name }}</p>
+                <p class="text-sm text-gray-500">{{ r.type }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-400 text-sm">No resources available</p>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔙 BACK -->
+    <div>
+        <a href="{% url 'course_detail' course.pk %}"
+           class="text-blue-600 hover:underline">
+           ⬅ Back to Course
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
