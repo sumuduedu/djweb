@@ -5,7 +5,6 @@ from .models import Batch, Timetable, ModulePlan
 # =========================================================
 # 🔷 BATCH FORM
 # =========================================================
-
 class BatchForm(forms.ModelForm):
 
     class Meta:
@@ -23,7 +22,6 @@ class BatchForm(forms.ModelForm):
         widgets = {
             'course': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'academic_year': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-
             'name': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
             'start_date': forms.DateInput(attrs={
@@ -54,55 +52,91 @@ class BatchForm(forms.ModelForm):
         hours_per_day = cleaned_data.get('hours_per_day')
         days_per_week = cleaned_data.get('days_per_week')
 
-        if hours_per_day and hours_per_day <= 0:
+        if hours_per_day is not None and hours_per_day <= 0:
             raise forms.ValidationError("Hours per day must be greater than 0.")
 
-        if days_per_week and not (1 <= days_per_week <= 7):
+        if days_per_week is not None and not (1 <= days_per_week <= 7):
             raise forms.ValidationError("Days per week must be between 1 and 7.")
 
         return cleaned_data
 
 
 # =========================================================
-# 🔷 TIMETABLE FORM (MATCHES YOUR MODEL)
+# 🔷 TIMETABLE FORM (WITH CONFLICT VALIDATION 🔥)
 # =========================================================
+from django import forms
+from datetime import date
+from .models import Timetable
+
 
 class TimetableForm(forms.ModelForm):
+
+    # 🔥 DATE FIELD WITH CALENDAR SUPPORT
+    date = forms.DateField(
+        input_formats=['%Y-%m-%d'],
+        widget=forms.DateInput(
+            format='%Y-%m-%d',
+            attrs={
+                'type': 'date',
+                'class': 'w-full border rounded px-3 py-2',
+            }
+        )
+    )
 
     class Meta:
         model = Timetable
         fields = [
+            'batch',
             'module',
-            'week',
-            'day',
-            'row_slot',
+            'date',
+            'slot',
+            'session_type',
         ]
 
         widgets = {
+            'batch': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'module': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-
-            'week': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'min': 1
-            }),
-
-            'day': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'min': 1,
-                'max': 7
-            }),
-
-            'row_slot': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'min': 1
-            }),
+            'slot': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'session_type': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
         }
 
+    # 🔥 OPTIONAL: LIMIT DATE BASED ON TODAY
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Disable past dates
+        self.fields['date'].widget.attrs['min'] = date.today().isoformat()
+
+    # 🔥 VALIDATION (IMPORTANT)
+    def clean(self):
+        cleaned_data = super().clean()
+
+        batch = cleaned_data.get('batch')
+        date_value = cleaned_data.get('date')
+        slot = cleaned_data.get('slot')
+
+        # 🔥 CONFLICT CHECK
+        if batch and date_value and slot:
+            qs = Timetable.objects.filter(
+                batch=batch,
+                date=date_value,
+                slot=slot
+            )
+
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                raise forms.ValidationError(
+                    "⚠️ Conflict: This batch already has a session in this time slot."
+                )
+
+        return cleaned_data
+
 
 # =========================================================
-# 🔷 MODULE PLAN FORM (SMART FILTER 🔥)
+# 🔷 MODULE PLAN FORM
 # =========================================================
-
 class ModulePlanForm(forms.ModelForm):
 
     class Meta:
@@ -139,7 +173,7 @@ class ModulePlanForm(forms.ModelForm):
             }),
         }
 
-    # 🔥 FILTER MODULES BASED ON BATCH (IMPORTANT)
+    # 🔥 FILTER MODULES BASED ON BATCH
     def __init__(self, *args, **kwargs):
         batch = kwargs.pop('batch', None)
         super().__init__(*args, **kwargs)

@@ -102,6 +102,7 @@ class Timetable(models.Model):
 
     module = models.ForeignKey('courses.Module', on_delete=models.CASCADE)
     slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+
     week = models.IntegerField()
     day = models.IntegerField()
     row_slot = models.IntegerField()
@@ -109,6 +110,14 @@ class Timetable(models.Model):
     date = models.DateField(null=True, blank=True)
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["batch", "date", "slot"],
+                name="unique_batch_slot"
+            )
+        ]
 # =========================================================
 # 🔷 SESSION
 # =========================================================

@@ -4,68 +4,158 @@
 
 {% block content %}
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto">
 
-    <h2 class="text-2xl font-bold mb-6">📅 Timetable</h2>
+    <!-- 🔷 FILTER -->
+    <form method="get" class="flex flex-wrap gap-3 mb-4">
+
+        <select name="batch" class="border px-3 py-2 rounded">
+            <option value="">All Batches</option>
+            {% for b in batches %}
+                <option value="{{ b.id }}"
+                    {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>
+                    {{ b.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="number" name="week" placeholder="Week"
+               value="{{ selected_week }}"
+               class="border px-3 py-2 rounded w-24">
+
+        <input type="text" name="search" placeholder="Search"
+               value="{{ search_query }}"
+               class="border px-3 py-2 rounded">
+
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded">
+            Filter
+        </button>
+
+    </form>
+
+    <!-- 🔷 HEADER -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">📅 Timetable</h2>
+            <p class="text-sm text-gray-500">Manage all scheduled sessions</p>
+        </div>
+
+        <a href="{% url 'batch:timetable_create' %}"
+           class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+            + Add Entry
+        </a>
+    </div>
 
     {% if object_list %}
-        <div class="bg-white shadow rounded-xl overflow-hidden">
+    <div class="bg-white shadow rounded-xl overflow-hidden">
 
-            <table class="w-full text-sm">
+        <table class="w-full text-sm">
 
-                <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
-                    <tr>
-                        <th class="p-4 text-left">Date</th>
-                        <th class="p-4 text-left">Day</th>
-                        <th class="p-4 text-left">Module</th>
-                        <th class="p-4 text-left">Type</th>
-                        <th class="p-4 text-left">Time</th>
-                    </tr>
-                </thead>
+            <thead class="bg-gray-50 border-b text-xs uppercase text-gray-600">
+                <tr>
+                    <th class="p-4 text-left">Batch</th>
+                    <th class="p-4 text-left">Course</th>
+                    <th class="p-4 text-left">Date</th>
+                    <th class="p-4 text-left">Day</th>
+                    <th class="p-4 text-left">Week</th>
+                    <th class="p-4 text-left">Module</th>
+                    <th class="p-4 text-left">Type</th>
+                    <th class="p-4 text-left">Time</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
 
-                <tbody>
-                {% for t in object_list %}
-                    <tr class="border-b hover:bg-gray-50">
+<tbody>
+{% for t in object_list %}
 
-                        <!-- Date -->
-                        <td class="p-4">
-                            {{ t.date|date:"Y-m-d" }}
-                        </td>
+{% with key=t.batch.id|stringformat:"s"|add:"-"|add:t.date|stringformat:"s"|add:"-"|add:t.slot.id|stringformat:"s" %}
 
-                        <!-- Day Name -->
-                        <td class="p-4">
-                            {{ t.date|date:"l" }}
-                        </td>
+<tr class="border-b transition
+{% if key in conflict_set %}
+    bg-red-50
+{% else %}
+    hover:bg-gray-50
+{% endif %}
+">
 
-                        <!-- Module -->
-                        <td class="p-4">
-                            {{ t.module.title }}
-                        </td>
+    <td class="p-4 font-medium">{{ t.batch.name }}</td>
+    <td class="p-4 text-gray-600">{{ t.batch.course.title }}</td>
+    <td class="p-4">{{ t.date|date:"Y-m-d" }}</td>
+    <td class="p-4">{{ t.date|date:"l" }}</td>
+    <td class="p-4">Week {{ t.week }}</td>
 
-                        <!-- Session Type -->
-                        <td class="p-4">
-                            {% if t.session_type == "PRACTICAL" %}
-                                <span class="text-green-600 font-semibold">Practical</span>
-                            {% else %}
-                                <span class="text-blue-600 font-semibold">Theory</span>
-                            {% endif %}
-                        </td>
+    <td class="p-4 font-medium">
+        {{ t.module.title }}
 
-                        <!-- Time Slot -->
-                        <td class="p-4">
-                            {{ t.slot.start_time|time:"H:i" }} -
-                            {{ t.slot.end_time|time:"H:i" }}
-                        </td>
+        {% if key in conflict_set %}
+            <span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
+                Conflict
+            </span>
+        {% endif %}
+    </td>
 
-                    </tr>
-                {% endfor %}
-                </tbody>
+    <td class="p-4">
+        {% if t.session_type == "PRACTICAL" %}
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                Practical
+            </span>
+        {% else %}
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                Theory
+            </span>
+        {% endif %}
+    </td>
 
-            </table>
+    <td class="p-4">
+        {{ t.slot.start_time|time:"H:i" }} -
+        {{ t.slot.end_time|time:"H:i" }}
+    </td>
+
+    <td class="p-4 text-right space-x-2">
+        <a href="{% url 'batch:timetable_detail' t.pk %}" class="text-indigo-600">View</a>
+        <a href="{% url 'batch:timetable_update' t.pk %}" class="text-yellow-600">Edit</a>
+        <a href="{% url 'batch:timetable_delete' t.pk %}" class="text-red-600">Delete</a>
+    </td>
+
+</tr>
+
+{% endwith %}
+{% endfor %}
+</tbody>
+
+        </table>
+
+        <!-- 🔷 PAGINATION -->
+        {% if is_paginated %}
+        <div class="flex justify-between items-center px-6 py-4 border-t">
+
+            <span class="text-sm text-gray-500">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            <div class="space-x-2">
+
+                {% if page_obj.has_previous %}
+                    <a href="?page=1&batch={{ selected_batch }}&week={{ selected_week }}&search={{ search_query }}">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}&batch={{ selected_batch }}&week={{ selected_week }}&search={{ search_query }}">Prev</a>
+                {% endif %}
+
+                <span class="font-medium">{{ page_obj.number }}</span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&batch={{ selected_batch }}&week={{ selected_week }}&search={{ search_query }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}&batch={{ selected_batch }}&week={{ selected_week }}&search={{ search_query }}">Last</a>
+                {% endif %}
+
+            </div>
 
         </div>
+        {% endif %}
+
+    </div>
+
     {% else %}
-        <div class="bg-white shadow rounded-xl p-6 text-center text-gray-500">
+        <div class="bg-white shadow rounded-xl p-8 text-center text-gray-500">
             No timetable data available.
         </div>
     {% endif %}

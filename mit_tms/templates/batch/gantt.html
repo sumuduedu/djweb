@@ -4,15 +4,19 @@
 <div class="max-w-7xl mx-auto space-y-6">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold">{{ batch.name }}</h2>
+<div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold">{{ batch.name }}</h2>
 
-        <div class="flex items-center gap-3">
-            <button onclick="changeWeek(-1)" class="px-3 py-1 bg-gray-200 rounded">⬅</button>
-            <span class="font-semibold">Week Week <span id="week">{{ current_week }}</span>
-            <button onclick="changeWeek(1)" class="px-3 py-1 bg-gray-200 rounded">➡</button>
-        </div>
+    <div class="flex items-center gap-3">
+        <button onclick="clearAll()" class="px-3 py-1 bg-red-600 text-white rounded">
+            Clear All
+        </button>
+
+        <button onclick="changeWeek(-1)" class="px-3 py-1 bg-gray-200 rounded">⬅</button>
+        <span>Week {{ current_week }}</span>
+        <button onclick="changeWeek(1)" class="px-3 py-1 bg-gray-200 rounded">➡</button>
     </div>
+</div>
 
     <!-- THEORY MODULES -->
     <div class="bg-white shadow rounded-xl p-4">
@@ -112,6 +116,7 @@
 </div>
 
 <script>
+
 // =========================
 // GLOBAL STATE
 // =========================
@@ -120,13 +125,14 @@ let currentWeek = {{ current_week|default:1 }};
 let moduleState = {};
 
 // =========================
-// INIT MODULE STATE
+// INIT MODULES
 // =========================
 document.querySelectorAll('.draggable').forEach(el => {
 
     const key = el.dataset.id + "_" + el.dataset.type;
 
     moduleState[key] = {
+        total: parseFloat(el.dataset.hours),
         remaining: parseFloat(el.dataset.hours),
         el: el
     };
@@ -141,36 +147,39 @@ document.querySelectorAll('.draggable').forEach(el => {
 // SLOT DURATION
 // =========================
 function getSlotDuration(zone) {
-
-    let start = zone.dataset.start;
-    let end = zone.dataset.end;
-
-    if (!start || !end) return 1;
-
-    let [sh, sm] = start.split(":").map(Number);
-    let [eh, em] = end.split(":").map(Number);
-
+    let [sh, sm] = zone.dataset.start.split(":").map(Number);
+    let [eh, em] = zone.dataset.end.split(":").map(Number);
     return (eh + em / 60) - (sh + sm / 60);
 }
 
 // =========================
-// UPDATE UI
+// UI UPDATE
 // =========================
 function updateUI(key) {
-    moduleState[key].el.querySelector(".remain").innerText =
-        moduleState[key].remaining.toFixed(1);
+    const m = moduleState[key];
+    if (!m) return;
+
+    const remainEl = m.el.querySelector(".remain");
+
+    if (remainEl) {
+        remainEl.innerText = m.remaining.toFixed(1);
+    }
+
+    // Hide when finished
+    if (m.remaining <= 0) {
+        m.el.classList.add("hidden");
+    } else {
+        m.el.classList.remove("hidden");
+    }
 }
 
 // =========================
-// DROP + DELETE
+// DROP
 // =========================
 document.querySelectorAll('.drop-zone').forEach(zone => {
 
     zone.addEventListener('dragover', e => e.preventDefault());
 
-    // =========================
-    // DROP
-    // =========================
     zone.addEventListener('drop', e => {
         e.preventDefault();
 
@@ -184,38 +193,32 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 
         let duration = getSlotDuration(zone);
 
-        if (!moduleState[key] || moduleState[key].remaining < duration) {
+        if (moduleState[key].remaining < duration) {
             alert("Not enough remaining hours");
             return;
         }
 
-        moduleState[key].remaining =
-            parseFloat((moduleState[key].remaining - duration).toFixed(2));
-
+        // UPDATE STATE
+        moduleState[key].remaining -= duration;
         updateUI(key);
 
-        const block = document.createElement("div");
+        // UI
+        const div = document.createElement("div");
 
-        let colorClass = type === "PRACTICAL"
-            ? "bg-green-500"
-            : "bg-blue-500";
+        div.className = `text-xs ${
+            type === "PRACTICAL" ? "bg-green-500" : "bg-blue-500"
+        } text-white px-2 py-1 rounded mt-1`;
 
-        block.className = `text-xs ${colorClass} text-white px-2 py-1 rounded mt-1 cursor-pointer`;
-        block.dataset.id = id;
-        block.dataset.type = type;
+        div.dataset.id = id;
+        div.dataset.type = type;
+        div.innerText = dragged.innerText;
 
-        block.innerText = dragged.dataset.type === "PRACTICAL"
-            ? dragged.innerText.split("(P)")[0] + "(P)"
-            : dragged.innerText.split("(T)")[0] + "(T)";
-
-        zone.appendChild(block);
+        zone.appendChild(div);
 
         save(zone, id, type);
     });
 
-    // =========================
-    // DELETE (FIXED)
-    // =========================
+    // DELETE
     zone.addEventListener('dblclick', (e) => {
 
         const block = e.target.closest('[data-id]');
@@ -227,16 +230,12 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 
         let duration = getSlotDuration(zone);
 
-        if (moduleState[key]) {
-            moduleState[key].remaining =
-                parseFloat((moduleState[key].remaining + duration).toFixed(2));
-
-            updateUI(key);
-        }
+        // RESTORE
+        moduleState[key].remaining += duration;
+        updateUI(key);
 
         block.remove();
 
-        // ✅ CORRECT DELETE
         fetch("{% url 'batch:save_timetable' %}", {
             method: "POST",
             headers: {
@@ -257,10 +256,9 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 });
 
 // =========================
-// SAVE WITH CONFLICT HANDLING
+// SAVE
 // =========================
 function save(zone, id, type) {
-
     fetch("{% url 'batch:save_timetable' %}", {
         method: "POST",
         headers: {
@@ -277,31 +275,66 @@ function save(zone, id, type) {
             start_time: zone.dataset.start,
             end_time: zone.dataset.end
         })
-    })
-    .then(res => {
-        if (res.status === 409) {
-            return res.json().then(data => {
+    });
+}
 
-                // 🔥 revert UI
-                zone.innerHTML = "";
+// =========================
+// 🔥 CORRECT LOAD (FINAL)
+// =========================
+function load() {
 
-                alert("⚠ Conflict: " + data.message);
+    // STEP 1: Reset to total
+    for (let key in moduleState) {
+        moduleState[key].remaining = moduleState[key].total;
+    }
 
-                const key = id + "_" + type;
-                let duration = getSlotDuration(zone);
+    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}")
+    .then(res => res.json())
+    .then(data => {
 
-                if (moduleState[key]) {
-                    moduleState[key].remaining =
-                        parseFloat((moduleState[key].remaining + duration).toFixed(2));
-                    updateUI(key);
-                }
+        // Clear UI
+        document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
 
-                throw "conflict";
-            });
+        data.forEach(item => {
+
+            const key = item.module + "_" + item.session_type;
+
+            const zone = document.querySelector(
+                `.drop-zone[data-day="${item.day}"][data-slot="${item.slot}"]`
+            );
+
+            if (!zone) return;
+
+            let duration = getSlotDuration(zone);
+
+            // 🔥 GLOBAL REDUCTION (ALL WEEKS)
+            if (moduleState[key]) {
+                moduleState[key].remaining -= duration;
+            }
+
+            // 🔥 RENDER ONLY CURRENT WEEK
+            if (item.week == currentWeek) {
+
+                const div = document.createElement("div");
+
+                div.className = `text-xs ${
+                    item.session_type === "PRACTICAL" ? "bg-green-500" : "bg-blue-500"
+                } text-white px-2 py-1 rounded mt-1`;
+
+                div.dataset.id = item.module;
+                div.dataset.type = item.session_type;
+                div.innerText = item.module_name;
+
+                zone.appendChild(div);
+            }
+        });
+
+        // 🔥 FINAL UI UPDATE
+        for (let key in moduleState) {
+            updateUI(key);
         }
-        return res.json();
-    })
-    .catch(err => console.log(err));
+
+    });
 }
 
 // =========================
@@ -311,14 +344,11 @@ function changeWeek(v) {
     currentWeek += v;
     if (currentWeek < 1) currentWeek = 1;
 
-    document.getElementById("week").innerText = currentWeek;
-
-    // 🔥 reload page with week
     window.location.href = "?batch={{ batch.id }}&week=" + currentWeek;
 }
 
 // =========================
-// CSRF TOKEN
+// CSRF
 // =========================
 function getCSRF() {
     return document.cookie.split('; ')
@@ -326,67 +356,42 @@ function getCSRF() {
         ?.split('=')[1];
 }
 
-// =========================
-// LOAD EXISTING DATA
-// =========================
-function load() {
+function clearAll() {
 
-    for (let key in moduleState) {
-        moduleState[key].remaining =
-            parseFloat(moduleState[key].el.dataset.hours);
-        updateUI(key);
-    }
+    if (!confirm("⚠️ Delete ALL timetable data?")) return;
 
-    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}&week=" + currentWeek)
+    fetch("{% url 'batch:clear_timetable' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRF()
+        },
+        body: JSON.stringify({
+            batch: {{ batch.id }}
+        })
+    })
     .then(res => res.json())
     .then(data => {
 
-        document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
+        if (data.success) {
 
-        data.forEach(item => {
+            // 🔥 CLEAR UI
+            document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
 
-            if (item.week != currentWeek) return;
-
-            const zone = document.querySelector(
-                `.drop-zone[data-day="${item.day}"][data-slot="${item.slot}"]`
-            );
-
-            if (!zone) return;
-
-            const key = item.module + "_" + item.session_type;
-
-            let duration = getSlotDuration(zone);
-
-            if (moduleState[key]) {
-                moduleState[key].remaining =
-                    parseFloat((moduleState[key].remaining - duration).toFixed(2));
+            // 🔥 RESET MODULE HOURS
+            for (let key in moduleState) {
+                moduleState[key].remaining = moduleState[key].total;
                 updateUI(key);
             }
 
-            const div = document.createElement("div");
+            alert("✅ Timetable cleared!");
 
-            let colorClass = item.session_type === "PRACTICAL"
-                ? "bg-green-500"
-                : "bg-blue-500";
-
-            div.className = `text-xs ${colorClass} text-white px-2 py-1 rounded mt-1`;
-
-            div.dataset.id = item.module;
-            div.dataset.type = item.session_type;
-
-            div.innerText = item.module_name +
-                (item.session_type === "PRACTICAL" ? " (P)" : " (T)");
-
-            zone.appendChild(div);
-        });
+        }
 
     });
 }
-
-// =========================
 // INIT
-// =========================
 document.addEventListener("DOMContentLoaded", load);
-</script>
 
+</script>
 {% endblock %}
