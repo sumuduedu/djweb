@@ -20,7 +20,17 @@ def calculate_end_date(batch):
 
     return batch.start_date + timedelta(days=total_days)
 
+class TimeSlot(models.Model):
+    name = models.CharField(max_length=50, blank=True)  # e.g. "Morning 1"
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
+    order = models.IntegerField()  # for sorting
+
+    is_break = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.start_time} - {self.end_time}"
 # =========================================================
 # 🔷 ACADEMIC YEAR
 # =========================================================
@@ -91,7 +101,7 @@ class Timetable(models.Model):
     )
 
     module = models.ForeignKey('courses.Module', on_delete=models.CASCADE)
-
+    slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
     week = models.IntegerField()
     day = models.IntegerField()
     row_slot = models.IntegerField()
@@ -138,14 +148,4 @@ class ModulePlan(models.Model):
 
 # apps/batch/models.py
 
-class TimeSlot(models.Model):
-    name = models.CharField(max_length=50, blank=True)  # e.g. "Morning 1"
-    start_time = models.TimeField()
-    end_time = models.TimeField()
 
-    order = models.IntegerField()  # for sorting
-
-    is_break = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.start_time} - {self.end_time}"

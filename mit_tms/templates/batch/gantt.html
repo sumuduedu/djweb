@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -24,7 +23,6 @@
 
             {% for module in modules %}
 
-            <!-- THEORY -->
             <div class="draggable bg-blue-500 text-white p-3 rounded cursor-move mb-2"
                  draggable="true"
                  data-id="{{ module.id }}"
@@ -36,7 +34,6 @@
                 </div>
             </div>
 
-            <!-- PRACTICAL -->
             <div class="draggable bg-green-500 text-white p-3 rounded cursor-move mb-3"
                  draggable="true"
                  data-id="{{ module.id }}"
@@ -68,8 +65,10 @@
 
                 {% for d in "1234567" %}
                 <div class="drop-zone border h-24 rounded p-1 flex flex-col"
-                     data-day="{{ forloop.counter }}"
-                     data-slot="{{ slot.id }}">
+                    data-day="{{ forloop.counter }}"
+                    data-slot="{{ slot.id }}"
+                    data-start="{{ slot.start_time|time:'H:i' }}"
+                    data-end="{{ slot.end_time|time:'H:i' }}">
                 </div>
                 {% endfor %}
 
@@ -84,6 +83,7 @@
 </div>
 
 <script>
+
 // =========================
 // GLOBAL STATE
 // =========================
@@ -91,7 +91,9 @@ let dragged = null;
 let currentWeek = 1;
 let moduleState = {};
 
+// =========================
 // INIT MODULE STATE
+// =========================
 document.querySelectorAll('.draggable').forEach(el => {
 
     const key = el.dataset.id + "_" + el.dataset.type;
@@ -107,12 +109,40 @@ document.querySelectorAll('.draggable').forEach(el => {
 
 });
 
+// =========================
+// SLOT DURATION (TIME-BASED)
+// =========================
+function getSlotDuration(zone) {
+
+    let start = zone.dataset.start;
+    let end = zone.dataset.end;
+
+    if (!start || !end) return 1;
+
+    let [sh, sm] = start.split(":").map(Number);
+    let [eh, em] = end.split(":").map(Number);
+
+    return (eh + em / 60) - (sh + sm / 60);
+}
+
+// =========================
+// UPDATE UI
+// =========================
+function updateUI(key) {
+    moduleState[key].el.querySelector(".remain").innerText =
+        moduleState[key].remaining.toFixed(1);
+}
+
+// =========================
 // DROP + DELETE
+// =========================
 document.querySelectorAll('.drop-zone').forEach(zone => {
 
     zone.addEventListener('dragover', e => e.preventDefault());
 
+    // =========================
     // DROP
+    // =========================
     zone.addEventListener('drop', e => {
         e.preventDefault();
 
@@ -122,22 +152,25 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
         const type = dragged.dataset.type;
         const key = id + "_" + type;
 
-        // only one per slot
-        if (zone.children.length > 0) {
-            zone.classList.add("bg-red-200");
-            setTimeout(() => zone.classList.remove("bg-red-200"), 400);
+        // 🔒 Only one block per slot
+        if (zone.querySelector('[data-id]')) return;
+
+        let duration = getSlotDuration(zone);
+
+        if (!moduleState[key] || moduleState[key].remaining < duration) {
+            alert("Not enough remaining hours");
             return;
         }
 
-        if (!moduleState[key] || moduleState[key].remaining <= 0) {
-            alert("No remaining hours");
-            return;
-        }
+        // 🔥 reduce hours safely
+        moduleState[key].remaining =
+            parseFloat((moduleState[key].remaining - duration).toFixed(2));
 
-        moduleState[key].remaining -= 1;
         updateUI(key);
 
+        // create block
         const block = document.createElement("div");
+
         let colorClass = type === "PRACTICAL"
             ? "bg-green-500"
             : "bg-blue-500";
@@ -146,14 +179,20 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
         block.dataset.id = id;
         block.dataset.type = type;
 
-        block.innerText = dragged.innerText;
+        // clean label
+        block.innerText = dragged.dataset.type === "PRACTICAL"
+            ? dragged.innerText.split("(P)")[0] + "(P)"
+            : dragged.innerText.split("(T)")[0] + "(T)";
 
         zone.appendChild(block);
 
+        // save
         save(zone, id, type);
     });
 
-    // DELETE
+    // =========================
+    // DELETE (DOUBLE CLICK)
+    // =========================
     zone.addEventListener('dblclick', (e) => {
 
         const block = e.target.closest('[data-id]');
@@ -163,13 +202,18 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
         const type = block.dataset.type;
         const key = id + "_" + type;
 
+        let duration = getSlotDuration(zone);
+
         if (moduleState[key]) {
-            moduleState[key].remaining += 1;
+            moduleState[key].remaining =
+                parseFloat((moduleState[key].remaining + duration).toFixed(2));
+
             updateUI(key);
         }
 
         block.remove();
 
+        // delete from DB
         fetch("{% url 'batch:save_timetable' %}", {
             method: "POST",
             headers: {
@@ -189,7 +233,9 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 
 });
 
-// SAVE
+// =========================
+// SAVE TO BACKEND
+// =========================
 function save(zone, id, type) {
     fetch("{% url 'batch:save_timetable' %}", {
         method: "POST",
@@ -204,39 +250,41 @@ function save(zone, id, type) {
             day: zone.dataset.day,
             slot: zone.dataset.slot,
             session_type: type,
-
-            // 🔥 ADD THESE
             start_time: zone.dataset.start,
             end_time: zone.dataset.end
         })
     });
 }
 
-// UPDATE UI
-function updateUI(key) {
-    moduleState[key].el.querySelector(".remain").innerText = moduleState[key].remaining;
-}
-
-// WEEK
+// =========================
+// WEEK CHANGE
+// =========================
 function changeWeek(v) {
     currentWeek += v;
     if (currentWeek < 1) currentWeek = 1;
+
     document.getElementById("week").innerText = currentWeek;
     load();
 }
 
-// CSRF
+// =========================
+// CSRF TOKEN
+// =========================
 function getCSRF() {
     return document.cookie.split('; ')
         .find(r => r.startsWith('csrftoken'))
         ?.split('=')[1];
 }
 
-// LOAD
+// =========================
+// LOAD EXISTING DATA
+// =========================
 function load() {
 
+    // reset all module hours
     for (let key in moduleState) {
-        moduleState[key].remaining = parseFloat(moduleState[key].el.dataset.hours);
+        moduleState[key].remaining =
+            parseFloat(moduleState[key].el.dataset.hours);
         updateUI(key);
     }
 
@@ -244,6 +292,7 @@ function load() {
     .then(res => res.json())
     .then(data => {
 
+        // clear grid
         document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
 
         data.forEach(item => {
@@ -256,23 +305,26 @@ function load() {
 
             if (!zone) return;
 
-            const key = item.module + "_" + (item.session_type || "THEORY");
+            const key = item.module + "_" + item.session_type;
+
+            let duration = getSlotDuration(zone);
 
             if (moduleState[key]) {
-                let duration = getSlotDuration(zone);
+                moduleState[key].remaining =
+                    parseFloat((moduleState[key].remaining - duration).toFixed(2));
 
-                moduleState[key].remaining -= duration;
                 updateUI(key);
             }
 
             const div = document.createElement("div");
+
             let colorClass = item.session_type === "PRACTICAL"
-            ? "bg-green-500"
-            : "bg-blue-500";
+                ? "bg-green-500"
+                : "bg-blue-500";
 
             div.className = `text-xs ${colorClass} text-white px-2 py-1 rounded mt-1`;
 
-                    div.dataset.id = item.module;
+            div.dataset.id = item.module;
             div.dataset.type = item.session_type;
 
             div.innerText = item.module_name +
@@ -284,16 +336,9 @@ function load() {
     });
 }
 
-function getSlotDuration(zone) {
-    let start = zone.dataset.start;
-    let end = zone.dataset.end;
-
-    let [sh, sm] = start.split(":").map(Number);
-    let [eh, em] = end.split(":").map(Number);
-
-    return (eh + em/60) - (sh + sm/60);
-}
+// =========================
 // INIT
+// =========================
 document.addEventListener("DOMContentLoaded", load);
 </script>
 

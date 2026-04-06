@@ -18,6 +18,26 @@ from .utils import get_monthly_plan, generate_timetable
 # 🔷 BATCH VIEWS
 # =========================================================
 
+
+from datetime import datetime
+
+def parse_time(t):
+    if not t:
+        return None
+
+    t = t.strip().lower()
+
+    t = t.replace("a.m.", "AM").replace("p.m.", "PM")
+    t = t.replace("am", "AM").replace("pm", "PM")
+
+    try:
+        return datetime.strptime(t, "%H:%M")
+    except:
+        try:
+            return datetime.strptime(t, "%I:%M %p")
+        except:
+            return None
+
 class BatchListView(LoginRequiredMixin, ListView):
     model = Batch
     template_name = "batch/batch_list.html"
@@ -185,7 +205,8 @@ import json
 from django.http import JsonResponse
 from datetime import timedelta
 from .models import Timetable, Batch
-@csrf_exempt   # 🔥 IMPORTANT (for now)
+from datetime import timedelta, datetime
+@csrf_exempt
 def save_timetable(request):
 
     data = json.loads(request.body)
@@ -194,18 +215,17 @@ def save_timetable(request):
 
     week = int(data["week"])
     day = int(data["day"])
-    slot = int(data["slot"])
+    slot_id = int(data["slot"])
 
     # =========================
     # DELETE
     # =========================
     if data.get("delete"):
-
         Timetable.objects.filter(
             batch=batch,
             week=week,
             day=day,
-            row_slot=slot,
+            slot_id=slot_id,
             module_id=data.get("module")
         ).delete()
 
@@ -218,26 +238,42 @@ def save_timetable(request):
     class_date = batch.start_date + timedelta(days=total_days)
 
     # =========================
-    # CREATE / UPDATE
+    # REMOVE OLD
     # =========================
     Timetable.objects.filter(
         batch=batch,
         week=week,
         day=day,
-        row_slot=slot
+        slot_id=slot_id
     ).delete()
 
-    session_type = data.get("session_type", "THEORY")
+    # =========================
+    # TIME CALC (FIXED)
+    # =========================
+    # =========================
+    # TIME CALC (FIXED)
+    # =========================
+    # =========================
+    # TIME CALC
+    # =========================
 
     start_time = data.get("start_time")
     end_time = data.get("end_time")
 
-    fmt = "%H:%M"
-    start = datetime.strptime(start_time, fmt)
-    end = datetime.strptime(end_time, fmt)
+    start = parse_time(start_time)
+    end = parse_time(end_time)
 
-    slot_hours = (end - start).seconds / 3600
+    if start and end:
+        slot_hours = (end - start).seconds / 3600
+    else:
+        slot_hours = 1
 
+    # 🔥 THIS LINE IS MISSING IN YOUR CODE
+    session_type = data.get("session_type", "THEORY")
+
+    # =========================
+    # CREATE
+    # =========================
     Timetable.objects.create(
         batch=batch,
         module_id=data["module"],
@@ -245,9 +281,10 @@ def save_timetable(request):
         day=day,
         slot_id=slot_id,
         date=class_date,
-        hours=slot_hours,   # 🔥 FIXED
+        hours=slot_hours,
         session_type=session_type
     )
+
     return JsonResponse({"status": "saved"})
 
 from django.http import JsonResponse
@@ -255,7 +292,7 @@ def load_timetable(request):
 
     batch_id = request.GET.get("batch")
 
-    qs = Timetable.objects.select_related("module")
+    qs = Timetable.objects.select_related("module", "slot")
 
     if batch_id:
         qs = qs.filter(batch_id=batch_id)
@@ -263,35 +300,18 @@ def load_timetable(request):
     data = []
 
     for t in qs:
-            data.append({
-                "module": t.module.id,
-                "module_name": t.module.title,
-                "week": t.week,
-                "day": t.day,
-                "slot": t.row_slot,
-                "session_type": t.session_type   # 🔥 ADD THIS
-            })
+        data.append({
+            "module": t.module.id,
+            "module_name": t.module.title,
+            "week": t.week,
+            "day": t.day,
+            "slot": t.slot.id,
+            "session_type": t.session_type
+        })
 
     return JsonResponse(data, safe=False)
 
 
-def load_modules(request, batch_id):
-
-    batch = get_object_or_404(Batch, id=batch_id)
-
-    modules = batch.course.modules.all()
-
-    data = [
-        {
-            "id": m.id,
-            "name": m.code,
-            "title": m.title,
-            "hours": getattr(m, "total_hours", 0),
-        }
-        for m in modules
-    ]
-
-    return JsonResponse(data, safe=False)
 
 # =========================================================
 # 🔷 TIMETABLE CRUD
@@ -331,3 +351,6 @@ class TimetableUpdateView(UpdateView):
 class TimetableDeleteView(DeleteView):
     model = Timetable
     success_url = reverse_lazy('batch:timetable_list')
+
+
+
