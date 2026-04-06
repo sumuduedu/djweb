@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
+
+    <!-- 🔷 Title -->
+    <h2 class="text-xl font-bold mb-6 text-gray-800">
+        {% if object %}Edit Unit{% else %}Add Unit{% endif %}
+    </h2>
+
+    <!-- 🔥 Form -->
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+
+        <!-- Code -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Unit Code
+            </label>
+            {{ form.code }}
+        </div>
+
+        <!-- Title -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Unit Title
+            </label>
+            {{ form.title }}
+        </div>
+
+        <!-- Description -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Description
+            </label>
+            {{ form.description }}
+        </div>
+
+        <!-- Level -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Level
+            </label>
+            {{ form.level }}
+        </div>
+
+
+        <!-- 🔘 Buttons -->
+        <div class="flex justify-between items-center pt-4">
+
+            <!-- Cancel -->
+            <a href="{% if object %}
+                        {% url 'course_detail' object.course.pk %}
+                     {% else %}
+                        {% url 'course_detail' view.kwargs.course_id %}
+                     {% endif %}"
+               class="text-gray-600 hover:underline">
+               Cancel
+            </a>
+
+            <!-- Save -->
+            <button type="submit"
+                class="bg-blue-600 text-white px-5 py-2 rounded shadow hover:bg-blue-700 transition">
+                Save Unit
+            </button>
+
+        </div>
+
+    </form>
+<!-- 🔥 ELEMENTS SECTION -->
+<div class="mt-6">
+
+    <h3 class="text-lg font-semibold mb-3">Elements</h3>
+
+    {{ elements.management_form }}
+
+    <div class="space-y-3">
+        {% for form in elements %}
+            <div class="flex items-center gap-2">
+
+                {{ form.title }}
+
+                {% if form.instance.pk %}
+                    {{ form.DELETE }}
+                    <span class="text-sm text-red-500">Delete</span>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+</div>
+
+{% endblock %}

@@ -2,11 +2,14 @@
 
 {% block content %}
 
-<div class="max-w-3xl mx-auto">
+<div class="max-w-6xl mx-auto">
 
-    <!-- Header -->
+    <!-- 🔷 Header -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">{{ object.title }}</h2>
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800">{{ object.title }}</h2>
+            <p class="text-sm text-gray-500">{{ object.code }}</p>
+        </div>
 
         <div class="space-x-2">
             <a href="{% url 'course_update' object.pk %}"
@@ -21,20 +24,11 @@
         </div>
     </div>
 
-    <!-- Card -->
-    <div class="bg-white shadow rounded-xl p-6 space-y-4">
 
-        <div>
-            <p class="text-sm text-gray-500">Course Code</p>
-            <p class="text-lg font-medium">{{ object.code }}</p>
-        </div>
+    <!-- 📦 Course Info -->
+    <div class="bg-white shadow rounded-xl p-6 mb-8 space-y-6">
 
-        <div>
-            <p class="text-sm text-gray-500">Description</p>
-            <p class="text-gray-700">{{ object.description }}</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             <div>
                 <p class="text-sm text-gray-500">Duration</p>
@@ -48,12 +42,189 @@
                 </span>
             </div>
 
+            <div>
+                <p class="text-sm text-gray-500">NVQ Level</p>
+                {% if object.nvq_level %}
+                    <p class="font-medium">NVQ {{ object.nvq_level }}</p>
+                {% else %}
+                    <p class="text-gray-400">-</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div>
+            <p class="text-sm text-gray-500 mb-1">Description</p>
+            <p class="text-gray-700">{{ object.description|linebreaks }}</p>
         </div>
 
     </div>
+<!-- 🔥 UNIT + ELEMENTS (NCS STRUCTURE) -->
+<div class="mt-10">
 
-    <!-- Back Button -->
-    <div class="mt-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Units (NCS)</h3>
+
+        <a href="{% url 'unit_create' object.pk %}"
+           class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+           + Add Unit
+        </a>
+    </div>
+
+    {% for unit in object.units.all %}
+        <div class="bg-white rounded-xl shadow mb-4 p-5">
+
+            <!-- 🔷 Unit Header -->
+            <div class="flex justify-between items-center border-b pb-2 mb-3">
+
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800">
+                        {{ unit.code }} - {{ unit.title }}
+                    </h4>
+                    <p class="text-sm text-gray-500">
+                        Level: {{ unit.level|default:"-" }}
+                    </p>
+                </div>
+
+                <div class="space-x-2 text-sm">
+                    <a href="{% url 'unit_update' unit.pk %}"
+                       class="text-yellow-600 hover:underline">Edit</a>
+
+                    <a href="{% url 'unit_delete' unit.pk %}"
+                       class="text-red-600 hover:underline">Delete</a>
+                </div>
+
+            </div>
+
+            <!-- 📄 Description -->
+            <p class="text-gray-600 text-sm mb-4">
+                {{ unit.description|default:"No description" }}
+            </p>
+
+
+            <!-- 🔥 ELEMENTS -->
+            {% if unit.elements.all %}
+                <div class="ml-4 border-l pl-4 space-y-3">
+
+                    {% for element in unit.elements.all %}
+                        <div>
+
+                            <!-- Element -->
+                            <p class="font-medium text-gray-800">
+                                ▸ {{ element.title }}
+                            </p>
+
+                            <!-- 🔥 PERFORMANCE CRITERIA -->
+                            {% if element.criteria.all %}
+                                <ul class="ml-4 mt-1 text-sm text-gray-600 list-disc">
+                                    {% for pc in element.criteria.all %}
+                                        <li>{{ pc.description }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="ml-4 text-xs text-gray-400">
+                                    No performance criteria
+                                </p>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+                <p class="text-gray-400 text-sm">No elements added</p>
+            {% endif %}
+
+        </div>
+
+    {% empty %}
+        <div class="text-center text-gray-500 p-6 bg-white rounded shadow">
+            No units available
+        </div>
+    {% endfor %}
+
+</div>
+
+
+    <!-- 📚 Modules Section -->
+    <div class="mb-8">
+
+        <!-- 🔥 Header + Add Button -->
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Modules</h3>
+
+            <a href="{% url 'module_create' object.pk %}"
+               class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+               + Add Module
+            </a>
+        </div>
+
+
+        {% for module in object.modules.all %}
+            <div class="bg-white rounded-xl shadow mb-4 p-5">
+
+                <!-- Module Header -->
+                <div class="flex justify-between items-center mb-3 border-b pb-2">
+
+                    <h4 class="font-semibold text-lg">
+                        {{ module.code }} - {{ module.title }}
+                    </h4>
+
+                    <!-- ✅ Module Actions -->
+
+                    <div class="space-x-2 text-sm">
+                    <a href="{% url 'module_detail' module.pk %}"
+   class="font-semibold text-lg text-blue-600 hover:underline">
+   {{ module.code }} - {{ module.title }}
+</a>
+                        <a href="{% url 'module_update' module.pk %}"
+                           class="text-yellow-600 hover:underline">Edit</a>
+
+                        <a href="{% url 'module_delete' module.pk %}"
+                           class="text-red-600 hover:underline">Delete</a>
+                    </div>
+
+                </div>
+
+
+                <!-- Tasks -->
+                {% if module.tasks.all %}
+                    <ul class="space-y-2">
+                        {% for task in module.tasks.all %}
+                            <li class="p-3 bg-gray-50 rounded flex justify-between">
+
+                                <div>
+                                    <p class="font-medium">{{ task.title }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ task.duration_hours }} hrs
+                                    </p>
+                                </div>
+
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                    Task
+                                </span>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-400 text-sm">No tasks added</p>
+                {% endif %}
+
+            </div>
+        {% empty %}
+            <div class="text-center text-gray-500 p-6 bg-white rounded shadow">
+                No modules available
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔙 Back -->
+    <div>
         <a href="{% url 'course_list' %}"
            class="text-blue-600 hover:underline">
             ⬅ Back to Courses

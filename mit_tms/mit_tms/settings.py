@@ -48,11 +48,11 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-
 LOCAL_APPS = [
     'apps.courses.apps.CoursesConfig',
-        'apps.core.apps.CoreConfig',
+    'apps.core.apps.CoreConfig',
     'apps.website.apps.WebsiteConfig',
+    'apps.accounts.apps.AccountsConfig',   # ✅ ADD THIS
 ]
 
 THIRD_PARTY_APPS = [

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto">
+
+    <!-- 🔷 Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">{{ task.title }}</h2>
+            <p class="text-sm text-gray-500">
+                Module: {{ task.module.title }}
+            </p>
+        </div>
+
+        <div class="space-x-2">
+            <a href="{% url 'task_update' task.pk %}"
+               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                ✏️ Edit
+            </a>
+
+            <a href="{% url 'task_delete' task.pk %}"
+               class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                🗑 Delete
+            </a>
+        </div>
+    </div>
+
+
+    <!-- 📦 Task Info -->
+    <div class="bg-white shadow rounded-xl p-6 space-y-4 mb-6">
+
+        <div>
+            <p class="text-sm text-gray-500">Description</p>
+            <p class="text-gray-700">
+                {{ task.description|default:"-" }}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+
+            <div>
+                <p class="text-sm text-gray-500">Duration</p>
+                <p class="font-medium">{{ task.duration_hours }} hours</p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500">Mandatory</p>
+                <p class="font-medium">
+                    {% if task.is_mandatory %}Yes{% else %}No{% endif %}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500">Order</p>
+                <p class="font-medium">{{ task.order }}</p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- 🔥 Activities (Future Expansion) -->
+    <div class="bg-white shadow rounded-xl p-6 mb-6">
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Activities</h3>
+
+            <a href="#"
+               class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+               + Add Activity
+            </a>
+        </div>
+
+        {% if task.activities.all %}
+            {% for activity in task.activities.all %}
+                <div class="border-b py-2">
+                    <p class="font-medium">{{ activity.title }}</p>
+                    <p class="text-sm text-gray-500">
+                        {{ activity.duration_minutes }} mins
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-400">No activities available</p>
+        {% endif %}
+
+    </div>
+
+
+    <!-- 🔙 Back -->
+    <div>
+        <a href="{% url 'module_detail' task.module.pk %}"
+           class="text-blue-600 hover:underline">
+            ⬅ Back to Module
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
