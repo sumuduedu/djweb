@@ -2,111 +2,107 @@
 
 {% block content %}
 
-<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow space-y-6">
 
-    <!-- 🔷 Title -->
-    <h2 class="text-2xl font-bold mb-6">
+    <h2 class="text-2xl font-bold">
         {% if object %}✏️ Edit Course{% else %}➕ Add Course{% endif %}
     </h2>
 
+    <!-- 🔥 SHOW ALL ERRORS -->
+    <div class="text-red-500 text-sm">
+        {{ form.errors }}
+    </div>
 
-    <!-- ❌ Form Errors -->
-    {% if form.errors %}
-        <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
-            Please fix the errors below.
-        </div>
-    {% endif %}
-
-
-    <!-- 📋 Form -->
     <form method="post" class="space-y-6">
         {% csrf_token %}
 
-        <!-- Title -->
-        <div>
-            <label class="block text-sm font-medium mb-1">Title</label>
-            {{ form.title }}
-            <div class="text-red-500 text-sm">{{ form.title.errors }}</div>
+        <!-- BASIC -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label>Title</label>
+                {{ form.title }}
+            </div>
+            <div>
+                <label>Code</label>
+                {{ form.code }}
+            </div>
         </div>
 
-        <!-- Code -->
         <div>
-            <label class="block text-sm font-medium mb-1">Code</label>
-            {{ form.code }}
-            <div class="text-red-500 text-sm">{{ form.code.errors }}</div>
-        </div>
-
-        <!-- Description -->
-        <div>
-            <label class="block text-sm font-medium mb-1">Description</label>
+            <label>Description</label>
             {{ form.description }}
-            <div class="text-red-500 text-sm">{{ form.description.errors }}</div>
         </div>
 
-
-        <!-- 🔷 Grid Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <!-- Duration -->
+        <!-- SETTINGS -->
+        <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium mb-1">Duration (Hours)</label>
-                {{ form.duration_hours }}
-                <div class="text-red-500 text-sm">{{ form.duration_hours.errors }}</div>
-            </div>
-
-            <!-- Level -->
-            <div>
-                <label class="block text-sm font-medium mb-1">Level</label>
+                <label>Level</label>
                 {{ form.level }}
-                <div class="text-red-500 text-sm">{{ form.level.errors }}</div>
             </div>
-
-            <!-- NVQ Level -->
             <div>
-                <label class="block text-sm font-medium mb-1">NVQ Level</label>
+                <label>NVQ Level</label>
                 {{ form.nvq_level }}
-                <div class="text-red-500 text-sm">{{ form.nvq_level.errors }}</div>
             </div>
-
-            <!-- Qualification Code -->
             <div>
-                <label class="block text-sm font-medium mb-1">Qualification Code</label>
+                <label>Qualification Code</label>
                 {{ form.qualification_code }}
-                <div class="text-red-500 text-sm">{{ form.qualification_code.errors }}</div>
+            </div>
+            <div>
+                <label>Course Fee</label>
+                {{ form.course_fee }}
+            </div>
+        </div>
+
+        <!-- 🔥 DURATION (FIXED) -->
+        <div class="border-t pt-4">
+
+            <h3 class="font-semibold">Duration Breakdown</h3>
+
+            <div class="grid grid-cols-4 gap-4">
+
+                <div>
+                    <label>Months</label>
+                    {{ form.duration_months }}
+                </div>
+
+                <div>
+                    <label>Theory</label>
+                    {{ form.theory_hours }}
+                </div>
+
+                <div>
+                    <label>Practical</label>
+                    {{ form.practical_hours }}
+                </div>
+
+                <div>
+                    <label>Industry</label>
+                    {{ form.industry_training_hours }}
+                </div>
+
             </div>
 
         </div>
 
-
-        <!-- Prerequisite -->
+        <!-- PEDAGOGY -->
         <div>
-            <label class="block text-sm font-medium mb-1">Prerequisites</label>
+            <label>Prerequisite</label>
             {{ form.prerequisite }}
-            <div class="text-red-500 text-sm">{{ form.prerequisite.errors }}</div>
         </div>
 
-
-        <!-- Learning Outcomes -->
         <div>
-            <label class="block text-sm font-medium mb-1">Learning Outcomes</label>
+            <label>Learning Outcomes</label>
             {{ form.learning_outcomes }}
-            <div class="text-red-500 text-sm">{{ form.learning_outcomes.errors }}</div>
         </div>
 
-
-        <!-- 🔘 Buttons -->
-        <div class="flex justify-between items-center pt-4">
-
-            <a href="{% url 'course_list' %}"
-               class="text-gray-600 hover:underline">
-                ← Cancel
-            </a>
+        <!-- BUTTONS -->
+        <div class="flex justify-between">
+            <a href="{% url 'course_list' %}">Cancel</a>
 
             <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">
-                💾 Save Course
+                class="bg-blue-600 text-white px-4 py-2 rounded">
+                Save
             </button>
-
         </div>
 
     </form>

@@ -28,4 +28,6 @@ path('tasks/<int:pk>/', TaskDetailView.as_view(), name='task_detail'),
 path('units/add/<int:course_id>/', UnitCreateView.as_view(), name='unit_create'),
 path('units/<int:pk>/edit/', UnitUpdateView.as_view(), name='unit_update'),
 path('units/<int:pk>/delete/', UnitDeleteView.as_view(), name='unit_delete'),
+path('units/<int:pk>/', UnitDetailView.as_view(), name='unit_detail'),
+path('courses/<int:pk>/ncs/', CourseNCSView.as_view(), name='course_ncs'),
 ]

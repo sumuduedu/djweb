@@ -4,52 +4,66 @@
 
 <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
 
-    <!-- 🔷 Title -->
-    <h2 class="text-xl font-bold mb-6 text-gray-800">
+    <h2 class="text-xl font-bold mb-6">
         {% if object %}Edit Unit{% else %}Add Unit{% endif %}
     </h2>
 
-    <!-- 🔥 Form -->
     <form method="post" class="space-y-5">
         {% csrf_token %}
 
-        <!-- Code -->
+        <!-- Unit Fields -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Unit Code
-            </label>
+            <label class="block text-sm font-medium">Unit Code</label>
             {{ form.code }}
         </div>
 
-        <!-- Title -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Unit Title
-            </label>
+            <label class="block text-sm font-medium">Unit Title</label>
             {{ form.title }}
         </div>
 
-        <!-- Description -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Description
-            </label>
+            <label class="block text-sm font-medium">Description</label>
             {{ form.description }}
         </div>
 
-        <!-- Level -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Level
-            </label>
+            <label class="block text-sm font-medium">Level</label>
             {{ form.level }}
         </div>
 
+        <!-- 🔥 ELEMENTS -->
+        <div class="mt-6 border-t pt-4">
 
-        <!-- 🔘 Buttons -->
-        <div class="flex justify-between items-center pt-4">
+            <h3 class="text-lg font-semibold mb-3">Elements</h3>
 
-            <!-- Cancel -->
+            {{ elements.management_form }}
+
+            <div id="element-container" class="space-y-3">
+                {% for el_form in elements %}
+                    <div class="flex items-center gap-2 element-form">
+
+                        {{ el_form.title }}
+
+                        {% if el_form.instance.pk %}
+                            {{ el_form.DELETE }}
+                            <span class="text-red-500 text-sm">Delete</span>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-element"
+                class="mt-3 bg-green-500 text-white px-3 py-1 rounded text-sm">
+                + Add Element
+            </button>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-between pt-4">
+
             <a href="{% if object %}
                         {% url 'course_detail' object.course.pk %}
                      {% else %}
@@ -59,38 +73,35 @@
                Cancel
             </a>
 
-            <!-- Save -->
             <button type="submit"
-                class="bg-blue-600 text-white px-5 py-2 rounded shadow hover:bg-blue-700 transition">
+                class="bg-blue-600 text-white px-5 py-2 rounded">
                 Save Unit
             </button>
 
         </div>
 
     </form>
-<!-- 🔥 ELEMENTS SECTION -->
-<div class="mt-6">
-
-    <h3 class="text-lg font-semibold mb-3">Elements</h3>
-
-    {{ elements.management_form }}
-
-    <div class="space-y-3">
-        {% for form in elements %}
-            <div class="flex items-center gap-2">
-
-                {{ form.title }}
-
-                {% if form.instance.pk %}
-                    {{ form.DELETE }}
-                    <span class="text-sm text-red-500">Delete</span>
-                {% endif %}
-
-            </div>
-        {% endfor %}
-    </div>
 
 </div>
-</div>
+
+<script>
+document.getElementById('add-element').addEventListener('click', function () {
+
+    const container = document.getElementById('element-container');
+    const totalForms = document.querySelector('[name="elements-TOTAL_FORMS"]');
+
+    let formCount = parseInt(totalForms.value);
+
+    let newForm = container.children[0].cloneNode(true);
+
+    newForm.innerHTML = newForm.innerHTML.replace(/elements-\d+/g, `elements-${formCount}`);
+
+    newForm.querySelector('input').value = '';
+
+    container.appendChild(newForm);
+
+    totalForms.value = formCount + 1;
+});
+</script>
 
 {% endblock %}

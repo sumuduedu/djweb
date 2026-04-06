@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-
 class Course(models.Model):
     LEVEL_CHOICES = [
         ('BEGINNER', 'Beginner'),
@@ -8,24 +7,52 @@ class Course(models.Model):
         ('ADVANCED', 'Advanced'),
     ]
 
+    # 🔷 BASIC INFO
     title = models.CharField(max_length=255)
     code = models.CharField(max_length=20, unique=True)
     description = models.TextField()
 
-    duration_hours = models.IntegerField()
+    # 🔷 DURATION (ONLY BREAKDOWN)
+    duration_months = models.FloatField(default=0)
+
+    theory_hours = models.FloatField(default=0)
+    practical_hours = models.FloatField(default=0)
+    industry_training_hours = models.FloatField(default=0)
+
+    # 🔷 FINANCIAL
+    course_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # 🔷 LEVEL
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
 
+    # 🔷 NVQ
     nvq_level = models.IntegerField(null=True, blank=True)
     qualification_code = models.CharField(max_length=50, blank=True)
 
+    # 🔷 PEDAGOGY
     prerequisite = models.TextField(blank=True)
     learning_outcomes = models.TextField(blank=True)
 
+    # 🔷 SYSTEM
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # 🔥 CALCULATED TOTAL (IMPORTANT)
+    @property
+    def total_hours(self):
+        return (
+            (self.theory_hours or 0) +
+            (self.practical_hours or 0) +
+            (self.industry_training_hours or 0)
+        )
+
     def __str__(self):
-        return f"{self.title} ({self.code})"
+        return f"{self.code} - {self.title}"
 
 
 class Unit(models.Model):
@@ -85,17 +112,53 @@ class Resource(models.Model):
 
 
 class Module(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
 
-    code = models.CharField(max_length=10)
+    MODULE_TYPE_CHOICES = [
+        ('CORE', 'Core Module'),
+        ('ELECTIVE', 'Elective Module'),
+        ('BASIC', 'Basic Module'),
+    ]
+
+    course = models.ForeignKey(
+        'Course',
+        on_delete=models.CASCADE,
+        related_name='modules'
+    )
+
+    # 🔷 BASIC INFO
+    code = models.CharField(max_length=20)
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
-    order = models.IntegerField()
+    module_type = models.CharField(max_length=20, choices=MODULE_TYPE_CHOICES)
+
+    # 🔷 DURATION
+    total_hours = models.FloatField(default=0)
+    theory_hours = models.FloatField(default=0)
+    practical_hours = models.FloatField(default=0)
+
+    # 🔷 LEARNING OUTCOMES
+    learning_outcomes = models.TextField(
+        help_text="Write outcomes as bullet points"
+    )
+
+    # 🔷 LEARNING CONTENT
+    theory_content = models.TextField(blank=True)
+    practical_content = models.TextField(blank=True)
+
+    # 🔷 TEACHING METHODS
+    teaching_methods = models.TextField(blank=True)
+
+    # 🔷 ASSESSMENT METHODS
+    assessment_methods = models.TextField(blank=True)
+
+    # 🔷 ORDERING
+    order = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['order']
-        unique_together = ['course', 'code']
+        ordering = ['order', 'code']
 
     def __str__(self):
         return f"{self.code} - {self.title}"

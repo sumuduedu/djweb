@@ -36,7 +36,38 @@ class CourseListView(LoginRequiredMixin, ListView):
 class CourseDetailView(LoginRequiredMixin, DetailView):
     model = Course
     template_name = "courses/course_detail.html"
-    context_object_name = "course"
+    context_object_name = "object"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        modules = self.object.modules.all()
+
+        # 🔥 MODULE TOTALS
+        total_theory = sum(m.theory_hours or 0 for m in modules)
+        total_practical = sum(m.practical_hours or 0 for m in modules)
+
+        context['total_theory'] = total_theory
+        context['total_practical'] = total_practical
+
+        # 🔥 COURSE VALUES
+        course_theory = self.object.theory_hours or 0
+        course_practical = self.object.practical_hours or 0
+
+        context['course_theory'] = course_theory
+        context['course_practical'] = course_practical
+        context['course_industry'] = self.object.industry_training_hours or 0
+
+        # 🔥 MONTHS
+        context['total_months'] = self.object.duration_months
+
+        # 🔥 ✅ MATCH CHECK (NEW)
+        context['is_matching'] = (
+            total_theory == course_theory and
+            total_practical == course_practical
+        )
+
+        return context
 
 
 # ➕ Create Course
@@ -189,6 +220,7 @@ class UnitCreateView(LoginRequiredMixin, CreateView):
         context = self.get_context_data()
         elements = context['elements']
 
+        # 🔥 SET COURSE BEFORE VALIDATION
         form.instance.course_id = self.kwargs['course_id']
 
         if elements.is_valid():
@@ -232,3 +264,8 @@ class UnitDetailView(LoginRequiredMixin, DetailView):
     model = Unit
     template_name = "courses/unit_detail.html"
     context_object_name = "unit"
+
+class CourseNCSView(LoginRequiredMixin, DetailView):
+    model = Course
+    template_name = "courses/course_ncs.html"
+    context_object_name = "course"
