@@ -57,7 +57,7 @@ class CourseDetailView(LoginRequiredMixin, DetailView):
         context['course_theory'] = course_theory
         context['course_practical'] = course_practical
         context['course_industry'] = self.object.industry_training_hours or 0
-
+        context['total_hours_sum'] = total_theory + total_practical
         # 🔥 MONTHS
         context['total_months'] = self.object.duration_months
 

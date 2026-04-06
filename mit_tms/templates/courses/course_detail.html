@@ -141,9 +141,9 @@
                     <tr>
                         <th class="p-3 text-left">Module Code</th>
                         <th class="p-3 text-left">Module Title</th>
-                        <th class="p-3 text-center">Duration (Months)</th>
                         <th class="p-3 text-center">Theory (Hrs)</th>
                         <th class="p-3 text-center">Practical (Hrs)</th>
+                        <th class="p-3 text-center">Total (Hrs)</th>
                     </tr>
                 </thead>
 
@@ -155,15 +155,14 @@
                         <td class="p-3">{{ module.title }}</td>
 
                         <td class="p-3 text-center">
-                            {{ module.duration_months|default:"-" }}
-                        </td>
-
-                        <td class="p-3 text-center">
                             {{ module.theory_hours }}
                         </td>
 
                         <td class="p-3 text-center">
                             {{ module.practical_hours }}
+                        </td>
+                        <td class="p-3 text-center">
+                            {{ module.theory_hours|add:module.practical_hours }}
                         </td>
 
                     </tr>
@@ -173,9 +172,7 @@
                     <tr class="bg-gray-100 font-semibold border-t">
                         <td colspan="2" class="p-3 text-right">Total</td>
 
-                        <td class="p-3 text-center">
-                            {{ total_months|default:"-" }}
-                        </td>
+
 
                         <td class="p-3 text-center">
                             {{ total_theory }}
@@ -183,6 +180,9 @@
 
                         <td class="p-3 text-center">
                             {{ total_practical }}
+                        </td>
+                         <td class="p-3 text-center">
+                            {{total_hours_sum }}
                         </td>
                     </tr>
 
