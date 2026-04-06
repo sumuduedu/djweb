@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="max-w-7xl mx-auto space-y-6">
 
     <!-- HEADER -->
@@ -10,71 +9,101 @@
 
         <div class="flex items-center gap-3">
             <button onclick="changeWeek(-1)" class="px-3 py-1 bg-gray-200 rounded">⬅</button>
-            <span class="font-semibold">Week <span id="week">1</span></span>
+            <span class="font-semibold">Week Week <span id="week">{{ current_week }}</span>
             <button onclick="changeWeek(1)" class="px-3 py-1 bg-gray-200 rounded">➡</button>
         </div>
     </div>
 
-    <div class="grid grid-cols-4 gap-6">
+    <!-- THEORY MODULES -->
+    <div class="bg-white shadow rounded-xl p-4">
+        <h3 class="font-semibold mb-3 text-blue-600">📘 Theory Modules</h3>
 
-        <!-- MODULE PANEL -->
-        <div class="bg-white shadow rounded-xl p-4">
-            <h3 class="font-semibold mb-3">Modules</h3>
-
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             {% for module in modules %}
-
-            <div class="draggable bg-blue-500 text-white p-3 rounded cursor-move mb-2"
+            <div class="draggable bg-blue-500 text-white p-2 rounded-lg cursor-move shadow hover:shadow-md transition"
                  draggable="true"
                  data-id="{{ module.id }}"
                  data-type="THEORY"
                  data-hours="{{ module.theory_hours }}">
-                {{ module.title }} (T)
-                <div class="text-xs mt-1">
-                    Remaining: <span class="remain">{{ module.theory_hours }}</span>
+
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold truncate">
+                        {{ module.title }}
+                    </span>
+                    <span class="text-[10px] bg-white text-blue-600 px-1.5 py-0.5 rounded">
+                        T
+                    </span>
+                </div>
+
+                <div class="text-[10px] mt-1">
+                    Remaining:
+                    <span class="remain font-semibold">{{ module.theory_hours }}</span> hrs
                 </div>
             </div>
+            {% endfor %}
+        </div>
+    </div>
 
-            <div class="draggable bg-green-500 text-white p-3 rounded cursor-move mb-3"
+    <!-- PRACTICAL MODULES -->
+    <div class="bg-white shadow rounded-xl p-4">
+        <h3 class="font-semibold mb-3 text-green-600">🧪 Practical Modules</h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {% for module in modules %}
+            <div class="draggable bg-green-500 text-white p-2 rounded-lg cursor-move shadow hover:shadow-md transition"
                  draggable="true"
                  data-id="{{ module.id }}"
                  data-type="PRACTICAL"
                  data-hours="{{ module.practical_hours }}">
-                {{ module.title }} (P)
-                <div class="text-xs mt-1">
-                    Remaining: <span class="remain">{{ module.practical_hours }}</span>
+
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold truncate">
+                        {{ module.title }}
+                    </span>
+                    <span class="text-[10px] bg-white text-green-600 px-1.5 py-0.5 rounded">
+                        P
+                    </span>
+                </div>
+
+                <div class="text-[10px] mt-1">
+                    Remaining:
+                    <span class="remain font-semibold">{{ module.practical_hours }}</span> hrs
                 </div>
             </div>
-
             {% endfor %}
         </div>
+    </div>
 
-        <!-- GRID -->
-        <div class="col-span-3 bg-white shadow rounded-xl p-4">
+    <!-- TIMETABLE GRID -->
+    <div class="bg-white shadow rounded-xl p-4">
 
-            <div class="grid grid-cols-8 gap-2 text-sm text-center">
+        <div class="grid grid-cols-8 gap-2 text-sm text-center">
 
-                <div></div>
-                {% for d in "1234567" %}
-                    <div class="font-semibold">Day {{ forloop.counter }}</div>
-                {% endfor %}
+            <div></div>
 
-                {% for slot in slots %}
-                <div class="font-semibold">
-                    {{ slot.start_time }} - {{ slot.end_time }}
+            {% for d in days %}
+                <div class="font-semibold text-xs bg-gray-50 rounded p-1">
+                    {{ d|date:"D" }}<br>
+                    {{ d|date:"Y-m-d" }}
                 </div>
+            {% endfor %}
 
-                {% for d in "1234567" %}
-                <div class="drop-zone border h-24 rounded p-1 flex flex-col"
-                    data-day="{{ forloop.counter }}"
-                    data-slot="{{ slot.id }}"
-                    data-start="{{ slot.start_time|time:'H:i' }}"
-                    data-end="{{ slot.end_time|time:'H:i' }}">
-                </div>
-                {% endfor %}
-
-                {% endfor %}
-
+            {% for slot in slots %}
+            <div class="font-semibold text-xs bg-gray-100 rounded p-1">
+                {{ slot.start_time }} - {{ slot.end_time }}
             </div>
+
+            {% for d in days %}
+            <div class="drop-zone border h-24 rounded p-1 flex flex-col bg-gray-50 hover:bg-blue-50 transition"
+                 data-day="{{ forloop.counter }}"
+                 data-date="{{ d|date:'Y-m-d' }}"
+                 data-slot="{{ slot.id }}"
+                 data-start="{{ slot.start_time|time:'H:i' }}"
+                 data-end="{{ slot.end_time|time:'H:i' }}">
+            </div>
+            {% endfor %}
+
+            {% endfor %}
 
         </div>
 
@@ -83,12 +112,11 @@
 </div>
 
 <script>
-
 // =========================
 // GLOBAL STATE
 // =========================
 let dragged = null;
-let currentWeek = 1;
+let currentWeek = {{ current_week|default:1 }};
 let moduleState = {};
 
 // =========================
@@ -110,7 +138,7 @@ document.querySelectorAll('.draggable').forEach(el => {
 });
 
 // =========================
-// SLOT DURATION (TIME-BASED)
+// SLOT DURATION
 // =========================
 function getSlotDuration(zone) {
 
@@ -152,7 +180,6 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
         const type = dragged.dataset.type;
         const key = id + "_" + type;
 
-        // 🔒 Only one block per slot
         if (zone.querySelector('[data-id]')) return;
 
         let duration = getSlotDuration(zone);
@@ -162,13 +189,11 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
             return;
         }
 
-        // 🔥 reduce hours safely
         moduleState[key].remaining =
             parseFloat((moduleState[key].remaining - duration).toFixed(2));
 
         updateUI(key);
 
-        // create block
         const block = document.createElement("div");
 
         let colorClass = type === "PRACTICAL"
@@ -179,19 +204,17 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
         block.dataset.id = id;
         block.dataset.type = type;
 
-        // clean label
         block.innerText = dragged.dataset.type === "PRACTICAL"
             ? dragged.innerText.split("(P)")[0] + "(P)"
             : dragged.innerText.split("(T)")[0] + "(T)";
 
         zone.appendChild(block);
 
-        // save
         save(zone, id, type);
     });
 
     // =========================
-    // DELETE (DOUBLE CLICK)
+    // DELETE (FIXED)
     // =========================
     zone.addEventListener('dblclick', (e) => {
 
@@ -213,7 +236,7 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 
         block.remove();
 
-        // delete from DB
+        // ✅ CORRECT DELETE
         fetch("{% url 'batch:save_timetable' %}", {
             method: "POST",
             headers: {
@@ -234,9 +257,10 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
 });
 
 // =========================
-// SAVE TO BACKEND
+// SAVE WITH CONFLICT HANDLING
 // =========================
 function save(zone, id, type) {
+
     fetch("{% url 'batch:save_timetable' %}", {
         method: "POST",
         headers: {
@@ -253,7 +277,31 @@ function save(zone, id, type) {
             start_time: zone.dataset.start,
             end_time: zone.dataset.end
         })
-    });
+    })
+    .then(res => {
+        if (res.status === 409) {
+            return res.json().then(data => {
+
+                // 🔥 revert UI
+                zone.innerHTML = "";
+
+                alert("⚠ Conflict: " + data.message);
+
+                const key = id + "_" + type;
+                let duration = getSlotDuration(zone);
+
+                if (moduleState[key]) {
+                    moduleState[key].remaining =
+                        parseFloat((moduleState[key].remaining + duration).toFixed(2));
+                    updateUI(key);
+                }
+
+                throw "conflict";
+            });
+        }
+        return res.json();
+    })
+    .catch(err => console.log(err));
 }
 
 // =========================
@@ -264,7 +312,9 @@ function changeWeek(v) {
     if (currentWeek < 1) currentWeek = 1;
 
     document.getElementById("week").innerText = currentWeek;
-    load();
+
+    // 🔥 reload page with week
+    window.location.href = "?batch={{ batch.id }}&week=" + currentWeek;
 }
 
 // =========================
@@ -281,18 +331,16 @@ function getCSRF() {
 // =========================
 function load() {
 
-    // reset all module hours
     for (let key in moduleState) {
         moduleState[key].remaining =
             parseFloat(moduleState[key].el.dataset.hours);
         updateUI(key);
     }
 
-    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}")
+    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}&week=" + currentWeek)
     .then(res => res.json())
     .then(data => {
 
-        // clear grid
         document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
 
         data.forEach(item => {
@@ -312,7 +360,6 @@ function load() {
             if (moduleState[key]) {
                 moduleState[key].remaining =
                     parseFloat((moduleState[key].remaining - duration).toFixed(2));
-
                 updateUI(key);
             }
 

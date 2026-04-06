@@ -16,21 +16,47 @@
                 <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
                     <tr>
                         <th class="p-4 text-left">Date</th>
-                        <th class="p-4 text-left">Module</th>
-                        <th class="p-4 text-left">Week</th>
                         <th class="p-4 text-left">Day</th>
-                        <th class="p-4 text-left">Slot</th>
+                        <th class="p-4 text-left">Module</th>
+                        <th class="p-4 text-left">Type</th>
+                        <th class="p-4 text-left">Time</th>
                     </tr>
                 </thead>
 
                 <tbody>
                 {% for t in object_list %}
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="p-4">{{ t.date }}</td>
-                        <td class="p-4">{{ t.module.title }}</td>
-                        <td class="p-4">Week {{ t.week }}</td>
-                        <td class="p-4">Day {{ t.day }}</td>
-                        <td class="p-4">Slot {{ t.row_slot }}</td>
+
+                        <!-- Date -->
+                        <td class="p-4">
+                            {{ t.date|date:"Y-m-d" }}
+                        </td>
+
+                        <!-- Day Name -->
+                        <td class="p-4">
+                            {{ t.date|date:"l" }}
+                        </td>
+
+                        <!-- Module -->
+                        <td class="p-4">
+                            {{ t.module.title }}
+                        </td>
+
+                        <!-- Session Type -->
+                        <td class="p-4">
+                            {% if t.session_type == "PRACTICAL" %}
+                                <span class="text-green-600 font-semibold">Practical</span>
+                            {% else %}
+                                <span class="text-blue-600 font-semibold">Theory</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Time Slot -->
+                        <td class="p-4">
+                            {{ t.slot.start_time|time:"H:i" }} -
+                            {{ t.slot.end_time|time:"H:i" }}
+                        </td>
+
                     </tr>
                 {% endfor %}
                 </tbody>

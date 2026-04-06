@@ -4,71 +4,62 @@
 
 {% block content %}
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
 
     <!-- 🔷 Header -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">📦 Batch Management</h2>
+        <h2 class="text-2xl font-semibold text-gray-800">📦 Batch Management</h2>
 
         <a href="{% url 'batch:batch_create' %}"
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+           class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 transition">
             + New Batch
         </a>
     </div>
 
-    <!-- 🔷 Table Container -->
-    <div class="bg-white rounded-xl shadow overflow-hidden">
+    <!-- 🔷 Table -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
 
-        <table class="w-full text-sm">
+        <table class="w-full text-sm text-left">
 
             <!-- Header -->
-            <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
+            <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs tracking-wide">
                 <tr>
-                    <th class="p-4 text-left">Batch</th>
-                    <th class="p-4 text-left">Course</th>
-                    <th class="p-4 text-left">Academic Year</th>
-                    <th class="p-4 text-left">Start Date</th>
-                    <th class="p-4 text-left">Schedule</th>
+                    <th class="p-4">Batch</th>
+                    <th class="p-4">Course</th>
+                    <th class="p-4">Academic Year</th>
+                    <th class="p-4">Start Date</th>
+                    <th class="p-4">Schedule</th>
                     <th class="p-4 text-right">Actions</th>
                 </tr>
             </thead>
 
             <!-- Body -->
-            <tbody>
+            <tbody class="divide-y">
 
             {% for batch in batches %}
-                <tr class="border-b hover:bg-gray-50 transition">
+                <tr class="hover:bg-gray-50 transition">
 
-                    <!-- Batch Name -->
                     <td class="p-4 font-medium text-gray-800">
                         {{ batch.name }}
                     </td>
 
-                    <!-- Course -->
                     <td class="p-4 text-gray-600">
-                        {{ batch.course.title }}
+                        {{ batch.course.title|default:"-" }}
                     </td>
 
-                    <!-- Academic Year -->
                     <td class="p-4 text-gray-600">
-                        {% if batch.academic_year %}
-                            {{ batch.academic_year.name }}
-                        {% else %}
-                            <span class="text-gray-400">-</span>
-                        {% endif %}
+                        {{ batch.academic_year.name|default:"-" }}
                     </td>
 
-                    <!-- Start Date -->
                     <td class="p-4 text-gray-600">
-                        {{ batch.start_date }}
+                        {{ batch.start_date|date:"Y-m-d" }}
                     </td>
 
-                    <!-- Schedule Info -->
                     <td class="p-4 text-gray-600">
-                        {{ batch.hours_per_day }} hrs/day · {{ batch.days_per_week }} days/week
+                        {{ batch.hours_per_day|default:"0" }} hrs/day ·
+                        {{ batch.days_per_week|default:"0" }} days/week
                     </td>
 
-                    <!-- Actions -->
                     <td class="p-4 text-right space-x-3">
 
                         <a href="{% url 'batch:batch_detail' batch.pk %}"
@@ -86,16 +77,22 @@
                             Delete
                         </a>
 
+                        <!-- 📅 Timetable (per batch - FIXED) -->
+                        <a href="{% url 'batch:timetable_list' %}?batch={{ batch.id }}"
+                           class="text-indigo-600 hover:text-indigo-800 font-medium">
+                            Timetable
+                        </a>
+
                     </td>
 
                 </tr>
 
             {% empty %}
-                <!-- 💤 Empty State -->
                 <tr>
                     <td colspan="6" class="p-8 text-center text-gray-500">
                         No batches found.
-                        <a href="{% url 'batch:batch_create' %}" class="text-blue-600 underline">
+                        <a href="{% url 'batch:batch_create' %}"
+                           class="text-blue-600 underline ml-1">
                             Create your first batch
                         </a>
                     </td>
@@ -110,7 +107,7 @@
 
     <!-- 🔷 Pagination -->
     {% if is_paginated %}
-    <div class="mt-6 flex justify-center items-center space-x-2">
+    <div class="mt-6 flex justify-center items-center space-x-2 text-sm">
 
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}"

@@ -142,8 +142,9 @@ from .models import TimeSlot
 # =========================================================
 # 🔷 GANTT VIEW
 # =========================================================
-from django.shortcuts import render, get_object_or_404
+from datetime import timedelta
 from django.views import View
+from django.shortcuts import render, get_object_or_404
 from .models import Batch, TimeSlot
 
 class GanttView(View):
@@ -151,34 +152,28 @@ class GanttView(View):
     def get(self, request):
 
         batch_id = request.GET.get("batch")
+        week = int(request.GET.get("week", 1))   # ✅ GET WEEK
+
         batch = get_object_or_404(Batch, id=batch_id)
 
-        slots = TimeSlot.objects.all().order_by("order")
+        # 🔥 BASE DATE
+        base_date = batch.start_date
+
+        # 🔥 APPLY WEEK OFFSET
+        start_of_week = base_date + timedelta(days=(week - 1) * 7)
+
+        # 🔥 GENERATE DAYS
+        days = []
+        for i in range(7):
+            days.append(start_of_week + timedelta(days=i))
 
         return render(request, "batch/gantt.html", {
             "batch": batch,
             "modules": batch.course.modules.all(),
-            "slots": slots
+            "slots": TimeSlot.objects.all().order_by("order"),
+            "days": days,
+            "current_week": week   # ✅ IMPORTANT
         })
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        batch_id = self.request.GET.get("batch")
-
-        # 🔥 IMPORTANT FIX
-        if not batch_id:
-            # fallback → take first batch
-            batch = Batch.objects.first()
-        else:
-            batch = get_object_or_404(Batch, id=batch_id)
-
-        context["batch"] = batch
-        context["modules"] = batch.course.modules.all()
-
-        return context
-
-
 
 
 # =========================================================
@@ -203,9 +198,13 @@ def load_modules(request, batch_id):
 
 import json
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from datetime import timedelta
+
 from .models import Timetable, Batch
-from datetime import timedelta, datetime
+
+
 @csrf_exempt
 def save_timetable(request):
 
@@ -216,6 +215,12 @@ def save_timetable(request):
     week = int(data["week"])
     day = int(data["day"])
     slot_id = int(data["slot"])
+
+    # =========================
+    # DATE CALC (FIRST FIX)
+    # =========================
+    total_days = (week - 1) * batch.days_per_week + (day - 1)
+    class_date = batch.start_date + timedelta(days=total_days)
 
     # =========================
     # DELETE
@@ -232,13 +237,21 @@ def save_timetable(request):
         return JsonResponse({"status": "deleted"})
 
     # =========================
-    # DATE CALC
+    # CONFLICT CHECK (FIXED POSITION)
     # =========================
-    total_days = (week - 1) * batch.days_per_week + (day - 1)
-    class_date = batch.start_date + timedelta(days=total_days)
+    conflict = Timetable.objects.filter(
+        date=class_date,
+        slot_id=slot_id
+    ).exclude(batch=batch).exists()
+
+    if conflict:
+        return JsonResponse({
+            "status": "conflict",
+            "message": "Another batch already has a class at this time"
+        }, status=409)
 
     # =========================
-    # REMOVE OLD
+    # REMOVE OLD (SAME SLOT)
     # =========================
     Timetable.objects.filter(
         batch=batch,
@@ -248,15 +261,8 @@ def save_timetable(request):
     ).delete()
 
     # =========================
-    # TIME CALC (FIXED)
-    # =========================
-    # =========================
-    # TIME CALC (FIXED)
-    # =========================
-    # =========================
     # TIME CALC
     # =========================
-
     start_time = data.get("start_time")
     end_time = data.get("end_time")
 
@@ -268,7 +274,9 @@ def save_timetable(request):
     else:
         slot_hours = 1
 
-    # 🔥 THIS LINE IS MISSING IN YOUR CODE
+    # =========================
+    # SESSION TYPE
+    # =========================
     session_type = data.get("session_type", "THEORY")
 
     # =========================
@@ -286,8 +294,6 @@ def save_timetable(request):
     )
 
     return JsonResponse({"status": "saved"})
-
-from django.http import JsonResponse
 def load_timetable(request):
 
     batch_id = request.GET.get("batch")
@@ -310,7 +316,6 @@ def load_timetable(request):
         })
 
     return JsonResponse(data, safe=False)
-
 
 
 # =========================================================
