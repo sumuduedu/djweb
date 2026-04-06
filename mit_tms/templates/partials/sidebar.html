@@ -1,0 +1,89 @@
+<aside id="sidebar"
+       class="w-64 bg-gray-900 text-white flex flex-col transition-all duration-300">
+
+    <!-- LOGO -->
+    <div class="p-5 border-b border-gray-800">
+        <h2 id="logoText" class="text-xl font-bold tracking-wide">
+            MIT TMS
+        </h2>
+    </div>
+
+    <!-- NAV -->
+    <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+
+        <!-- 🔥 ADD section-title -->
+        <p class="section-title px-3 text-xs text-gray-400 uppercase mb-2">
+            Main
+        </p>
+
+      <a href="{% url 'dashboard' %}" class="nav-link">
+    <span class="icon text-lg">📊</span>
+    <span class="menu-text">Dashboard</span>
+</a>
+
+<a href="{% url 'course_list' %}" class="nav-link">
+    <span class="icon text-lg">📚</span>
+    <span class="menu-text">Courses</span>
+</a>
+
+<a href="{% url 'batch:batch_list' %}" class="nav-link">
+    <span class="icon text-lg">📦</span>
+    <span class="menu-text">Batches</span>
+</a>
+
+
+        <!-- 🔥 ADD section-title -->
+        <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
+            Planning
+        </p>
+
+
+<a href="{% url 'batch:timetable_list' %}" class="nav-link">
+    <span class="icon text-lg">📅</span>
+    <span class="menu-text">Timetable</span>
+</a>
+
+    </nav>
+
+</aside>
+<style>
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+.nav-link:hover {
+    background: #1f2937;
+}
+
+/* 🔥 COLLAPSED MODE */
+.sidebar-collapsed .menu-text,
+.sidebar-collapsed .section-title {
+    display: none;
+}
+
+.sidebar-collapsed .nav-link {
+    justify-content: center;
+}
+.icon {
+    font-size: 18px;   /* normal */
+}
+
+.sidebar-collapsed .icon {
+    font-size: 22px;   /* bigger when collapsed 🔥 */
+}
+</style>
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+
+    sidebar.classList.toggle('w-20');
+    sidebar.classList.toggle('w-64');
+
+    // 🔥 ONE CLASS CONTROLS EVERYTHING
+    sidebar.classList.toggle('sidebar-collapsed');
+}
+</script>
