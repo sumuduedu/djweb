@@ -53,6 +53,7 @@ LOCAL_APPS = [
     'apps.core.apps.CoreConfig',
     'apps.website.apps.WebsiteConfig',
     'apps.accounts.apps.AccountsConfig',   # ✅ ADD THIS
+    'apps.batch.apps.BatchConfig',
 ]
 
 THIRD_PARTY_APPS = [

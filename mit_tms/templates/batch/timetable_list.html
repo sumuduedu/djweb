@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Timetable{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto">
+
+    <h2 class="text-2xl font-bold mb-6">📅 Timetable</h2>
+
+    {% if object_list %}
+        <div class="bg-white shadow rounded-xl overflow-hidden">
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="p-4 text-left">Date</th>
+                        <th class="p-4 text-left">Module</th>
+                        <th class="p-4 text-left">Week</th>
+                        <th class="p-4 text-left">Day</th>
+                        <th class="p-4 text-left">Slot</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for t in object_list %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4">{{ t.date }}</td>
+                        <td class="p-4">{{ t.module.title }}</td>
+                        <td class="p-4">Week {{ t.week }}</td>
+                        <td class="p-4">Day {{ t.day }}</td>
+                        <td class="p-4">Slot {{ t.row_slot }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    {% else %}
+        <div class="bg-white shadow rounded-xl p-6 text-center text-gray-500">
+            No timetable data available.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

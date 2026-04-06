@@ -19,7 +19,7 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-gray-900 text-white p-5 flex flex-col">
 
-        <h2 class="text-2xl font-bold mb-6">MIT TMS</h2>
+        <h2 class="text-2xl font-bold mb-8 tracking-wide">MIT TMS</h2>
 
         <nav class="space-y-2 flex-1">
 
@@ -32,6 +32,11 @@
                class="block px-3 py-2 rounded hover:bg-gray-700">
                 📚 Courses
             </a>
+
+                <a href="{% url 'batch:batch_list' %}"
+                class="block px-3 py-2 rounded hover:bg-gray-700">
+                    📦 Batches
+                </a>
 
         </nav>
 
@@ -49,7 +54,7 @@
     <div class="flex-1 flex flex-col">
 
         <!-- Topbar -->
-        <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
+        <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center">
 
             <h1 class="text-xl font-semibold">
                 {% block page_title %}Dashboard{% endblock %}
@@ -62,9 +67,20 @@
         </header>
 
         <!-- Content -->
-        <main class="p-6">
+        <main role="main" class="p-6">
+
+            <!-- Messages -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="mb-4 p-3 rounded bg-green-100 text-green-700 shadow">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
             {% block content %}
             {% endblock %}
+
         </main>
 
     </div>

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    {% if object %}Edit Batch{% else %}Create Batch{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto">
+
+    <!-- 🔷 Header -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">
+            {% if object %}
+                ✏️ Edit Batch
+            {% else %}
+                ➕ Create New Batch
+            {% endif %}
+        </h2>
+        <p class="text-sm text-gray-500">
+            Manage training batch details and scheduling.
+        </p>
+    </div>
+
+    <!-- 🔷 Form Card -->
+    <div class="bg-white shadow rounded-xl p-6">
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <!-- 🔷 Form Fields -->
+            {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <!-- 🔷 Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-100 text-red-700 p-3 rounded">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- 🔷 Buttons -->
+            <div class="flex justify-between items-center pt-4">
+
+                <!-- ✅ FIXED -->
+                <a href="{% url 'batch:batch_list' %}"
+                   class="text-gray-600 hover:underline">
+                    Cancel
+                </a>
+
+                <!-- Submit -->
+                <button type="submit"
+                        class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+                    {% if object %}
+                        Update Batch
+                    {% else %}
+                        Create Batch
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

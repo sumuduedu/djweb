@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Batch Details{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto space-y-8">
+
+    <!-- ===================================================== -->
+    <!-- 🔷 BATCH HEADER -->
+    <!-- ===================================================== -->
+    <div class="bg-white shadow rounded-xl p-6 flex justify-between items-start">
+
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">
+                {{ batch.name }}
+            </h2>
+
+            <p class="text-gray-600 text-sm mt-2">
+                <strong>Course:</strong> {{ batch.course.title }} <br>
+                <strong>Academic Year:</strong> {{ batch.academic_year }} <br>
+                <strong>Start Date:</strong> {{ batch.start_date }} <br>
+                <strong>End Date:</strong> {{ batch.end_date }} <br>
+                <strong>Schedule:</strong>
+                {{ batch.hours_per_day }} hrs/day ·
+                {{ batch.days_per_week }} days/week
+            </p>
+        </div>
+
+        <div class="flex gap-2">
+            <a href="{% url 'batch:generate_timetable' batch.pk %}"
+               class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">
+               ⚡ Generate
+            </a>
+
+            <a href="{% url 'batch:batch_update' batch.pk %}"
+               class="bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600">
+               ✏️ Edit
+            </a>
+        </div>
+
+    </div>
+<div class="flex flex-wrap gap-2">
+
+    <!-- ⚡ Generate -->
+    <a href="{% url 'batch:generate_timetable' batch.pk %}"
+       class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">
+        ⚡ Generate
+    </a>
+
+    <!-- 📅 View Timetable -->
+    <a href="{% url 'batch:timetable_list' %}?batch={{ batch.id }}"
+       class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700">
+        📅 Timetable
+    </a>
+
+    <!-- 🧩 Gantt Chart -->
+    <a href="{% url 'batch:gantt' %}?batch={{ batch.id }}"
+       class="bg-purple-600 text-white px-4 py-2 rounded shadow hover:bg-purple-700">
+        🧩 Gantt
+    </a>
+
+    <!-- ✏️ Edit -->
+    <a href="{% url 'batch:batch_update' batch.pk %}"
+       class="bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600">
+        ✏️ Edit
+    </a>
+
+</div>
+
+    <!-- ===================================================== -->
+    <!-- 📅 MONTHLY PLAN -->
+    <!-- ===================================================== -->
+    <div>
+        <h3 class="text-xl font-semibold mb-4">📅 Monthly Plan</h3>
+
+        {% if monthly_plan %}
+            {% for item in monthly_plan %}
+            <div class="bg-white shadow rounded-xl p-4 mb-4">
+
+                <h4 class="font-bold text-gray-800 mb-2">
+                    {{ item.month }}
+                </h4>
+
+                <ul class="space-y-1">
+                    {% for module, hours in item.modules.items %}
+                        <li class="flex justify-between">
+                            <span>{{ module }}</span>
+                            <span class="text-gray-600 font-medium">
+                                {{ hours|floatformat:1 }} hrs
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <p class="text-sm text-gray-500 mt-2">
+                    Total: {{ item.total|floatformat:1 }} hrs
+                </p>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="bg-white shadow rounded-xl p-6 text-center text-gray-500">
+                No timetable generated yet.
+            </div>
+        {% endif %}
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- 📝 MANUAL PLAN -->
+    <!-- ===================================================== -->
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold">📝 Manual Plan</h3>
+
+            <a href="{% url 'batch:module_plan_create' batch.pk %}"
+               class="bg-blue-600 text-white px-3 py-2 rounded shadow hover:bg-blue-700">
+               + Add Plan
+            </a>
+        </div>
+
+        {% if batch.plans.all %}
+            {% for plan in batch.plans.all %}
+            <div class="bg-white shadow rounded-xl p-4 mb-3">
+
+                <div class="flex justify-between items-center">
+                    <h4 class="font-semibold text-gray-800">
+                        {{ plan.module.title }}
+                    </h4>
+
+                    <span class="text-sm text-gray-500">
+                        {{ plan.start_date }} → {{ plan.end_date }}
+                    </span>
+                </div>
+
+                <div class="mt-2 text-sm text-gray-600">
+                    Theory: <strong>{{ plan.theory_hours }}</strong> hrs |
+                    Practical: <strong>{{ plan.practical_hours }}</strong> hrs
+                </div>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="bg-white shadow rounded-xl p-6 text-center text-gray-500">
+                No manual plan added yet.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

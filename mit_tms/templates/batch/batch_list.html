@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Batches{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto">
+
+    <!-- 🔷 Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">📦 Batch Management</h2>
+
+        <a href="{% url 'batch:batch_create' %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            + New Batch
+        </a>
+    </div>
+
+    <!-- 🔷 Table Container -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+
+        <table class="w-full text-sm">
+
+            <!-- Header -->
+            <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
+                <tr>
+                    <th class="p-4 text-left">Batch</th>
+                    <th class="p-4 text-left">Course</th>
+                    <th class="p-4 text-left">Academic Year</th>
+                    <th class="p-4 text-left">Start Date</th>
+                    <th class="p-4 text-left">Schedule</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <!-- Body -->
+            <tbody>
+
+            {% for batch in batches %}
+                <tr class="border-b hover:bg-gray-50 transition">
+
+                    <!-- Batch Name -->
+                    <td class="p-4 font-medium text-gray-800">
+                        {{ batch.name }}
+                    </td>
+
+                    <!-- Course -->
+                    <td class="p-4 text-gray-600">
+                        {{ batch.course.title }}
+                    </td>
+
+                    <!-- Academic Year -->
+                    <td class="p-4 text-gray-600">
+                        {% if batch.academic_year %}
+                            {{ batch.academic_year.name }}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Start Date -->
+                    <td class="p-4 text-gray-600">
+                        {{ batch.start_date }}
+                    </td>
+
+                    <!-- Schedule Info -->
+                    <td class="p-4 text-gray-600">
+                        {{ batch.hours_per_day }} hrs/day · {{ batch.days_per_week }} days/week
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="p-4 text-right space-x-3">
+
+                        <a href="{% url 'batch:batch_detail' batch.pk %}"
+                           class="text-blue-600 hover:text-blue-800 font-medium">
+                            View
+                        </a>
+
+                        <a href="{% url 'batch:batch_update' batch.pk %}"
+                           class="text-yellow-600 hover:text-yellow-800 font-medium">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'batch:batch_delete' batch.pk %}"
+                           class="text-red-600 hover:text-red-800 font-medium">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+                <!-- 💤 Empty State -->
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-gray-500">
+                        No batches found.
+                        <a href="{% url 'batch:batch_create' %}" class="text-blue-600 underline">
+                            Create your first batch
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- 🔷 Pagination -->
+    {% if is_paginated %}
+    <div class="mt-6 flex justify-center items-center space-x-2">
+
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Prev
+            </a>
+        {% endif %}
+
+        <span class="px-4 py-1 bg-blue-100 rounded">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Next
+            </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

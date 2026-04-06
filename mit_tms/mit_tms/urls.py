@@ -25,4 +25,6 @@ urlpatterns = [
     path('signup/', SignupView.as_view(), name='signup'),   # ✅ ADD THIS
 
     path('accounts/', include('allauth.urls')),
+
+        path('app/batches/', include('apps.batch.urls')),   # 👈 ADD THIS
 ]

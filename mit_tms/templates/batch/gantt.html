@@ -1,0 +1,300 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">{{ batch.name }}</h2>
+
+        <div class="flex items-center gap-3">
+            <button onclick="changeWeek(-1)" class="px-3 py-1 bg-gray-200 rounded">⬅</button>
+            <span class="font-semibold">Week <span id="week">1</span></span>
+            <button onclick="changeWeek(1)" class="px-3 py-1 bg-gray-200 rounded">➡</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-6">
+
+        <!-- MODULE PANEL -->
+        <div class="bg-white shadow rounded-xl p-4">
+            <h3 class="font-semibold mb-3">Modules</h3>
+
+            {% for module in modules %}
+
+            <!-- THEORY -->
+            <div class="draggable bg-blue-500 text-white p-3 rounded cursor-move mb-2"
+                 draggable="true"
+                 data-id="{{ module.id }}"
+                 data-type="THEORY"
+                 data-hours="{{ module.theory_hours }}">
+                {{ module.title }} (T)
+                <div class="text-xs mt-1">
+                    Remaining: <span class="remain">{{ module.theory_hours }}</span>
+                </div>
+            </div>
+
+            <!-- PRACTICAL -->
+            <div class="draggable bg-green-500 text-white p-3 rounded cursor-move mb-3"
+                 draggable="true"
+                 data-id="{{ module.id }}"
+                 data-type="PRACTICAL"
+                 data-hours="{{ module.practical_hours }}">
+                {{ module.title }} (P)
+                <div class="text-xs mt-1">
+                    Remaining: <span class="remain">{{ module.practical_hours }}</span>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+
+        <!-- GRID -->
+        <div class="col-span-3 bg-white shadow rounded-xl p-4">
+
+            <div class="grid grid-cols-8 gap-2 text-sm text-center">
+
+                <div></div>
+                {% for d in "1234567" %}
+                    <div class="font-semibold">Day {{ forloop.counter }}</div>
+                {% endfor %}
+
+                {% for slot in slots %}
+                <div class="font-semibold">
+                    {{ slot.start_time }} - {{ slot.end_time }}
+                </div>
+
+                {% for d in "1234567" %}
+                <div class="drop-zone border h-24 rounded p-1 flex flex-col"
+                     data-day="{{ forloop.counter }}"
+                     data-slot="{{ slot.id }}">
+                </div>
+                {% endfor %}
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+// =========================
+// GLOBAL STATE
+// =========================
+let dragged = null;
+let currentWeek = 1;
+let moduleState = {};
+
+// INIT MODULE STATE
+document.querySelectorAll('.draggable').forEach(el => {
+
+    const key = el.dataset.id + "_" + el.dataset.type;
+
+    moduleState[key] = {
+        remaining: parseFloat(el.dataset.hours),
+        el: el
+    };
+
+    el.addEventListener('dragstart', () => {
+        dragged = el;
+    });
+
+});
+
+// DROP + DELETE
+document.querySelectorAll('.drop-zone').forEach(zone => {
+
+    zone.addEventListener('dragover', e => e.preventDefault());
+
+    // DROP
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+
+        if (!dragged) return;
+
+        const id = dragged.dataset.id;
+        const type = dragged.dataset.type;
+        const key = id + "_" + type;
+
+        // only one per slot
+        if (zone.children.length > 0) {
+            zone.classList.add("bg-red-200");
+            setTimeout(() => zone.classList.remove("bg-red-200"), 400);
+            return;
+        }
+
+        if (!moduleState[key] || moduleState[key].remaining <= 0) {
+            alert("No remaining hours");
+            return;
+        }
+
+        moduleState[key].remaining -= 1;
+        updateUI(key);
+
+        const block = document.createElement("div");
+        let colorClass = type === "PRACTICAL"
+            ? "bg-green-500"
+            : "bg-blue-500";
+
+        block.className = `text-xs ${colorClass} text-white px-2 py-1 rounded mt-1 cursor-pointer`;
+        block.dataset.id = id;
+        block.dataset.type = type;
+
+        block.innerText = dragged.innerText;
+
+        zone.appendChild(block);
+
+        save(zone, id, type);
+    });
+
+    // DELETE
+    zone.addEventListener('dblclick', (e) => {
+
+        const block = e.target.closest('[data-id]');
+        if (!block) return;
+
+        const id = block.dataset.id;
+        const type = block.dataset.type;
+        const key = id + "_" + type;
+
+        if (moduleState[key]) {
+            moduleState[key].remaining += 1;
+            updateUI(key);
+        }
+
+        block.remove();
+
+        fetch("{% url 'batch:save_timetable' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRF()
+            },
+            body: JSON.stringify({
+                delete: true,
+                batch: {{ batch.id }},
+                week: currentWeek,
+                day: zone.dataset.day,
+                slot: zone.dataset.slot,
+                module: id
+            })
+        });
+    });
+
+});
+
+// SAVE
+function save(zone, id, type) {
+    fetch("{% url 'batch:save_timetable' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRF()
+        },
+        body: JSON.stringify({
+            module: id,
+            batch: {{ batch.id }},
+            week: currentWeek,
+            day: zone.dataset.day,
+            slot: zone.dataset.slot,
+            session_type: type,
+
+            // 🔥 ADD THESE
+            start_time: zone.dataset.start,
+            end_time: zone.dataset.end
+        })
+    });
+}
+
+// UPDATE UI
+function updateUI(key) {
+    moduleState[key].el.querySelector(".remain").innerText = moduleState[key].remaining;
+}
+
+// WEEK
+function changeWeek(v) {
+    currentWeek += v;
+    if (currentWeek < 1) currentWeek = 1;
+    document.getElementById("week").innerText = currentWeek;
+    load();
+}
+
+// CSRF
+function getCSRF() {
+    return document.cookie.split('; ')
+        .find(r => r.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+// LOAD
+function load() {
+
+    for (let key in moduleState) {
+        moduleState[key].remaining = parseFloat(moduleState[key].el.dataset.hours);
+        updateUI(key);
+    }
+
+    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}")
+    .then(res => res.json())
+    .then(data => {
+
+        document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
+
+        data.forEach(item => {
+
+            if (item.week != currentWeek) return;
+
+            const zone = document.querySelector(
+                `.drop-zone[data-day="${item.day}"][data-slot="${item.slot}"]`
+            );
+
+            if (!zone) return;
+
+            const key = item.module + "_" + (item.session_type || "THEORY");
+
+            if (moduleState[key]) {
+                let duration = getSlotDuration(zone);
+
+                moduleState[key].remaining -= duration;
+                updateUI(key);
+            }
+
+            const div = document.createElement("div");
+            let colorClass = item.session_type === "PRACTICAL"
+            ? "bg-green-500"
+            : "bg-blue-500";
+
+            div.className = `text-xs ${colorClass} text-white px-2 py-1 rounded mt-1`;
+
+                    div.dataset.id = item.module;
+            div.dataset.type = item.session_type;
+
+            div.innerText = item.module_name +
+                (item.session_type === "PRACTICAL" ? " (P)" : " (T)");
+
+            zone.appendChild(div);
+        });
+
+    });
+}
+
+function getSlotDuration(zone) {
+    let start = zone.dataset.start;
+    let end = zone.dataset.end;
+
+    let [sh, sm] = start.split(":").map(Number);
+    let [eh, em] = end.split(":").map(Number);
+
+    return (eh + em/60) - (sh + sm/60);
+}
+// INIT
+document.addEventListener("DOMContentLoaded", load);
+</script>
+
+{% endblock %}
