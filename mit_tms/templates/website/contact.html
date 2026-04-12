@@ -1,0 +1,126 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Contact | MIT{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-20 text-center">
+    <div class="max-w-4xl mx-auto px-6">
+
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight">
+            Let’s Connect
+        </h1>
+
+        <p class="mt-4 text-lg text-blue-100">
+            Have questions or need guidance? We’re always ready to help you.
+        </p>
+
+    </div>
+</section>
+
+<!-- ================= CONTACT SECTION ================= -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
+
+        <!-- ================= LEFT SIDE ================= -->
+        <div class="space-y-8">
+
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                    Get in Touch
+                </h2>
+                <p class="text-gray-600">
+                    Reach out to us for course details, career guidance, or any inquiries. We’ll respond as quickly as possible.
+                </p>
+            </div>
+
+            <!-- Contact Cards -->
+            <div class="space-y-4">
+
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">📧</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-semibold text-gray-800">info@mit.lk</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+                    <div class="bg-green-100 text-green-600 p-3 rounded-lg">📞</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Phone</p>
+                        <p class="font-semibold text-gray-800">+94 7X XXX XXXX</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+                    <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">📍</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Location</p>
+                        <p class="font-semibold text-gray-800">Negombo, Sri Lanka</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Map -->
+            <div class="rounded-2xl overflow-hidden shadow-lg border">
+                <iframe
+                    src="https://maps.google.com/maps?q=Negombo%20Sri%20Lanka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    class="w-full h-72 border-0">
+                </iframe>
+            </div>
+
+        </div>
+
+        <!-- ================= FORM ================= -->
+        <div class="bg-white p-10 rounded-2xl shadow-xl border">
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                Send Us a Message
+            </h2>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name
+                    </label>
+                    <input type="text" name="name" required
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                    </label>
+                    <input type="email" name="email" required
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Message
+                    </label>
+                    <textarea name="message" rows="5" required
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></textarea>
+                </div>
+
+                <!-- Button -->
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-105 hover:shadow-lg transition duration-300">
+                    🚀 Send Message
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

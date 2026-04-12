@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Users{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4">
+
+    <!-- 🔷 Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800">👤 User Management</h2>
+
+        <a href="{% url 'accounts:user_create' %}"
+           class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 transition">
+            + New User
+        </a>
+    </div>
+<form method="get" class="mb-6">
+    <div class="flex items-center gap-3">
+
+        <!-- 🔍 Search Input -->
+        <div class="relative w-full max-w-md">
+            <input
+                type="text"
+                name="q"
+                value="{{ request.GET.q }}"
+                placeholder="Search users by username or email..."
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl shadow-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       text-sm transition"
+            >
+
+            <!-- 🔍 Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="absolute left-3 top-3.5 h-5 w-5 text-gray-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </div>
+
+        <!-- 🔘 Search Button -->
+        <button
+            type="submit"
+            class="bg-blue-600 text-white px-5 py-3 rounded-xl shadow-sm
+                   hover:bg-blue-700 transition text-sm font-medium">
+            Search
+        </button>
+
+    </div>
+</form>
+    <!-- 🔷 Table -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+
+        <table class="w-full text-sm text-left">
+
+            <!-- Header -->
+            <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs tracking-wide">
+                <tr>
+                    <th class="p-4">Username</th>
+                    <th class="p-4">Email</th>
+                    <th class="p-4">Role</th>
+                    <th class="p-4">Joined</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <!-- Body -->
+            <tbody class="divide-y">
+
+            {% for user in users %}
+                <tr class="hover:bg-gray-50 transition">
+
+                    <td class="p-4 font-medium text-gray-800">
+                        {{ user.username }}
+                    </td>
+
+                    <td class="p-4 text-gray-600">
+                        {{ user.email|default:"-" }}
+                    </td>
+
+                    <td class="p-4">
+                        <span class="px-2 py-1 rounded text-xs font-medium
+                            {% if user.profile.role == 'ADMIN' %}
+                                bg-red-100 text-red-700
+                            {% elif user.profile.role == 'TEACHER' %}
+                                bg-green-100 text-green-700
+                            {% else %}
+                                bg-blue-100 text-blue-700
+                            {% endif %}
+                        ">
+                            {{ user.profile.role }}
+                        </span>
+                    </td>
+
+                    <td class="p-4 text-gray-600">
+                        {{ user.date_joined|date:"Y-m-d" }}
+                    </td>
+
+                    <td class="p-4 text-right space-x-3">
+
+                        <a href="{% url 'accounts:user_detail' user.pk %}"
+                           class="text-blue-600 hover:text-blue-800 font-medium">
+                            View
+                        </a>
+
+                        <a href="{% url 'accounts:user_update' user.pk %}"
+                           class="text-yellow-600 hover:text-yellow-800 font-medium">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'accounts:user_delete' user.pk %}"
+                           class="text-red-600 hover:text-red-800 font-medium">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-gray-500">
+                        No users found.
+                        <a href="{% url 'accounts:user_create' %}"
+                           class="text-blue-600 underline ml-1">
+                            Create your first user
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- 🔷 Pagination -->
+    {% if is_paginated %}
+    <div class="mt-6 flex justify-center items-center space-x-2 text-sm">
+
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Prev
+            </a>
+        {% endif %}
+
+        <span class="px-4 py-1 bg-blue-100 rounded">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Next
+            </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

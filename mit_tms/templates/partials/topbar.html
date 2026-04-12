@@ -67,6 +67,11 @@
                 ⚙️ Settings
             </a>
 
+                {% if request.user.is_staff %}
+                    <a href="/admin/" class="dropdown-link">
+                        🛠 Admin Panel
+                    </a>
+                {% endif %}
             <!-- Logout -->
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}

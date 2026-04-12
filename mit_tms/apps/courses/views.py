@@ -31,7 +31,6 @@ class CourseListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Course.objects.all().order_by('-created_at')
 
-
 # 🔍 Course Detail
 class CourseDetailView(LoginRequiredMixin, DetailView):
     model = Course
@@ -53,22 +52,51 @@ class CourseDetailView(LoginRequiredMixin, DetailView):
         # 🔥 COURSE VALUES
         course_theory = self.object.theory_hours or 0
         course_practical = self.object.practical_hours or 0
+        course_assignment = self.object.assignment_hours or 0
 
         context['course_theory'] = course_theory
         context['course_practical'] = course_practical
-        context['course_industry'] = self.object.industry_training_hours or 0
+        context['course_industry'] = course_assignment   # keep your name (no break)
+
         context['total_hours_sum'] = total_theory + total_practical
-        # 🔥 MONTHS
         context['total_months'] = self.object.duration_months
 
-        # 🔥 ✅ MATCH CHECK (NEW)
+        # 🔥 ADDITIONAL COURSE DETAILS (NEW)
+        context['course_level'] = self.object.level
+        context['course_medium'] = self.object.medium
+        context['delivery_mode'] = self.object.delivery_mode
+        context['course_mode'] = self.object.course_mode
+        context['entry_qualification'] = self.object.entry_qualification
+
+        context['nvq_level'] = self.object.nvq_level
+        context['qualification_code'] = self.object.qualification_code
+
+        context['batches_per_year'] = self.object.batches_per_year
+        context['students_per_batch'] = self.object.students_per_batch
+
+        context['course_fee'] = self.object.course_fee
+        context['is_free'] = self.object.is_free
+        context['fee_includes'] = self.object.fee_includes
+
+        context['tools'] = self.object.tools_available
+        context['equipment'] = self.object.equipment_available
+        context['machinery'] = self.object.machinery_available
+
+        context['prerequisite'] = self.object.prerequisite
+        context['learning_outcomes'] = self.object.learning_outcomes
+
+        context['industry_sector'] = self.object.industry_sector
+        context['equivalent_course'] = self.object.equivalent_course
+
+        context['is_active'] = self.object.active
+
+        # 🔥 MATCH CHECK
         context['is_matching'] = (
             total_theory == course_theory and
             total_practical == course_practical
         )
 
         return context
-
 
 # ➕ Create Course
 class CourseCreateView(LoginRequiredMixin, CreateView):

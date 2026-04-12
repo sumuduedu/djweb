@@ -16,27 +16,36 @@ def calculate_end_date(batch):
         return batch.start_date
 
     total_weeks = total_hours / weekly_hours
-    total_days = int(total_weeks * batch.days_per_week)  # ✅ FIXED
+    total_days = int(total_weeks * batch.days_per_week)
 
     return batch.start_date + timedelta(days=total_days)
 
+
+# =========================================================
+# 🔷 TIME SLOT
+# =========================================================
+
 class TimeSlot(models.Model):
-    name = models.CharField(max_length=50, blank=True)  # e.g. "Morning 1"
+    name = models.CharField(max_length=50, blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    order = models.IntegerField()  # for sorting
-
+    order = models.IntegerField()
     is_break = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['order']  # ✅ added (safe improvement)
 
     def __str__(self):
         return f"{self.start_time} - {self.end_time}"
+
+
 # =========================================================
 # 🔷 ACADEMIC YEAR
 # =========================================================
 
 class AcademicYear(models.Model):
-    name = models.CharField(max_length=20)  # e.g. "2026"
+    name = models.CharField(max_length=20)
     start_date = models.DateField()
     end_date = models.DateField()
 
@@ -71,6 +80,8 @@ class Batch(models.Model):
     # 🔥 AUTO CALCULATED END DATE
     @property
     def end_date(self):
+        if not self.start_date:
+            return None
         return calculate_end_date(self)
 
     def __str__(self):
@@ -80,12 +91,31 @@ class Batch(models.Model):
 # =========================================================
 # 🔷 TIMETABLE
 # =========================================================
+
 class Timetable(models.Model):
     batch = models.ForeignKey(
         'Batch',
         on_delete=models.CASCADE,
         related_name='timetable'
     )
+
+    module = models.ForeignKey('courses.Module', on_delete=models.CASCADE)
+    slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+
+    week = models.IntegerField()
+
+    DAY_CHOICES = [
+        (1, 'Monday'),
+        (2, 'Tuesday'),
+        (3, 'Wednesday'),
+        (4, 'Thursday'),
+        (5, 'Friday'),
+        (6, 'Saturday'),
+        (7, 'Sunday'),
+    ]
+
+    day = models.IntegerField(choices=DAY_CHOICES)
+    row_slot = models.IntegerField()
 
     hours = models.FloatField(default=1)
 
@@ -100,13 +130,6 @@ class Timetable(models.Model):
         default='THEORY'
     )
 
-    module = models.ForeignKey('courses.Module', on_delete=models.CASCADE)
-    slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
-
-    week = models.IntegerField()
-    day = models.IntegerField()
-    row_slot = models.IntegerField()
-
     date = models.DateField(null=True, blank=True)
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
@@ -114,10 +137,15 @@ class Timetable(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["batch", "date", "slot"],
-                name="unique_batch_slot"
+                fields=["batch", "day", "row_slot"],
+                name="unique_batch_day_slot"
             )
         ]
+
+    def __str__(self):
+        return f"{self.batch} - Day {self.day} Slot {self.row_slot}"
+
+
 # =========================================================
 # 🔷 SESSION
 # =========================================================
@@ -130,7 +158,6 @@ class Session(models.Model):
     )
 
     conducted = models.BooleanField(default=False)
-
     notes = models.TextField(blank=True)
 
     started_at = models.DateTimeField(null=True, blank=True)
@@ -141,6 +168,11 @@ class Session(models.Model):
 
     def __str__(self):
         return f"Session - {self.timetable.date}"
+
+
+# =========================================================
+# 🔷 MODULE PLAN
+# =========================================================
 
 class ModulePlan(models.Model):
     batch = models.ForeignKey('Batch', on_delete=models.CASCADE, related_name='plans')
@@ -154,7 +186,3 @@ class ModulePlan(models.Model):
 
     def __str__(self):
         return f"{self.module.title} ({self.start_date} - {self.end_date})"
-
-# apps/batch/models.py
-
-
