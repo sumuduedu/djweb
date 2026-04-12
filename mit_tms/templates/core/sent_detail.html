@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="p-6 max-w-3xl mx-auto">
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-bold mb-4">📤 Sent Message</h2>
+
+        <p><strong>To:</strong> {{ msg.to_email }}</p>
+        <p><strong>Subject:</strong> {{ msg.subject }}</p>
+        <p><strong>Date:</strong> {{ msg.sent_at }}</p>
+
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+            {{ msg.message }}
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'sent' %}" class="text-gray-500 hover:underline">
+                ← Back to Sent
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -73,14 +73,13 @@
                     </a>
                 {% endif %}
             <!-- Logout -->
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit"
-                        class="dropdown-link text-red-500 w-full text-left">
-                    🚪 Logout
-                </button>
-            </form>
-
+<form method="post" action="{% url 'logout' %}" class="inline">
+    {% csrf_token %}
+<button type="submit"
+    class="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 rounded transition">
+    🚪 Logout
+</button>
+</form>
         </div>
 
     </div>
@@ -113,7 +112,7 @@ function toggleUserMenu() {
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('userMenu');
 
-    if (!e.target.closest('#userMenu') && !e.target.closest('button')) {
+    if (!e.target.closest('#userMenu') && !e.target.closest('[onclick="toggleUserMenu()"]')) {
         menu.classList.add('hidden');
     }
 });

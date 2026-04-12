@@ -51,6 +51,7 @@ LOCAL_APPS = [
     'apps.website.apps.WebsiteConfig',
     'apps.accounts.apps.AccountsConfig',   # ✅ ADD THIS
     'apps.batch.apps.BatchConfig',
+     'apps.scheduling.apps.SchedulingConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -159,7 +160,7 @@ SITE_ID = 1
 
 
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/app/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -175,3 +176,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_UNIQUE_EMAIL = True

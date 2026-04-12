@@ -66,71 +66,82 @@
             </thead>
 
             <!-- Body -->
-            <tbody class="divide-y">
+ <tbody class="divide-y">
 
-            {% for user in users %}
-                <tr class="hover:bg-gray-50 transition">
+{% now "Y-m-d" as today %}
 
-                    <td class="p-4 font-medium text-gray-800">
-                        {{ user.username }}
-                    </td>
+{% for user in users %}
+<tr class="hover:bg-gray-50 transition {% if user.is_new %}bg-green-50{% endif %}">
+<td class="p-4 font-medium text-gray-800">
+    {{ user.username }}
 
-                    <td class="p-4 text-gray-600">
-                        {{ user.email|default:"-" }}
-                    </td>
+    {% if user.is_new %}
+        <span class="ml-2 text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded">
+            🟢 NEW
+        </span>
+    {% endif %}
+</td>
 
-                    <td class="p-4">
-                        <span class="px-2 py-1 rounded text-xs font-medium
-                            {% if user.profile.role == 'ADMIN' %}
-                                bg-red-100 text-red-700
-                            {% elif user.profile.role == 'TEACHER' %}
-                                bg-green-100 text-green-700
-                            {% else %}
-                                bg-blue-100 text-blue-700
-                            {% endif %}
-                        ">
-                            {{ user.profile.role }}
-                        </span>
-                    </td>
+        <td class="p-4 text-gray-600">
+            {{ user.email|default:"-" }}
+        </td>
 
-                    <td class="p-4 text-gray-600">
-                        {{ user.date_joined|date:"Y-m-d" }}
-                    </td>
+        <td class="p-4">
+            <span class="px-2 py-1 rounded text-xs font-medium
+                {% if user.profile.role == 'ADMIN' %}
+                    bg-red-100 text-red-700
+                {% elif user.profile.role == 'TEACHER' %}
+                    bg-green-100 text-green-700
+                {% else %}
+                    bg-blue-100 text-blue-700
+                {% endif %}
+            ">
+                {{ user.profile.role }}
+            </span>
+        </td>
 
-                    <td class="p-4 text-right space-x-3">
+        <td class="p-4 text-gray-600">
+            {% if user.date_joined|date:"Y-m-d" == today %}
+                <span class="text-green-600 font-medium">Today</span>
+            {% else %}
+                {{ user.date_joined|date:"Y-m-d" }}
+            {% endif %}
+        </td>
 
-                        <a href="{% url 'accounts:user_detail' user.pk %}"
-                           class="text-blue-600 hover:text-blue-800 font-medium">
-                            View
-                        </a>
+        <td class="p-4 text-right space-x-3">
 
-                        <a href="{% url 'accounts:user_update' user.pk %}"
-                           class="text-yellow-600 hover:text-yellow-800 font-medium">
-                            Edit
-                        </a>
+            <a href="{% url 'accounts:user_detail' user.pk %}"
+               class="text-blue-600 hover:text-blue-800 font-medium">
+                View
+            </a>
 
-                        <a href="{% url 'accounts:user_delete' user.pk %}"
-                           class="text-red-600 hover:text-red-800 font-medium">
-                            Delete
-                        </a>
+            <a href="{% url 'accounts:user_update' user.pk %}"
+               class="text-yellow-600 hover:text-yellow-800 font-medium">
+                Edit
+            </a>
 
-                    </td>
+            <a href="{% url 'accounts:user_delete' user.pk %}"
+               class="text-red-600 hover:text-red-800 font-medium">
+                Delete
+            </a>
 
-                </tr>
+        </td>
 
-            {% empty %}
-                <tr>
-                    <td colspan="5" class="p-8 text-center text-gray-500">
-                        No users found.
-                        <a href="{% url 'accounts:user_create' %}"
-                           class="text-blue-600 underline ml-1">
-                            Create your first user
-                        </a>
-                    </td>
-                </tr>
-            {% endfor %}
+    </tr>
 
-            </tbody>
+{% empty %}
+    <tr>
+        <td colspan="5" class="p-8 text-center text-gray-500">
+            No users found.
+            <a href="{% url 'accounts:user_create' %}"
+               class="text-blue-600 underline ml-1">
+                Create your first user
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+
+</tbody>
 
         </table>
 

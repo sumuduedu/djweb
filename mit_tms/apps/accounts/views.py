@@ -75,6 +75,11 @@ from apps.accounts.models import Profile
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.views.generic import ListView
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
+from django.views.generic import ListView
+from django.contrib.auth.models import User
 
 class UserListView(ListView):
     model = User
@@ -83,7 +88,7 @@ class UserListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by('-date_joined')
         query = self.request.GET.get('q')
 
         if query:
@@ -91,6 +96,10 @@ class UserListView(ListView):
                 Q(username__icontains=query) |
                 Q(email__icontains=query)
             )
+
+        # 🔥 Mark new users (last 24 hours)
+        for user in queryset:
+            user.is_new = user.date_joined >= timezone.now() - timedelta(days=1)
 
         return queryset
 

@@ -23,7 +23,7 @@
 <section class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-6">
 
-        <!-- Filter / Search (Optional UI ready) -->
+        <!-- Header + Search -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
 
             <h2 class="text-2xl font-bold text-gray-800">
@@ -45,15 +45,15 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
 
             {% for course in courses %}
-            <div class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition duration-300 overflow-hidden border">
+            <div class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition duration-300 overflow-hidden border flex flex-col">
 
-                <!-- Top Banner -->
-                <div class="h-40 bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold">
-                    {{ course.title|truncatechars:20 }}
+                <!-- Banner -->
+                <div class="h-40 bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-lg font-semibold text-center px-4">
+                    {{ course.title|truncatechars:30 }}
                 </div>
 
                 <!-- Content -->
-                <div class="p-6">
+                <div class="p-6 flex flex-col flex-grow">
 
                     <h2 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition">
                         {{ course.title }}
@@ -64,11 +64,11 @@
                     </p>
 
                     <p class="text-gray-600 mt-3 text-sm line-clamp-3">
-                        {{ course.description }}
+                        {{ course.description|truncatechars:120 }}
                     </p>
 
-                    <!-- Price + Button -->
-                    <div class="mt-6 flex justify-between items-center">
+                    <!-- Footer -->
+                    <div class="mt-auto pt-6 flex justify-between items-center">
 
                         <span class="text-lg font-bold text-blue-600">
                             {% if course.is_free %}
@@ -78,11 +78,12 @@
                             {% endif %}
                         </span>
 
-                        <a href="/courses/{{ course.id }}/"
-                           class="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                            View →
-                        </a>
+                        <!-- ✅ FIXED BUTTON -->
 
+<a href="{% url 'enroll' %}?course={{ course.id }}"
+   class="bg-blue-600 text-white px-6 py-3 rounded-xl">
+   Enroll Now
+</a>
                     </div>
 
                 </div>
