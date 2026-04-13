@@ -145,44 +145,56 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+SITE_ID = 1
+# ===============================
+# STATIC & MEDIA FILES
+# ===============================
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']   # your custom static files
-STATIC_ROOT = BASE_DIR / 'staticfiles'     # for production
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
+# ===============================
+# AUTH (FINAL CLEAN VERSION)
+# ===============================
 
-SITE_ID = 1
-
-
-
-
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/app/dashboard/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = '/'
 
+# 🔥 REQUIRED (fixes your error)
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 
-# ===============================
-# EMAIL CONFIGURATION (.env)
-# ===============================
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# 🔥 New allauth format (ONLY these — no old ones)
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 
-EMAIL_HOST_USER = config('EMAIL_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
-OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+ACCOUNT_SIGNUP_FIELDS = [
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+    'email*',
 
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+]
 
-SOCIALACCOUNT_LOGIN_ON_GET = True
+# 🔥 Email settings
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_UNIQUE_EMAIL = True
+
+
+# ===============================
+# GOOGLE LOGIN
+# ===============================
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.MySocialAccountAdapter'
+
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')

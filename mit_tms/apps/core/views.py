@@ -16,6 +16,7 @@ from apps.accounts.models import Profile
 from apps.website.models import Enrollment, ContactMessage
 from .forms import CustomSignupForm
 
+from django.contrib.auth import login
 
 class BaseView(LoginRequiredMixin, TemplateView):
     allowed_roles = None
@@ -71,20 +72,18 @@ class StudentDashboardView(BaseView):
 class TeacherDashboardView(BaseView):
     allowed_roles = ['TEACHER']
     template_name = "dashboard/teacher.html"
-
 @login_required
 def dashboard_redirect(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
-    role = profile.role
 
-    if role == 'ADMIN':
+    if profile.role == 'ADMIN':
         return redirect('admin_dashboard')
-    elif role == 'TEACHER':
+    elif profile.role == 'TEACHER':
         return redirect('teacher_dashboard')
-    elif role == 'STUDENT':
+    elif profile.role == 'STUDENT':
         return redirect('student_dashboard')
 
-    return redirect('home')
+    return redirect('student_dashboard')   # 🔥 fallback
 
 class SignupView(View):
 
@@ -127,7 +126,6 @@ class SignupView(View):
             })
 
         return render(request, 'auth/signup.html', {'form': form})
-
 class ActivateAccountView(View):
 
     def get(self, request, uidb64, token):
@@ -140,10 +138,12 @@ class ActivateAccountView(View):
         if user and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-            return render(request, 'auth/activation_success.html')
+
+            login(request, user)   # 🔥 AUTO LOGIN
+
+            return redirect('dashboard')   # 🔥 go to dashboard
 
         return render(request, 'auth/activation_failed.html')
-
 
 class StudentCoursesView(BaseView):
     allowed_roles = ['STUDENT']
@@ -159,6 +159,6 @@ class StudentCoursesView(BaseView):
         return context
 
 
-
 class StudentAttendanceView(BaseView):
-    pass
+    allowed_roles = ['STUDENT']
+    template_name = "student/attendance.html"
