@@ -38,7 +38,9 @@
                 <th class="p-4">Level</th>
                 <th class="p-4">NVQ</th>
                 <th class="p-4">Duration</th>
+                <th class="p-4">Hours</th>
                 <th class="p-4">Fees</th>
+                <th class="p-4">Status</th>
                 <th class="p-4 text-right">Actions</th>
             </tr>
         </thead>
@@ -79,9 +81,31 @@
                     {{ course.duration_months }} months
                 </td>
 
-                <!-- Fees (FIXED) -->
+                <!-- Total Hours -->
                 <td class="p-4 text-gray-600">
-                    Rs. {{ course.course_fee }}
+                    {{ course.total_hours }} hrs
+                </td>
+
+                <!-- Fees -->
+                <td class="p-4 text-gray-600">
+                    {% if course.course_fee %}
+                        Rs. {{ course.course_fee }}
+                    {% else %}
+                        <span class="text-green-600 font-medium">Free</span>
+                    {% endif %}
+                </td>
+
+                <!-- Status -->
+                <td class="p-4">
+                    {% if course.active %}
+                        <span class="px-2 py-1 text-xs rounded-md bg-green-100 text-green-700">
+                            Active
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-1 text-xs rounded-md bg-red-100 text-red-600">
+                            Inactive
+                        </span>
+                    {% endif %}
                 </td>
 
                 <!-- Actions -->
@@ -108,7 +132,7 @@
         {% empty %}
             <!-- 💤 Empty State -->
             <tr>
-                <td colspan="7" class="p-6 text-center text-gray-500">
+                <td colspan="9" class="p-6 text-center text-gray-500">
                     No courses available.
                     <a href="{% url 'course_create' %}" class="text-blue-600 underline ml-1">
                         Create one

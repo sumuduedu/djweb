@@ -11,14 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+from decouple import config, Csv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SITE_ID = 1
 
-LOGIN_REDIRECT_URL = '/app/'
-LOGOUT_REDIRECT_URL = '/'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -28,12 +25,12 @@ AUTHENTICATION_BACKENDS = [
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2%0m$iicv@&&fn8c_rd)o*-w@5jlyu)fuor!!x*$=i*s#toayh'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']  # dev only
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Application definition
@@ -53,6 +50,8 @@ LOCAL_APPS = [
     'apps.core.apps.CoreConfig',
     'apps.website.apps.WebsiteConfig',
     'apps.accounts.apps.AccountsConfig',   # ✅ ADD THIS
+    'apps.batch.apps.BatchConfig',
+     'apps.scheduling.apps.SchedulingConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -156,8 +155,34 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'     # for production
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-STATICFILES_DIRS = [BASE_DIR / 'static']
+SITE_ID = 1
 
-LOGIN_URL = '/login/'
+
+
+
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/app/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+# ===============================
+# EMAIL CONFIGURATION (.env)
+# ===============================
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = config('EMAIL_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_UNIQUE_EMAIL = True

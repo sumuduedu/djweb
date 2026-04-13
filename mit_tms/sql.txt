@@ -1,0 +1,422 @@
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (1, 'K72S004M01', 'Maintaining files & folders', 'OS', 1, 'Formative Assessment
+Summative Assessment', '2026-04-05 16:53:14.849276', 'After completion of this module the trainee will be able to:
+Identify components of Windows desktop environment.
+Modify operating system configuration of a computer.
+Handle files and folders according to the given requirement
+Perform system maintenance to optimize computer performance.', 'CORE', 'Practical:
+Identify system configuration and make necessary changes in settings
+for a given scenario.
+Create user accounts with different types of control.
+Create folder structure and modify the structure and its attributes
+according to the given instructions.
+Create different types of files and change their attributes.
+Use disk defragmenter tool to improve system performance', 6, 'Assignments
+Presentations
+Illustrated talk
+Demonstrations', 'Theory:
+Setting up a computer for use
+Basic components of an operating system and its user interface
+How to identify configuration of an OS and modify its settings
+File systems and controlling files and folders.
+How to optimize a computer performance and available tools to achieve it.', 18, 0, '1');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (2, 'K72S004M02', 'Performing word processing', 'Non', 1, 'Formative Assessment
+Summative Assessment', '2026-04-05 16:53:14.849276', 'After completion of this module the trainee will be able to:
+perform each of the tasks mentioned here according to the relevant
+standards.', 'CORE', 'Practical:
+Create a CV (should include a photograph, O/L examination results)
+Create a report minimum of five pages based on given scenario
+Prepare a printing label sheet using the given address list', 36, 'Assignments
+Presentations
+Demonstrations', 'Theory:
+Introduction to Word Processing
+o What is Word Processing
+o Available word processing packages
+o Features of the word processing package
+ Elements of the interface of the word processing
+package
+Setting up of the page setup
+Available templates, usage of them, customize them and create new
+ones
+Spelling, Grammer Grammar and Thesaurus
+Text and paragraph formatting
+o Font
+o Alignment
+o Columns
+o Tab setting
+o Bullets and Numbering
+Features of
+Working with drawing objects
+Insert Images into the document
+o Positioning of image with text wrapping
+Insert charts into the document
+Styles and Table of contents (TOC)
+Performing mail merge
+Find & replace text
+Working with headers and footers
+Review documents
+o Comments and Track changes
+Saving documents
+o Different file formats
+Print documents / envelops / labels
+Security of documents
+o Passwords
+o Auto save and restoring
+Uses of online word processing tools
+Usage of help function for unknown activities', 24, 0, '2');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (3, 'K72S004M03', 'Preparing spread sheets', 'non', 1, 'Formative Assessment
+Summative Assessment', '2026-04-06 02:47:13.165184', 'After completion of this module the trainee will be able to:
+perform each of the tasks mentioned here according to the relevant
+standards.', 'CORE', 'Practical:
+ Create a excel database including classmates’ information and present
+the data to class room using charts, graphs and other analytical tools
+Perform a simple statistical analysis on set of Financial Data', 36, 'Assignments
+Illustrated talk
+Demonstrations
+Role play & Drama', 'Theory:
+ Introduction to Spreadsheet applications
+o What is Spreadsheet application
+o Available Spreadsheet application packages
+o Features of the Spreadsheet application package
+ Elements of the interface of the Spreadsheet
+application package
+ Format work sheet
+o Number formats and their usage
+ Working with open windows
+o Vertical / Horizontal/ Cascade
+o Freeze panes
+o Move, Copy spreadsheets
+ Fill, Sort and Filter data
+o Conditional formatting
+ Absolute / Relative/Mix cell reference
+o Working with multiple worksheets
+ Apply built – in functions and formulas
+o Basic statistical concepts Mean, Median, Count, Sum, Average,
+Standard Deviation, Minimum, Maximum
+o Basic Logical functions IF, Nested IF
+ Prepare graphs and charts
+o Components of a Chart/Graphs
+o Type of Chart/Graph
+ Use data tools
+ Define a name for a cell/ cell range
+ Create a pivot table
+ Develop and customize worksheet
+ Set Page properties and print a spread sheet', 24, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (4, 'K72S004M04', 'Preparing presentations', '', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 02:48:32.152736', 'After completion of this module the trainee will be able to:
+perform each of the tasks mentioned here according to the relevant
+standards.', 'CORE', 'Practical:
+ Create an interactive personation presentation on either of following
+topics
+o History of internet
+o History of computer
+o Cyber security
+o Good practices of social media usages', 18, 'Assignments
+
+ Illustrated talk
+
+ Demonstrations', 'Theory:
+ Introduction to Presentation Software
+ Creating a presentation
+ Apply design templates to an existing presentation
+ Create themes
+ Insert different media
+ Slide transition and animation
+ Recording a presentation
+ Insert action buttons and hyperlinks
+ Conduct the presentation
+ Save presentations
+ Print slides
+ Best practices in presentations', 12, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (5, 'K72S004M05', 'Performing basic operations of cloud computing including internet and email services', 'Non', 1, 'Formative Assessment
+Summative Assessment', '2026-04-06 02:51:13.092617', 'After completion of this module the trainee will be able to:
+perform each of the tasks mentioned here according to the relevant standards.', 'CORE', 'Visit to a given URL appropriately
+Extract the required details/images/video using a search engine
+Download required resources such as
+document/image/audio/video/software
+Customize the web browser’s setting as required
+Send an email with an attachment to few people using both Cc and Bcc
+options
+Create a collaborative document which can be edited by few people
+Upload a file to a cloud storage space', 24, 'Assignments
+Presentation
+Illustrated talk
+Demonstrations', 'Evolution of Internet, WWW and email
+Function of the ISP
+Methods can use to connect to Internet
+Basic Protocols use in Internet and email
+URL/URI, Domain name, IP Address basics
+How to use a Web browser
+Customizing/fine tuning the Web Browser (setting up home page,
+Security & Privacy settings, clearing history, cookies and browsing data)
+
+
+Bookmarks/favorites
+Install/uninstall plug-in/add-on/extensions for web browsers
+Search engines and how the searching takes place
+AI based search engines
+Searching techniques
+Downloading various files from Internet (documents, audios, videos,
+images, software etc.)
+ Internet ethics and safety (Plagiarism, Security, Privacy)
+Introduction to emails and its uses
+How to get an email account
+Sending and receiving emails (using Cc, Bcc and attachments)
+Replying, forwarding email messages
+Creating/managing email folders
+Creating/managing address book/s
+How to handle spam/junk mails
+ Printing web page/part of a web page and email/s
+What is social media and why use it?
+Safety measure should take when using social media
+How to make a YouTube channel
+Features of document collaboration software
+Features of spreadsheet collaboration software
+Features of presentation collaboration software
+Creating, handling and collect data using online forms
+What is video conferencing?
+Basic requirements for video conferencing
+
+
+
+
+Popular video conferencing tools available
+Inviting/Handling participants for video conferencing sessions
+Facilities available on video conferencing tools
+Basics of Cloud Computing
+Services available in Cloud Computing (Iaas, Paas, Saas)
+Cloud deployment models (Public, Private, Community, and Hybrid)
+Advantages/disadvantages of Cloud computing
+Popular Cloud Service Providers (e.g., Amazon Web Services (AWS),
+Microsoft Azure, Google Cloud Platform, IBM Cloud Services, VMware
+Cloud, Oracle cloud … etc.)
+How to use a cloud for collaboration? (e.g., Google Drive)', 24, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (6, 'K72S004M06', 'Perform Basic database manipulation', '', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 02:52:23.298004', 'After completion of this module the trainee will be able to:
+Create a database with the relevant relationships, Forms, queries and
+reports.', 'CORE', 'Practical:
+ Design a database with minimum 3 tables with the relevant relationship
+relationships, and should include one Form, one query and one report.', 36, '
+
+
+Assignments
+Illustrated talk
+Demonstrations', 'Theory:
+ Introduction to Relational Database Management Systems (RDBMS)
+o What is RDBMS
+o Available RDBMS
+o Features of the RDBMS
+ Structure of a tables
+o Fields/columns
+o Data types
+o Field size
+o Data field Validation rules
+ Different keys using RDBMS
+o Primary key
+o Foreign key
+ Relationships among tables
+ Working with forms
+ Working with queries
+o Use of aggregate functions
+ Working with reports
+o Use of aggregate functions
+ Import data from External data source/s', 24, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (7, 'K72S004M07', 'Computer system, network and peripherals', 'Non', 1, 'Formative Assessment
+Summative Assessment', '2026-04-06 02:58:24.479720', 'After completion of this module the trainee will be able to:
+ Identify the component of the computer system
+ Install and configure different application software
+ Obtain backup of the hard disk
+ Describe networking concept and component
+ Identify Network tools
+ Describe the basic network environment and related
+services', 'CORE', 'Identify a basic hardware fault
+ Install an operating system and make sure standard performance of the
+computer (Group)
+ Configure computer with wireless network
+ Network three computers using switch
+ Create cross and straight two cables', 24, 'Assignments
+Illustrated talk
+Demonstrations
+Role play & Drama', 'Theory:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Identifying the components of the different types of computers and
+their functionalities (RAM Types, Motherboard form factor, Power
+Supply Form factor, Hard disk – HDD, SSHD, SSD, PCIe SSD, VGA /
+Adaptor Cards, Processors, etc.)
+Basic hardware faults
+Check hardware compatibility with operating system
+Preparation of the computer for installation
+Installing the operating system
+Installing device drivers
+Installing application software
+Backups and restore points
+Ensure standard performance
+Disk cleanup and Defragmentation
+Importance of power management system
+Principals of Networking
+o Components and types of computer networks
+basic networking concepts and technologies
+o Configure network connectivity between PCs.
+types of topologies
+o purpose and characteristics of networking
+standards
+o LAN topologies
+physical components of a network
+o purpose of physical components of a network
+Ethernet standards
+o Wired and Wireless Standards
+Networking Standards
+o OSI and TCP/IP data models
+Identification of routers, switches and othernetwork devices
+Importance of installing anti- malware software
+
+
+Basics of cyber threats, their effect and prevention method
+Importance of Ethical usage and Legal implications of
+unauthorized software/data usage
+o Software Licensing', 36, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (8, 'K72S004BM01', 'Communication skills for workplace', '', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 07:49:50.347781', 'After completion of this module the trainee will be able to:
+- communicate ideas and information at the workplace effectively', 'BASIC', ' Role plays and dramas
+ Assignments 01 - Provide opportunities to trainees to present learned
+content
+ Assignments 02 – Prepare list of 250 – 300 technical / vocational terms
+in English used in relevant industry during the course period
+ Assignment 03 – Collect manufacturers guidelines/ operational
+instructions / specifications in relevant field, prepare a file and
+interpret the information', 12, '
+
+
+
+Assignments
+Illustrated talk
+Demonstrations
+Role play & Drama', ' Listening skills
+ Telephone etiquettes
+ Presentation skills
+ Verbal and non-verbal communication
+ Safety symbols & procedures
+ Basic English relevant to workplace and type of work
+ Organization’s rules, regulations and procedures
+ General norms of polite conduct
+ Forms of Different manner of address appropriately to customers,
+superior and subordinates and persons in different positions
+ Customs and practices of different ethnic and religious groups
+ Gender issues relevant to the communications
+ Trends in related technology
+ Friendliness through a friendly tone, a personal question, or simply a
+smile, encourage coworkers to engage in open and honest
+communication
+ Respect – convey respect for others and their ideas', 12, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (9, 'K72S004BM02', 'Workshop calculation & science', '', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 07:51:00.589351', 'After completion of this module the trainee will be able to:
+ Perform basic arithmetic and trigonometric operations in the
+workplace when and where required.
+ Describe electrical characteristics related to hardware
+process', 'BASIC', 'Practice arithmetic and trigonometric operations,
+ Measuring Practice', 15, ' Illustrated talk
+ Demonstrations
+ Group and individual practices
+ Use video clips
+ Assignments', '
+ Basic Arithmetic.
+
+ Area, Volume
+
+ Basic trigonometry and angles.
+
+ Units and Measurements (Length, Volume, Speed, Time).
+
+ Conversion from metric to BS and vice versa.
+
+ Basic idea of Work, Energy, power & Pressure
+
+ Units & measurement
+
+ Basic electricity, Electricity principles, Ground connections,
+Introduction to voltage, Current, Resistance, Power,
+Energy. Clip on meter, Voltmeter, Conductors & insulators', 15, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (10, 'K72S004BM03', 'Team work', '', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 07:52:09.703801', 'At the end of this module student should be able to;
+
+ Contribute positively to the work in team environment
+
+ Work effectively with others in a socially diverse
+environment
+
+ Respect and understand the views of others
+
+ Give, receive and act upon feedback
+
+ Identify and describe own roles and roles of others', 'BASIC', ' Identify and establish team purpose, team member’s roles
+and responsibilities.
+ Coach and motivate team.
+ Assignment 01- Form a group for workshop cleaning,
+machine maintenance, waste management and give the
+feedback on group effort
+ Assignment 02- Arrange sports activities / social events', 4, 'Assignments
+•
+ Lecturers
+•
+ role plays
+•
+ case studies
+•
+ team building activities
+•
+ coaching and mentoring', 'Simple concepts of team behavior
+•
+ Elementary group dynamics
+•
+ Basic knowledge in social and demographic structures', 2, 0, '0');
+INSERT INTO "main"."courses_module" ("id", "code", "title", "description", "course_id", "assessment_methods", "created_at", "learning_outcomes", "module_type", "practical_content", "practical_hours", "teaching_methods", "theory_content", "theory_hours", "total_hours", "order") VALUES (11, 'K72S004BM04', 'Occupational safety & health and environmental aspects', 'Non', 1, 'Formative Assessment + Summative Assessment', '2026-04-06 07:53:08.325729', 'After completion of this module the trainee will be able to:
+
+ Describe importance of safety
+
+ Use personal safety gears
+
+ Arrange the place to minimize health risk
+
+ Give first aid', 'BASIC', ' Practical related to Safety and Health,
+ Importance of maintenance and cleanliness of workshop.
+ Demonstration on First aid and Fire safety,
+ Use personal safety gears
+ Arrange the place of work to minimize the health risks.
+ Arrange the place of work in order to make it possible to work in
+the most ergonomic way.
+ Arrange exhaust system
+ Give first aid.
+ Use of fire extinguishers.
+ Demonstration on safe handling and Periodic testing of lifting
+equipment
+ Energy saving Tips
+ Collect details of waste (solid & gases)
+ process and prepare a brief report with proposal of appropriate
+disposing/ reusing methods of them', 9, 'Illustrated talk
+Use video clips
+Demonstrations
+Assignments', ' Importance of safety and general precautions to be observed in
+the workshop.
+ Personal safety gears available to protect body; how and when
+they use
+ safety signs - for danger, warning, caution & personal safety
+message
+ Safe handling of, Fire extinguishers used for Different types of
+fire. safe handling and Periodic testing of lifting equipment,
+Energy Conservation
+ Types of waste materials
+ Environmental rules and regulations on disposal of waste (solid &
+gases) and noise into environment
+ Standard treatment and disposal methods of waste (solid & gases)
+and noise
+ Method of reuse of waste (solid & gases) and scraps', 9, 0, '0');

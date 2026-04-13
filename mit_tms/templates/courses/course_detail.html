@@ -53,78 +53,62 @@
         </div>
 
     </div>
+<!-- 📊 COURSE SUMMARY -->
 
-    <!-- 📊 COURSE SUMMARY -->
-    <div class="bg-white shadow rounded-xl p-6">
+    <!-- 📌 COURSE INFORMATION -->
+    <div class="bg-white shadow rounded-xl p-6 space-y-6">
 
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold text-gray-800">Course Overview</h3>
-            <p class="text-sm text-gray-500">Duration and learning breakdown</p>
+        <h3 class="text-lg font-semibold">Course Information</h3>
+
+        <!-- BASIC -->
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+            <div><p class="text-gray-500">Level</p><p>{{ course_level }}</p></div>
+            <div><p class="text-gray-500">Medium</p><p>{{ course_medium }}</p></div>
+            <div><p class="text-gray-500">Entry Qualification</p><p>{{ entry_qualification }}</p></div>
+
+            <div><p class="text-gray-500">Delivery Mode</p><p>{{ delivery_mode }}</p></div>
+            <div><p class="text-gray-500">Course Mode</p><p>{{ course_mode }}</p></div>
+
+            <div><p class="text-gray-500">NVQ Level</p><p>NVQ {{ nvq_level }}</p></div>
+            <div><p class="text-gray-500">Qualification Code</p><p>{{ qualification_code }}</p></div>
+
+            <div><p class="text-gray-500">Batches / Year</p><p>{{ batches_per_year }}</p></div>
+            <div><p class="text-gray-500">Students / Batch</p><p>{{ students_per_batch }}</p></div>
+
+            <div><p class="text-gray-500">Industry Sector</p><p>{{ industry_sector }}</p></div>
+            <div><p class="text-gray-500">Equivalent Course</p><p>{{ equivalent_course }}</p></div>
+
+            <div><p class="text-gray-500">OJT Months</p><p>{{ object.ojt_months }}</p></div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-            <!-- Total -->
-            <div class="bg-blue-50 rounded-lg p-4 text-center">
-                <p class="text-xs text-gray-500">Total Duration</p>
-                <p class="text-xl font-bold text-blue-700">
-                    {{ object.total_hours }} hrs
-                </p>
-            </div>
-
-            <!-- Theory -->
-            <div class="bg-green-50 rounded-lg p-4 text-center">
-                <p class="text-xs text-gray-500">Theory</p>
-                <p class="text-xl font-bold text-green-700">
-                    {{ course_theory }} hrs
-                </p>
-            </div>
-
-            <!-- Practical -->
-            <div class="bg-yellow-50 rounded-lg p-4 text-center">
-                <p class="text-xs text-gray-500">Practical</p>
-                <p class="text-xl font-bold text-yellow-700">
-                    {{ course_practical }} hrs
-                </p>
-            </div>
-
-            <!-- Months -->
-            <div class="bg-purple-50 rounded-lg p-4 text-center">
-                <p class="text-xs text-gray-500">Duration</p>
-                <p class="text-xl font-bold text-purple-700">
-                    {{ object.duration_months }} Months
-                </p>
-            </div>
-
-            <!-- 💰 Course Fee -->
-
-<div class="bg-indigo-50 rounded-lg p-4 text-center">
-    <p class="text-xs text-gray-500">Course Fee</p>
-    <p class="text-xl font-bold text-indigo-700">
-        Rs. {{ object.course_fee|default:"0.00" }}
-    </p>
-</div>
+        <!-- DESCRIPTION -->
+        <div>
+            <p class="text-gray-500 text-sm">Description</p>
+            <p>{{ object.description }}</p>
         </div>
 
-        <!-- Summary Line -->
-        <div class="mt-5 text-center text-sm text-gray-700">
-            <span class="font-medium">
-                {{ object.total_hours }} Hours
-            </span>
-            (T-{{ course_theory }}, P-{{ course_practical }}, I-{{ course_industry|default:"0" }})
+        <!-- RESOURCES -->
+        <div>
+            <h4 class="font-semibold">Resources</h4>
+            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                <div><p class="text-gray-500">Tools</p><p>{{ tools }}</p></div>
+                <div><p class="text-gray-500">Equipment</p><p>{{ equipment }}</p></div>
+                <div><p class="text-gray-500">Machinery</p><p>{{ machinery }}</p></div>
+            </div>
+        </div>
+
+        <!-- PEDAGOGY -->
+        <div>
+            <h4 class="font-semibold">Pedagogy</h4>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div><p class="text-gray-500">Prerequisite</p><p>{{ prerequisite }}</p></div>
+                <div><p class="text-gray-500">Learning Outcomes</p><p>{{ learning_outcomes }}</p></div>
+            </div>
         </div>
 
     </div>
 
-    <!-- 📈 THEORY COVERAGE -->
-    <div class="space-y-2">
-        <p class="text-xs text-gray-500">Theory Coverage</p>
-        <div class="w-full bg-gray-200 rounded h-2">
-            <div class="bg-green-500 h-2 rounded"
-                 style="width: {% widthratio total_theory course_theory 100 %}%">
-            </div>
-        </div>
-    </div>
+
 
     <!-- 📊 CURRICULUM TABLE -->
     <div>
@@ -193,7 +177,6 @@
         </div>
 
     </div>
-
     <!-- 📚 MODULES -->
     <div>
 

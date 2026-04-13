@@ -9,29 +9,59 @@ from .models import Course, Module, Task, Unit, Element, PerformanceCriteria
 # =========================================================
 
 from .models import Course
-
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = '__all__'
 
         widgets = {
+            # BASIC
             'title': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'code': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'description': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
-            'duration_months': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            # STATUS
+            'active': forms.CheckboxInput(attrs={'class': 'mr-2'}),
 
+            # ACADEMIC
+            'level': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'entry_qualification': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'curriculum_category': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'curriculum_availability': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'equivalent_course': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'industry_sector': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+
+            # DELIVERY
+            'delivery_mode': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'course_mode': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'medium': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+
+            # DURATION
+            'duration_months': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'theory_hours': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'practical_hours': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'industry_training_hours': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'assignment_hours': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'ojt_months': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
+            # CAPACITY
+            'batches_per_year': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'students_per_batch': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+
+            # FINANCIAL
             'course_fee': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'is_free': forms.CheckboxInput(attrs={'class': 'mr-2'}),
+            'fee_includes': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
-            'level': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            # RESOURCES
+            'tools_available': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'equipment_available': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'machinery_available': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
+
+            # NVQ
             'nvq_level': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'qualification_code': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
+            # PEDAGOGY
             'prerequisite': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'learning_outcomes': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2'}),
         }
@@ -41,9 +71,9 @@ class CourseForm(forms.ModelForm):
 
         theory = cleaned_data.get('theory_hours') or 0
         practical = cleaned_data.get('practical_hours') or 0
-        industry = cleaned_data.get('industry_training_hours') or 0
+        assignment = cleaned_data.get('assignment_hours') or 0
 
-        if theory == 0 and practical == 0 and industry == 0:
+        if theory == 0 and practical == 0 and assignment == 0:
             raise forms.ValidationError(
                 "At least one duration value must be provided."
             )

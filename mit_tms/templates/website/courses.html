@@ -1,0 +1,123 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Courses | MIT{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-20 text-center">
+    <div class="max-w-4xl mx-auto px-6">
+
+        <h1 class="text-4xl md:text-5xl font-bold">
+            Explore Our Courses
+        </h1>
+
+        <p class="mt-4 text-lg text-blue-100">
+            Practical, career-focused programs designed to build your future in IT.
+        </p>
+
+    </div>
+</section>
+
+<!-- ================= COURSES ================= -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <!-- Header + Search -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+
+            <h2 class="text-2xl font-bold text-gray-800">
+                Available Programs
+            </h2>
+
+            <form method="get" class="flex gap-2">
+                <input type="text" name="q" placeholder="Search courses..."
+                    class="px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+                    Search
+                </button>
+            </form>
+
+        </div>
+
+        <!-- Courses Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+            {% for course in courses %}
+            <div class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition duration-300 overflow-hidden border flex flex-col">
+
+                <!-- Banner -->
+                <div class="h-40 bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-lg font-semibold text-center px-4">
+                    {{ course.title|truncatechars:30 }}
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 flex flex-col flex-grow">
+
+                    <h2 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition">
+                        {{ course.title }}
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        ⏳ {{ course.duration_months }} Months
+                    </p>
+
+                    <p class="text-gray-600 mt-3 text-sm line-clamp-3">
+                        {{ course.description|truncatechars:120 }}
+                    </p>
+
+                    <!-- Footer -->
+                    <div class="mt-auto pt-6 flex justify-between items-center">
+
+                        <span class="text-lg font-bold text-blue-600">
+                            {% if course.is_free %}
+                                🎉 Free
+                            {% else %}
+                                Rs. {{ course.course_fee }}
+                            {% endif %}
+                        </span>
+
+                        <!-- ✅ FIXED BUTTON -->
+
+<a href="{% url 'enroll' %}?course={{ course.id }}"
+   class="bg-blue-600 text-white px-6 py-3 rounded-xl">
+   Enroll Now
+</a>
+                    </div>
+
+                </div>
+
+            </div>
+            {% empty %}
+            <p class="text-center col-span-3 text-gray-500 text-lg">
+                🚫 No courses available at the moment.
+            </p>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-16 text-center">
+    <div class="max-w-3xl mx-auto px-6">
+
+        <h2 class="text-3xl font-bold">
+            Not Sure Which Course to Choose?
+        </h2>
+
+        <p class="mt-4 text-blue-100">
+            Contact us and we’ll guide you to the best learning path.
+        </p>
+
+        <a href="{% url 'contact' %}"
+           class="inline-block mt-6 bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow hover:scale-105 transition">
+            Get Guidance
+        </a>
+
+    </div>
+</section>
+
+{% endblock %}

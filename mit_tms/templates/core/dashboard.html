@@ -1,10 +1,225 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Dashboard</h2>
 
-<p>Welcome {{ user.username }}</p>
+<div class="p-6 bg-gray-100 min-h-screen">
+<div class="bg-white p-6 rounded-2xl shadow mt-6">
 
-<a href="/app/courses/">Manage Courses</a>
+    <h2 class="text-xl font-semibold mb-4">🎓 Recent Enrollments</h2>
+
+    {% for e in enrollments %}
+    <div class="border-b py-2">
+        <p class="font-medium">{{ e.name }}</p>
+        <p class="text-sm text-gray-500">{{ e.course.title }}</p>
+    </div>
+    {% empty %}
+    <p>No enrollments yet</p>
+    {% endfor %}
+
+</div>
+    <!-- ================= MESSAGES ================= -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">
+                📩 Messages
+            </h2>
+
+            {% if new_messages > 0 %}
+                <span id="messageBadge"
+                      class="bg-red-500 text-white px-3 py-1 text-xs rounded-full shadow animate-pulse transition-all duration-500">
+                    {{ new_messages }} New
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left border-collapse">
+
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500">
+                        <th class="py-3 px-4">Name</th>
+                        <th class="py-3 px-4">Email</th>
+                        <th class="py-3 px-4">Message</th>
+                        <th class="py-3 px-4">Date</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                        <th class="py-3 px-4 text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for msg in messages %}
+                    <tr class="border-b hover:bg-gray-50 transition {% if not msg.is_read %}bg-blue-50{% endif %}">
+
+                        <td class="py-3 px-4 font-medium text-gray-800">
+                            {{ msg.name }}
+                        </td>
+
+                        <td class="py-3 px-4 text-gray-600">
+                            {{ msg.email }}
+                        </td>
+
+                        <td class="py-3 px-4 text-gray-600">
+                            {{ msg.message|truncatechars:40 }}
+                        </td>
+
+                        <td class="py-3 px-4 text-gray-500 text-xs">
+                            {{ msg.created_at|date:"M d, Y" }}
+                        </td>
+
+                        <td class="py-3 px-4 text-center">
+                            {% if msg.is_read %}
+                                <span class="text-green-600 text-xs font-medium">
+                                    Read
+                                </span>
+                            {% else %}
+                                <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-medium">
+                                    New
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="py-3 px-4 text-center">
+                            <a href="{% url 'message_detail' msg.id %}"
+                               class="text-blue-600 hover:underline text-sm">
+                                View
+                            </a>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-4 text-center text-gray-400">
+                            No messages available
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="mt-4 text-right">
+            <a href="{% url 'inbox' %}"
+               class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+               View All Messages →
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- ================= STATS ================= -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Total Courses</h3>
+            <p class="text-2xl font-bold text-blue-600">12</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Batches</h3>
+            <p class="text-2xl font-bold text-green-600">8</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Students</h3>
+            <p class="text-2xl font-bold text-purple-600">120</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Upcoming Classes</h3>
+            <p class="text-2xl font-bold text-red-500">5</p>
+        </div>
+
+    </div>
+
+
+    <!-- ================= ACTIVITIES ================= -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Recent Users -->
+        <div class="bg-white p-6 rounded-2xl shadow">
+            <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
+
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-500 border-b">
+                        <th class="pb-2">Username</th>
+                        <th class="pb-2">Email</th>
+                        <th class="pb-2">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for user in recent_users %}
+                    <tr class="border-b">
+                        <td class="py-2">{{ user.username }}</td>
+                        <td>{{ user.email|default:"No Email" }}</td>
+                        <td class="{% if user.is_active %}text-green-600{% else %}text-red-500{% endif %}">
+                            {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="py-3 text-center text-gray-400">
+                            No recent users
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Timetable -->
+        <div class="bg-white p-6 rounded-2xl shadow">
+            <h2 class="text-xl font-semibold mb-4">Today's Classes</h2>
+
+            <ul class="space-y-4">
+                <li class="p-4 bg-gray-50 rounded-xl">
+                    <p class="font-semibold">Web Development</p>
+                    <p class="text-gray-500 text-sm">9:00 AM - 11:00 AM</p>
+                </li>
+
+                <li class="p-4 bg-gray-50 rounded-xl">
+                    <p class="font-semibold">Python Programming</p>
+                    <p class="text-gray-500 text-sm">1:00 PM - 3:00 PM</p>
+                </li>
+
+                <li class="p-4 bg-gray-50 rounded-xl">
+                    <p class="font-semibold">Graphic Design</p>
+                    <p class="text-gray-500 text-sm">4:00 PM - 6:00 PM</p>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= JS ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const badge = document.getElementById("messageBadge");
+
+    if (badge) {
+        setTimeout(() => {
+            badge.style.transform = "translateX(20px)";
+            badge.style.opacity = "0";
+
+            setTimeout(() => {
+                badge.style.display = "none";
+            }, 500);
+        }, 3000);
+    }
+});
+</script>
 
 {% endblock %}

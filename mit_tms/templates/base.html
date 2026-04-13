@@ -3,73 +3,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MIT TMS Dashboard</title>
-
-    <!-- Tailwind CSS -->
+    <title>{% block page_title %}MIT TMS{% endblock %}</title>
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 
 <body class="bg-gray-100">
 
 <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-900 text-white p-5 flex flex-col">
+    <!-- 🔷 SIDEBAR -->
+    {% include "partials/sidebar.html" %}
 
-        <h2 class="text-2xl font-bold mb-6">MIT TMS</h2>
-
-        <nav class="space-y-2 flex-1">
-
-            <a href="{% url 'dashboard' %}"
-               class="block px-3 py-2 rounded hover:bg-gray-700">
-                📊 Dashboard
-            </a>
-
-            <a href="{% url 'course_list' %}"
-               class="block px-3 py-2 rounded hover:bg-gray-700">
-                📚 Courses
-            </a>
-
-        </nav>
-
-        <!-- Logout -->
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button class="w-full bg-red-500 py-2 rounded hover:bg-red-600">
-                Logout
-            </button>
-        </form>
-
-    </aside>
-
-    <!-- Main Content -->
+    <!-- 🔷 MAIN -->
     <div class="flex-1 flex flex-col">
 
-        <!-- Topbar -->
-        <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
+        <!-- 🔷 TOPBAR -->
+        {% include "partials/topbar.html" %}
 
-            <h1 class="text-xl font-semibold">
-                {% block page_title %}Dashboard{% endblock %}
-            </h1>
-
-            <div class="text-sm text-gray-600">
-                👤 {{ request.user.username }}
-            </div>
-
-        </header>
-
-        <!-- Content -->
+        <!-- 🔷 CONTENT -->
         <main class="p-6">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             {% block content %}
             {% endblock %}
+
         </main>
 
     </div>
 
 </div>
+
+<!-- 🔷 GLOBAL SCRIPT -->
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+
+    sidebar.classList.toggle('w-20');
+    sidebar.classList.toggle('w-64');
+
+    document.querySelectorAll('.menu-text').forEach(el => {
+        el.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.section-title').forEach(el => {
+        el.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(el => {
+        el.classList.toggle('justify-center');
+    });
+}
+
+function toggleUserMenu() {
+    document.getElementById('userMenu').classList.toggle('hidden');
+}
+
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('userMenu');
+    if (!e.target.closest('#userMenu') && !e.target.closest('button')) {
+        menu.classList.add('hidden');
+    }
+});
+</script>
 
 </body>
 </html>

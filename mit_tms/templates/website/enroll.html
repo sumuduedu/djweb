@@ -1,0 +1,41 @@
+{% extends 'website/base.html' %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto py-16 px-6">
+
+    <div class="bg-white p-8 rounded-2xl shadow">
+
+        <h2 class="text-2xl font-bold mb-6">
+            🎓 Course Enrollment
+        </h2>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <input type="hidden" name="course" value="{{ request.GET.course }}">
+
+            <input type="text" name="name" placeholder="Your Name" required
+                class="w-full border px-4 py-3 rounded-xl">
+
+            <input type="email" name="email" placeholder="Email" required
+                class="w-full border px-4 py-3 rounded-xl">
+
+            <input type="text" name="phone" placeholder="Phone Number" required
+                class="w-full border px-4 py-3 rounded-xl">
+
+            <textarea name="message" placeholder="Message (optional)"
+                class="w-full border px-4 py-3 rounded-xl"></textarea>
+
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-3 rounded-xl">
+                Submit Enrollment
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

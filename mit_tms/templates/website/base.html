@@ -1,24 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MIT Institute</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}MIT Computer Training Center{% endblock %}</title>
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-white">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
-<nav class="p-4 shadow flex justify-between">
-    <h1 class="font-bold">MIT Computer Training Center</h1>
+<!-- ================= NAVBAR ================= -->
+<header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-    <div>
-        <a href="/" class="mr-4">Home</a>
-        <a href="/login/" class="text-blue-600">Login</a>
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="flex items-center gap-3">
+            <img src="/static/images/logo.jpg" class="w-12 h-12 rounded-xl shadow-md">
+            <div>
+                <h1 class="text-lg font-bold text-gray-900 leading-tight">
+                    MIT Computer Training Center
+                </h1>
+                <p class="text-xs text-gray-500">Future IT Skills</p>
+            </div>
+        </a>
+
+        <!-- Desktop Menu -->
+        <nav class="hidden md:flex items-center gap-8 font-medium">
+
+            <a href="{% url 'home' %}" class="hover:text-blue-600 transition">Home</a>
+            <a href="{% url 'about' %}" class="hover:text-blue-600 transition">About</a>
+            <a href="{% url 'public_courses' %}" class="hover:text-blue-600 transition">Courses</a>
+            <a href="{% url 'contact' %}" class="hover:text-blue-600 transition">Contact</a>
+
+            <!-- Search
+            <form action="{% url 'public_courses' %}" method="get" class="hidden lg:block">
+                <input type="text" name="q" placeholder="Search..."
+                    class="px-3 py-1 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none">
+            </form>-->
+
+            {% if user.is_authenticated %}
+                <a href="/app/dashboard/"
+                   class="text-blue-600 font-semibold">
+                    Dashboard
+                </a>
+                <a href="{% url 'logout' %}"
+                   class="text-red-500">
+                    Logout
+                </a>
+            {% else %}
+<div class="flex items-center gap-3">
+
+    <a href="{% url 'login' %}"
+       class="px-6 py-2.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition duration-200 whitespace-nowrap">
+        Login
+    </a>
+
+    <a href="{% url 'signup' %}"
+       class="px-6 py-2.5 text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition duration-200 whitespace-nowrap">
+        Sign Up
+    </a>
+
+</div>
+            {% endif %}
+        </nav>
+
+        <!-- Mobile Button -->
+        <button id="menuBtn" class="md:hidden text-2xl">
+            ☰
+        </button>
+
     </div>
-</nav>
 
-<main class="p-10">
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden px-6 pb-4 space-y-3 text-sm">
+
+        <a href="{% url 'home' %}" class="block">Home</a>
+        <a href="{% url 'about' %}" class="block">About</a>
+        <a href="{% url 'public_courses' %}" class="block">Courses</a>
+        <a href="{% url 'contact' %}" class="block">Contact</a>
+
+        <form action="{% url 'public_courses' %}" method="get">
+            <input type="text" name="q" placeholder="Search courses..."
+                class="w-full border rounded-lg px-3 py-2">
+        </form>
+
+        {% if user.is_authenticated %}
+            <a href="/app/dashboard/" class="block text-blue-600">Dashboard</a>
+            <a href="{% url 'logout' %}" class="block text-red-500">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}"
+               class="block bg-blue-600 text-white text-center py-2 rounded-lg">
+                Login
+            </a>
+        {% endif %}
+
+    </div>
+</header>
+
+<!-- ================= MAIN CONTENT ================= -->
+<main class="flex-grow">
     {% block content %}{% endblock %}
 </main>
 
+<!-- ================= FOOTER ================= -->
+<footer class="bg-gray-900 text-gray-300 mt-10">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-10">
+
+        <!-- About -->
+        <div>
+            <h3 class="text-white text-lg font-semibold mb-3">
+                MIT Computer Training Center
+            </h3>
+            <p class="text-sm leading-relaxed">
+                Providing high-quality IT and vocational education with practical skills and career-focused training.
+            </p>
+        </div>
+
+        <!-- Links -->
+        <div>
+            <h3 class="text-white text-lg font-semibold mb-3">Quick Links</h3>
+            <ul class="space-y-2 text-sm">
+                <li><a href="{% url 'home' %}" class="hover:text-white">Home</a></li>
+                <li><a href="{% url 'about' %}" class="hover:text-white">About</a></li>
+                <li><a href="{% url 'public_courses' %}" class="hover:text-white">Courses</a></li>
+                <li><a href="{% url 'contact' %}" class="hover:text-white">Contact</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+            <h3 class="text-white text-lg font-semibold mb-3">Contact</h3>
+            <p class="text-sm">📧 info@mit.lk</p>
+            <p class="text-sm">📞 +94 773051133</p>
+            <p class="text-sm">📞 +94 112226361</p>
+            <p class="text-sm">📍 14/A/2/1, Bopitiya, Pamunugama, Sri Lanka</p>
+        </div>
+
+    </div>
+
+    <div class="text-center text-xs border-t border-gray-700 py-4">
+        © {% now "Y" %} MIT Computer Training Center. All rights reserved.
+    </div>
+</footer>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+    const btn = document.getElementById("menuBtn");
+    const menu = document.getElementById("mobileMenu");
+
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+</script>
+<!-- Chat Box -->
+<div id="chatBox" class="fixed bottom-5 right-5 w-80 bg-white shadow-xl rounded-xl hidden flex flex-col">
+
+    <div class="bg-blue-600 text-white p-3 rounded-t-xl">
+        MIT Assistant 🤖
+    </div>
+
+    <div id="messages" class="p-3 h-64 overflow-y-auto text-sm"></div>
+
+    <div class="p-2 flex">
+        <input id="userInput" class="flex-1 border rounded px-2 py-1" placeholder="Ask something...">
+        <button onclick="sendMessage()" class="ml-2 bg-blue-600 text-white px-3 rounded">Send</button>
+    </div>
+</div>
+
+<!-- Toggle Button -->
+<button onclick="toggleChat()"
+    class="fixed bottom-5 right-5 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg">
+    💬
+</button>
+
+<script>
+function toggleChat() {
+    document.getElementById("chatBox").classList.toggle("hidden");
+}
+
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value;
+
+    fetch("/chat/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const messages = document.getElementById("messages");
+
+        messages.innerHTML += `<div>👤 ${message}</div>`;
+        messages.innerHTML += `<div>🤖 ${data.reply}</div>`;
+
+        input.value = "";
+    });
+}
+</script>
 </body>
 </html>

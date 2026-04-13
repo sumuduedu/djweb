@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block header %}Timetable Entry{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- 🔷 FORM -->
+    <div class="bg-white shadow rounded-xl p-6">
+
+        <h2 class="text-lg font-semibold mb-4">
+            {{ view.object|yesno:"Edit Entry,Add Entry" }}
+        </h2>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-3 bg-red-100 text-red-700 rounded">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Batch -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Batch</label>
+                {{ form.batch }}
+            </div>
+
+            <!-- Module -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Module</label>
+                {{ form.module }}
+            </div>
+
+            <!-- Date -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Date</label>
+                {{ form.date }}
+            </div>
+
+            <!-- Slot -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Time Slot</label>
+                {{ form.slot }}
+            </div>
+
+            <!-- Session Type -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Session Type</label>
+                {{ form.session_type }}
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-2 pt-4">
+                <a href="{% url 'batch:timetable_list' %}"
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    Save
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- 🔷 CALENDAR -->
+    <div class="bg-white shadow rounded-xl p-4">
+        <div id="calendar"></div>
+    </div>
+
+</div>
+
+<!-- 🔥 FULLCALENDAR CDN -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<!-- 🔥 PASS DATA -->
+<script>
+    const bookedDates = {{ booked_dates|safe|default:"[]" }};
+</script>
+
+<!-- 🔥 MAIN SCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+    const dateInput = document.getElementById('id_date');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+
+        // 🔥 LOAD EVENTS
+        events: '/app/batches/api/load/',
+
+        selectable: true,
+
+        // 🔥 CLICK DATE → FILL FORM
+        dateClick: function(info) {
+            dateInput.value = info.dateStr;
+
+            if (bookedDates.includes(info.dateStr)) {
+                alert("⚠️ This date already has sessions!");
+            }
+        },
+
+        // 🔥 COLOR CONFLICT DAYS
+        dayCellDidMount: function(info) {
+            if (bookedDates.includes(info.date.toISOString().slice(0,10))) {
+                info.el.style.backgroundColor = "#fee2e2"; // red
+            }
+        }
+
+    });
+
+    calendar.render();
+
+});
+</script>
+
+<!-- 🔥 MODULE AUTO LOAD -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const batchSelect = document.getElementById("id_batch");
+    const moduleSelect = document.getElementById("id_module");
+
+    batchSelect.addEventListener("change", function () {
+        const batchId = this.value;
+
+        fetch(`/app/batches/api/modules/?batch_id=${batchId}`)
+            .then(response => response.json())
+            .then(data => {
+                moduleSelect.innerHTML = "";
+
+                data.forEach(module => {
+                    const option = document.createElement("option");
+                    option.value = module.id;
+                    option.textContent = module.title;
+                    moduleSelect.appendChild(option);
+                });
+            });
+    });
+});
+</script>
+
+{% endblock %}
