@@ -43,7 +43,7 @@ class BatchListView(LoginRequiredMixin, ListView):
     template_name = "batch/batch_list.html"
     context_object_name = "batches"
     paginate_by = 10
-
+    allowed_roles = ['ADMIN', 'TEACHER']
     def get_queryset(self):
         return Batch.objects.select_related('course').order_by('-created_at')
 

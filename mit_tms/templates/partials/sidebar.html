@@ -11,67 +11,128 @@
     <!-- NAV -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
-        <!-- 🔥 ADD section-title -->
+        <!-- ================= MAIN ================= -->
         <p class="section-title px-3 text-xs text-gray-400 uppercase mb-2">
             Main
         </p>
 
-      <a href="{% url 'dashboard' %}" class="nav-link">
-    <span class="icon text-lg">📊</span>
-    <span class="menu-text">Dashboard</span>
-</a>
-
-<a href="{% url 'course_list' %}" class="nav-link">
-    <span class="icon text-lg">📚</span>
-    <span class="menu-text">Courses</span>
-</a>
-
-<a href="{% url 'batch:batch_list' %}" class="nav-link">
-    <span class="icon text-lg">📦</span>
-    <span class="menu-text">Batches</span>
-</a>
+        <!-- ALL USERS -->
+        <a href="{% url 'dashboard' %}" class="nav-link">
+            <span class="icon text-lg">📊</span>
+            <span class="menu-text">Dashboard</span>
+        </a>
 
 
-        <!-- 🔥 ADD section-title -->
+        <!-- ================= ADMIN ================= -->
+        {% if is_admin %}
+
+        <!-- FULL ACCESS (YOUR ORIGINAL MENU) -->
+
+        <a href="{% url 'course_list' %}" class="nav-link">
+            <span class="icon text-lg">📚</span>
+            <span class="menu-text">Courses</span>
+        </a>
+
+        <a href="{% url 'batch:batch_list' %}" class="nav-link">
+            <span class="icon text-lg">📦</span>
+            <span class="menu-text">Batches</span>
+        </a>
+
         <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
             Planning
         </p>
 
-<a href="{% url 'batch:calendar' %}" class="nav-link">
-    📅 <span class="menu-text">Calendar</span>
-</a>
-<a href="{% url 'batch:timetable_list' %}" class="nav-link">
-    <span class="icon text-lg">📅</span>
-    <span class="menu-text">Timetable</span>
-</a>
-<!-- 🔥 USER MANAGEMENT -->
-<p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
-    User Management
-</p>
+        <a href="{% url 'batch:calendar' %}" class="nav-link">
+            <span class="icon text-lg">📅</span>
+            <span class="menu-text">Calendar</span>
+        </a>
 
-<a href="{% url 'accounts:user_list' %}" class="nav-link">
-    <span class="icon text-lg">👤</span>
-    <span class="menu-text">Users</span>
-</a>
+        <a href="{% url 'batch:timetable_list' %}" class="nav-link">
+            <span class="icon text-lg">📅</span>
+            <span class="menu-text">Timetable</span>
+        </a>
 
+        <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
+            User Management
+        </p>
+
+        <a href="{% url 'accounts:user_list' %}" class="nav-link">
+            <span class="icon text-lg">👤</span>
+            <span class="menu-text">Users</span>
+        </a>
+
+        {% endif %}
+
+
+        <!-- ================= TEACHER ================= -->
+        {% if is_teacher %}
+
+        <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
+            Teaching
+        </p>
+
+        <a href="{% url 'course_list' %}" class="nav-link">
+            <span class="icon text-lg">📚</span>
+            <span class="menu-text">Courses</span>
+        </a>
+
+        <a href="{% url 'batch:batch_list' %}" class="nav-link">
+            <span class="icon text-lg">📦</span>
+            <span class="menu-text">Batches</span>
+        </a>
+
+        <a href="{% url 'batch:timetable_list' %}" class="nav-link">
+            <span class="icon text-lg">📅</span>
+            <span class="menu-text">Timetable</span>
+        </a>
+
+        {% endif %}
+
+
+        <!-- ================= STUDENT ================= -->
+        {% if is_student %}
+
+        <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2">
+            Student
+        </p>
+
+        <a href="{% url 'student_courses' %}" class="nav-link">
+            <span class="icon text-lg">📚</span>
+            <span class="menu-text">My Courses</span>
+        </a>
+
+        <a href="{% url 'student_attendance' %}" class="nav-link">
+            <span class="icon text-lg">📅</span>
+            <span class="menu-text">Attendance</span>
+        </a>
+
+        {% endif %}
 
     </nav>
 
 </aside>
+
+
+<!-- ================= STYLE ================= -->
 <style>
 .nav-link {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-radius: 8px;
     transition: 0.2s;
 }
+
 .nav-link:hover {
     background: #1f2937;
 }
 
-/* 🔥 COLLAPSED MODE */
+.section-title {
+    letter-spacing: 0.05em;
+}
+
+/* COLLAPSED MODE */
 .sidebar-collapsed .menu-text,
 .sidebar-collapsed .section-title {
     display: none;
@@ -80,22 +141,24 @@
 .sidebar-collapsed .nav-link {
     justify-content: center;
 }
+
 .icon {
-    font-size: 18px;   /* normal */
+    font-size: 18px;
 }
 
 .sidebar-collapsed .icon {
-    font-size: 22px;   /* bigger when collapsed 🔥 */
+    font-size: 22px;
 }
 </style>
+
+
+<!-- ================= SCRIPT ================= -->
 <script>
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
 
     sidebar.classList.toggle('w-20');
     sidebar.classList.toggle('w-64');
-
-    // 🔥 ONE CLASS CONTROLS EVERYTHING
     sidebar.classList.toggle('sidebar-collapsed');
 }
 </script>
