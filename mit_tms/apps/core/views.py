@@ -6,87 +6,117 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 
+from apps.accounts.models import Profile
+from apps.website.models import Enrollment, ContactMessage
 from .forms import CustomSignupForm
-from apps.website.models import Enrollment
 
 
+class BaseView(LoginRequiredMixin, TemplateView):
+    allowed_roles = None
 
-# ===============================
-# HOME PAGE
-# ===============================
+    def dispatch(self, request, *args, **kwargs):
+        self.profile, _ = Profile.objects.get_or_create(user=request.user)
+
+        # 🔐 Role restriction
+        if self.allowed_roles and self.profile.role not in self.allowed_roles:
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["profile"] = self.profile
+        context["role"] = self.profile.role
+
+        # 🎯 Template helpers
+        context["is_admin"] = self.profile.role == "ADMIN"
+        context["is_teacher"] = self.profile.role == "TEACHER"
+        context["is_student"] = self.profile.role == "STUDENT"
+
+        # Optional related objects
+        context["student"] = getattr(self.request.user, "student", None)
+        context["teacher"] = getattr(self.request.user, "teacher", None)
+
+        return context
+
 class HomeView(TemplateView):
     template_name = "website/home.html"
 
 
-# ===============================
-# DASHBOARD (LOGIN REQUIRED)
-# ===============================
-from django.contrib.auth.models import User
-from django.utils import timezone
-from datetime import timedelta
-
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-from apps.website.models import ContactMessage
-
-
-class DashboardView(LoginRequiredMixin, TemplateView):
+class AdminDashboardView(BaseView):
+    allowed_roles = ['ADMIN']
     template_name = "core/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # ✅ Recent Users
         context['recent_users'] = User.objects.order_by('-date_joined')[:5]
-
-        # ✅ Contact Messages (latest 5)
         context['messages'] = ContactMessage.objects.order_by('-created_at')[:5]
-
-        # ✅ New Messages Count
         context['new_messages'] = ContactMessage.objects.filter(is_read=False).count()
         context['enrollments'] = Enrollment.objects.order_by('-created_at')[:5]
 
         return context
 
-# ===============================
-# SIGNUP VIEW (EMAIL ACTIVATION)
-# ===============================
+class StudentDashboardView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "dashboard/student.html"
+
+class TeacherDashboardView(BaseView):
+    allowed_roles = ['TEACHER']
+    template_name = "dashboard/teacher.html"
+
+@login_required
+def dashboard_redirect(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    role = profile.role
+
+    if role == 'ADMIN':
+        return redirect('admin_dashboard')
+    elif role == 'TEACHER':
+        return redirect('teacher_dashboard')
+    elif role == 'STUDENT':
+        return redirect('student_dashboard')
+
+    return redirect('home')
+
 class SignupView(View):
 
     def get(self, request):
-        form = CustomSignupForm()
-        return render(request, 'auth/signup.html', {'form': form})
+        return render(request, 'auth/signup.html', {
+            'form': CustomSignupForm()
+        })
 
     def post(self, request):
         form = CustomSignupForm(request.POST)
 
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False   # 🔥 disable until email verified
+            user.is_active = False
             user.save()
 
-            # 🔐 Generate token + UID
+            # 🔐 Token
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
 
-            # 🌐 Build activation URL
             domain = get_current_site(request).domain
             activation_link = f"http://{domain}/activate/{uid}/{token}/"
 
-            # 📧 Send email
+            # 📧 Email
             send_mail(
                 subject="Activate Your Account",
-                message=f"Hi {user.username},\n\n"
-                        f"Please click the link below to activate your account:\n\n"
-                        f"{activation_link}\n\n"
-                        f"If you did not register, please ignore this email.",
+                message=(
+                    f"Hi {user.username},\n\n"
+                    f"Click below to activate your account:\n\n"
+                    f"{activation_link}\n\n"
+                    f"If you didn't register, ignore this."
+                ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=False,
@@ -98,27 +128,37 @@ class SignupView(View):
 
         return render(request, 'auth/signup.html', {'form': form})
 
-
-# ===============================
-# ACTIVATE ACCOUNT VIEW
-# ===============================
 class ActivateAccountView(View):
 
     def get(self, request, uidb64, token):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except Exception:
             user = None
 
         if user and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-
             return render(request, 'auth/activation_success.html')
 
         return render(request, 'auth/activation_failed.html')
 
 
+class StudentCoursesView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "student/courses.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        student = self.request.user.student
+
+        context['enrollments'] = Enrollment.objects.filter(student=student)
+
+        return context
 
 
+
+class StudentAttendanceView(BaseView):
+    pass
