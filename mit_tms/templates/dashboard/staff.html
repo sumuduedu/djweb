@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <h1 class="text-2xl font-bold mb-6">🧑‍💼 Staff Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Enrollments</h3>
+            <p class="text-2xl font-bold text-blue-600">--</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Contacts</h3>
+            <p class="text-2xl font-bold text-green-600">--</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500">Tasks</h3>
+            <p class="text-2xl font-bold text-orange-500">--</p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
