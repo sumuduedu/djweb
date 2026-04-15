@@ -11,20 +11,21 @@
     <!-- NAV -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
-        <!-- ================= MAIN ================= -->
+
+
+        <!-- ================= ADMIN ================= -->
+        {% if is_admin %}
+      <!-- ================= MAIN ================= -->
         <p class="section-title px-3 text-xs text-gray-400 uppercase mb-2">
             Main
         </p>
 
         <!-- ALL USERS -->
-        <a href="{% url 'dashboard' %}" class="nav-link">
+        <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
             <span class="icon text-lg">📊</span>
             <span class="menu-text">Dashboard</span>
         </a>
 
-
-        <!-- ================= ADMIN ================= -->
-        {% if is_admin %}
 
         <!-- FULL ACCESS (YOUR ORIGINAL MENU) -->
 

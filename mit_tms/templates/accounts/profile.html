@@ -13,8 +13,8 @@
 
             <!-- PROFILE IMAGE -->
             <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500 bg-gray-200">
-                {% if request.user.profile and request.user.profile.image %}
-                    <img src="{{ request.user.profile.image.url }}"
+                {% if profile and profile.image %}
+                    <img src="{{ profile.image.url }}"
                          class="w-full h-full object-cover">
                 {% else %}
                     <div class="w-full h-full flex items-center justify-center text-xl font-bold text-gray-600">
@@ -83,28 +83,28 @@
             </h3>
 
             <!-- 🎓 STUDENT -->
-            {% if is_student and student %}
+            {% if student %}
                 <div class="bg-blue-50 p-4 rounded-lg">
                     <p><strong>Full Name:</strong> {{ student.full_name }}</p>
                 </div>
             {% endif %}
 
             <!-- 👨‍🏫 TEACHER -->
-            {% if is_teacher and teacher %}
+            {% if teacher %}
                 <div class="bg-green-50 p-4 rounded-lg">
                     <p><strong>Full Name:</strong> {{ teacher.full_name }}</p>
                 </div>
             {% endif %}
 
             <!-- 🧑‍💼 STAFF -->
-            {% if is_staff and staff %}
+            {% if staff %}
                 <div class="bg-orange-50 p-4 rounded-lg">
                     <p><strong>Full Name:</strong> {{ staff.full_name }}</p>
                 </div>
             {% endif %}
 
             <!-- 👨‍👩‍👧 PARENT -->
-            {% if is_parent and parent %}
+            {% if parent %}
                 <div class="bg-purple-50 p-4 rounded-lg">
                     <p><strong>Student:</strong> {{ parent.student.full_name }}</p>
                     <p><strong>Relationship:</strong> {{ parent.relationship }}</p>
@@ -112,23 +112,17 @@
             {% endif %}
 
             <!-- 🎓 ALUMNI -->
-            {% if is_alumni %}
+            {% if alumni %}
                 <div class="bg-indigo-50 p-4 rounded-lg">
-                    <p>🎓 You are an alumni of this institute.</p>
+                    <p><strong>Job:</strong> {{ alumni.job_title }}</p>
+                    <p><strong>Company:</strong> {{ alumni.company }}</p>
                 </div>
             {% endif %}
 
-            <!-- 👤 GUEST -->
-            {% if is_guest %}
+            <!-- 👤 DEFAULT -->
+            {% if not student and not teacher and not staff and not parent and not alumni %}
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <p>You are currently a guest user.</p>
-                </div>
-            {% endif %}
-
-            <!-- 👑 ADMIN -->
-            {% if is_admin %}
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <p>👑 You have full system access.</p>
+                    <p>No additional role data available.</p>
                 </div>
             {% endif %}
 

@@ -62,12 +62,12 @@
             {% else %}
 <div class="flex items-center gap-3">
 
-    <a href="{% url 'login' %}"
+    <a href="{% url 'accounts:login' %}"
        class="px-6 py-2.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition duration-200 whitespace-nowrap">
         Login
     </a>
 
-    <a href="{% url 'signup' %}"
+    <a href="{% url 'accounts:signup' %}"
        class="px-6 py-2.5 text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition duration-200 whitespace-nowrap">
         Sign Up
     </a>
@@ -100,7 +100,7 @@
             <a href="/app/dashboard/" class="block text-blue-600">Dashboard</a>
             <a href="{% url 'logout' %}" class="block text-red-500">Logout</a>
         {% else %}
-            <a href="{% url 'login' %}"
+            <a href="{% url 'accounts:login' %}"
                class="block bg-blue-600 text-white text-center py-2 rounded-lg">
                 Login
             </a>

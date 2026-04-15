@@ -17,6 +17,27 @@ from apps.accounts.models import Profile
 from apps.website.models import EnrollmentInquiry, ContactMessage
 
 
+# ================================
+# 🔁 DASHBOARD REDIRECT
+# ================================
+@login_required
+def dashboard_redirect(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    if profile.role == 'ADMIN':
+        return redirect('core:admin_dashboard')
+    elif profile.role == 'STAFF':
+        return redirect('core:staff_dashboard')
+    elif profile.role == 'TEACHER':
+        return redirect('core:teacher_dashboard')
+    elif profile.role == 'STUDENT':
+        return redirect('core:student_dashboard')
+    elif profile.role == 'PARENT':
+        return redirect('core:parent_dashboard')
+    elif profile.role == 'ALUMNI':
+        return redirect('core:alumni_dashboard')
+
+    return redirect('core:guest_dashboard')
 
 # ================================
 # 🔷 BASE VIEW (ROLE CONTROL)
@@ -137,27 +158,6 @@ class GuestDashboardView(BaseView):
 
 
 # ================================
-# 🔁 DASHBOARD REDIRECT
-# ================================
-@login_required
-def dashboard_redirect(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
-
-    if profile.role == 'ADMIN':
-        return redirect('admin_dashboard')
-    elif profile.role == 'STAFF':
-        return redirect('staff_dashboard')
-    elif profile.role == 'TEACHER':
-        return redirect('teacher_dashboard')
-    elif profile.role == 'STUDENT':
-        return redirect('student_dashboard')
-    elif profile.role == 'PARENT':
-        return redirect('parent_dashboard')
-    elif profile.role == 'ALUMNI':
-        return redirect('alumni_dashboard')
-
-    return redirect('guest_dashboard')
-# ================================
 # 🎓 STUDENT COURSES
 # ================================
 class StudentCoursesView(BaseView):
@@ -204,7 +204,7 @@ class ActivateAccountView(View):
 
             login(request, user)
 
-            return redirect('dashboard')   # 🔥 smart redirect
+            return redirect('core:dashboard')   # 🔥 smart redirect
 
         return render(request, 'auth/activation_failed.html')
 

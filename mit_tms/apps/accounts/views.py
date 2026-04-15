@@ -29,7 +29,7 @@ class CustomLoginView(LoginView):
     authentication_form = CustomLoginForm
 
     def get_success_url(self):
-        return '/dashboard/'
+        return '/app/dashboard/'
 
 
 # ================================
@@ -120,7 +120,18 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = getattr(self.request.user, 'profile', None)
+
+        user = self.request.user
+        profile = getattr(user, 'profile', None)
+
+        context['profile'] = profile
+
+        context['student'] = getattr(user, 'student', None)
+        context['teacher'] = getattr(user, 'teacher', None)
+        context['staff'] = getattr(user, 'staff', None)
+        context['parent'] = getattr(user, 'parent', None)
+        context['alumni'] = getattr(user, 'alumni', None)
+
         return context
 
 
@@ -129,16 +140,31 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 # ================================
 class AccountSettingsView(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ['role']  # adjust fields if needed
+    fields = ['role', 'image']
     template_name = "accounts/settings.html"
     success_url = reverse_lazy('accounts:profile')
 
     def get_object(self):
         return self.request.user.profile
 
-    def form_valid(self, form):
-        messages.success(self.request, "Settings updated successfully")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        form = self.get_form()
+
+        if form.is_valid():
+            profile = form.save(commit=False)
+
+            # 🔥 IMPORTANT: save uploaded file
+            if request.FILES.get('image'):
+                profile.image = request.FILES.get('image')
+
+            profile.save()
+
+            messages.success(request, "Settings updated successfully")
+            return redirect(self.success_url)
+
+        return self.form_invalid(form)
 
 
 # ================================
@@ -209,6 +235,27 @@ class UserUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
     success_url = reverse_lazy('accounts:user_list')
 
     def form_valid(self, form):
+        user = form.save()
+
+        profile = user.profile
+
+        # 🔥 Handle image
+        if self.request.FILES.get('image'):
+            profile.image = self.request.FILES.get('image')
+
+        # 🔥 Handle role
+        role = self.request.POST.get('role')
+        if role:
+            profile.role = role
+
+        profile.save()
+
+        # 🔥 Handle password
+        password = self.request.POST.get('password')
+        if password:
+            user.set_password(password)
+            user.save()
+
         messages.success(self.request, "User updated successfully")
         return super().form_valid(form)
 
