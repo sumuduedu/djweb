@@ -76,8 +76,15 @@
 
         {% for e in enrollments %}
         <div class="border-b py-2">
-            <p class="font-medium">{{ e.name }}</p>
-            <p class="text-sm text-gray-500">{{ e.course.title }}</p>
+
+            <!-- ✅ FIXED -->
+            <p class="font-medium">{{ e.student.full_name }}</p>
+
+            <!-- ✅ FIXED -->
+            <p class="text-sm text-gray-500">
+                {{ e.batch.course.title }} · {{ e.batch.name }}
+            </p>
+
         </div>
         {% empty %}
         <p class="text-gray-400">No enrollments yet</p>

@@ -1,5 +1,8 @@
 from django import forms
-from .models import Batch, Timetable, ModulePlan
+from django.core.exceptions import ValidationError
+
+from .models import Batch
+from apps.accounts.models import Teacher
 
 
 # =========================================================
@@ -11,146 +14,26 @@ class BatchForm(forms.ModelForm):
         model = Batch
         fields = [
             'course',
-            'academic_year',
             'name',
-            'start_date',
-            'hours_per_day',
-            'days_per_week',
-            'max_students',
-        ]
-
-        widgets = {
-            'course': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'academic_year': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'name': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-
-            'start_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'w-full border rounded px-3 py-2'
-            }),
-
-            'hours_per_day': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'step': '0.5'
-            }),
-
-            'days_per_week': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'min': 1,
-                'max': 7
-            }),
-
-            'max_students': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2'
-            }),
-        }
-
-    # 🔥 VALIDATION
-    def clean(self):
-        cleaned_data = super().clean()
-
-        hours_per_day = cleaned_data.get('hours_per_day')
-        days_per_week = cleaned_data.get('days_per_week')
-
-        if hours_per_day is not None and hours_per_day <= 0:
-            raise forms.ValidationError("Hours per day must be greater than 0.")
-
-        if days_per_week is not None and not (1 <= days_per_week <= 7):
-            raise forms.ValidationError("Days per week must be between 1 and 7.")
-
-        return cleaned_data
-
-
-# =========================================================
-# 🔷 TIMETABLE FORM (WITH CONFLICT VALIDATION 🔥)
-# =========================================================
-from django import forms
-from datetime import date
-from .models import Timetable
-
-
-class TimetableForm(forms.ModelForm):
-
-    # 🔥 DATE FIELD WITH CALENDAR SUPPORT
-    date = forms.DateField(
-        input_formats=['%Y-%m-%d'],
-        widget=forms.DateInput(
-            format='%Y-%m-%d',
-            attrs={
-                'type': 'date',
-                'class': 'w-full border rounded px-3 py-2',
-            }
-        )
-    )
-
-    class Meta:
-        model = Timetable
-        fields = [
-            'batch',
-            'module',
-            'date',
-            'slot',
-            'session_type',
-        ]
-
-        widgets = {
-            'batch': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'module': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'slot': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'session_type': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-        }
-
-    # 🔥 OPTIONAL: LIMIT DATE BASED ON TODAY
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Disable past dates
-        self.fields['date'].widget.attrs['min'] = date.today().isoformat()
-
-    # 🔥 VALIDATION (IMPORTANT)
-    def clean(self):
-        cleaned_data = super().clean()
-
-        batch = cleaned_data.get('batch')
-        date_value = cleaned_data.get('date')
-        slot = cleaned_data.get('slot')
-
-        # 🔥 CONFLICT CHECK
-        if batch and date_value and slot:
-            qs = Timetable.objects.filter(
-                batch=batch,
-                date=date_value,
-                slot=slot
-            )
-
-            if self.instance.pk:
-                qs = qs.exclude(pk=self.instance.pk)
-
-            if qs.exists():
-                raise forms.ValidationError(
-                    "⚠️ Conflict: This batch already has a session in this time slot."
-                )
-
-        return cleaned_data
-
-
-# =========================================================
-# 🔷 MODULE PLAN FORM
-# =========================================================
-class ModulePlanForm(forms.ModelForm):
-
-    class Meta:
-        model = ModulePlan
-        fields = [
-            'module',
+            'teacher',
             'start_date',
             'end_date',
-            'theory_hours',
-            'practical_hours'
+            'capacity',
         ]
 
         widgets = {
-            'module': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'course': forms.Select(attrs={
+                'class': 'w-full border rounded px-3 py-2'
+            }),
+
+            'name': forms.TextInput(attrs={
+                'class': 'w-full border rounded px-3 py-2',
+                'placeholder': 'Batch Name (e.g., 2026 Morning Batch)'
+            }),
+
+            'teacher': forms.Select(attrs={
+                'class': 'w-full border rounded px-3 py-2'
+            }),
 
             'start_date': forms.DateInput(attrs={
                 'type': 'date',
@@ -162,33 +45,37 @@ class ModulePlanForm(forms.ModelForm):
                 'class': 'w-full border rounded px-3 py-2'
             }),
 
-            'theory_hours': forms.NumberInput(attrs={
+            'capacity': forms.NumberInput(attrs={
                 'class': 'w-full border rounded px-3 py-2',
-                'step': '0.5'
-            }),
-
-            'practical_hours': forms.NumberInput(attrs={
-                'class': 'w-full border rounded px-3 py-2',
-                'step': '0.5'
+                'min': 1
             }),
         }
 
-    # 🔥 FILTER MODULES BASED ON BATCH
+    # =========================================================
+    # 🔥 INIT (FILTER TEACHERS ONLY)
+    # =========================================================
     def __init__(self, *args, **kwargs):
-        batch = kwargs.pop('batch', None)
         super().__init__(*args, **kwargs)
 
-        if batch:
-            self.fields['module'].queryset = batch.course.modules.all()
+        # Only valid teachers
+        self.fields['teacher'].queryset = Teacher.objects.select_related('user')
 
+    # =========================================================
     # 🔥 VALIDATION
+    # =========================================================
     def clean(self):
         cleaned_data = super().clean()
 
         start = cleaned_data.get('start_date')
         end = cleaned_data.get('end_date')
+        capacity = cleaned_data.get('capacity')
 
+        # ✅ Date validation
         if start and end and start > end:
-            raise forms.ValidationError("End date must be after start date.")
+            raise ValidationError("End date must be after start date.")
+
+        # ✅ Capacity validation
+        if capacity is not None and capacity < 1:
+            raise ValidationError("Capacity must be at least 1.")
 
         return cleaned_data

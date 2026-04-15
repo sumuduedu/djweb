@@ -92,11 +92,12 @@ class AdminDashboardView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # 🔹 Imports (keep inside for safety)
+        # 🔹 Imports (kept inside as you prefer)
         from django.contrib.auth.models import User
         from apps.accounts.models import Student, Teacher
-        from apps.enrollment.models import EnrollmentInquiry
+        from apps.enrollment.models import EnrollmentInquiry, Enrollment
         from apps.website.models import ContactMessage
+        from apps.batch.models import Batch
 
         # ================================
         # 📊 SYSTEM STATS
@@ -106,12 +107,26 @@ class AdminDashboardView(BaseView):
         context['total_teachers'] = Teacher.objects.count()
         context['pending_applications'] = EnrollmentInquiry.objects.filter(status='PENDING').count()
 
+        # 🔥 ADD THESE (IMPORTANT)
+        context['total_batches'] = Batch.objects.count()
+        context['total_enrollments'] = Enrollment.objects.count()
+
         # ================================
         # 📋 RECENT DATA
         # ================================
         context['recent_users'] = User.objects.order_by('-date_joined')[:5]
-        context['applications'] = EnrollmentInquiry.objects.order_by('-created_at')[:5]
+
+        context['applications'] = EnrollmentInquiry.objects.select_related(
+            'user', 'course'
+        ).order_by('-created_at')[:5]
+
         context['messages'] = ContactMessage.objects.order_by('-created_at')[:5]
+
+        # 🔥 FIXED ENROLLMENTS (IMPORTANT)
+        context['enrollments'] = Enrollment.objects.select_related(
+            'student',
+            'batch__course'
+        ).order_by('-enrolled_at')[:5]
 
         # ================================
         # 🔔 NOTIFICATIONS
@@ -119,7 +134,6 @@ class AdminDashboardView(BaseView):
         context['new_messages'] = ContactMessage.objects.filter(is_read=False).count()
 
         return context
-
 # ================================
 # 🧑‍💼 STAFF DASHBOARD
 # ================================

@@ -129,16 +129,6 @@
 
    <div class="flex justify-end">
 
-    <a href="{% url 'batch:gantt' %}?batch={{ batch.id }}"
-       class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
-              bg-purple-600 text-white shadow-md
-              hover:bg-purple-700 hover:shadow-lg
-              transition">
-
-        <span>🧩</span>
-        <span>View Gantt Chart</span>
-    </a>
-
 </div>
 
 </div>
@@ -264,7 +254,7 @@
                 📝 Manual Plan
             </h3>
 
-            <a href="{% url 'batch:module_plan_create' batch.pk %}"
+            <a href="{% url 'schedule:module_plan_create' batch.pk %}"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 text-sm">
                 + Add Plan
             </a>
