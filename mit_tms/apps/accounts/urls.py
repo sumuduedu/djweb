@@ -11,6 +11,7 @@ from .views import (
     UserDetailView,
     UserUpdateView,
     UserDeleteView,
+    ToggleUserStatusView,
 )
 
 app_name = "accounts"
@@ -21,6 +22,11 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("signup/", SignupView.as_view(), name="signup"),
     path("activate/<uidb64>/<token>/", ActivateAccountView.as_view(), name="activate"),
+    path(
+    'users/<int:pk>/toggle/',
+    ToggleUserStatusView.as_view(),
+    name='user_toggle',
+),
 
     # 👤 PROFILE
     path("profile/", ProfileView.as_view(), name="profile"),

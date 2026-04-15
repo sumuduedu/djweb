@@ -52,6 +52,13 @@ class Student(models.Model):
 
     full_name = models.CharField(max_length=255)
 
+    # 🔥 MANY PARENTS
+    parents = models.ManyToManyField(
+        'Parent',
+        related_name='students',
+        blank=True
+    )
+
     def __str__(self):
         return self.full_name
 
@@ -101,19 +108,13 @@ class Parent(models.Model):
         related_name="parent"
     )
 
-    # 🔥 Parent linked to student
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE,
-        related_name="parents"
-    )
-
     relationship = models.CharField(
-        max_length=50
-    )  # Father / Mother / Guardian
-
+        max_length=50,
+        blank=True,
+        null=True
+    )
     def __str__(self):
-        return f"{self.user.username} -> {self.student.full_name}"
+        return self.user.username
 
 class Alumni(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

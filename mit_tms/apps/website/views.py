@@ -220,7 +220,7 @@ class SentMessageDetailView(LoginRequiredMixin, DetailView):
     template_name = "core/sent_detail.html"
     context_object_name = "msg"
 
-from apps.website.models import EnrollmentInquiry
+from apps.enrollment.models import EnrollmentInquiry
 
 class EnrollView(TemplateView):
     template_name = "website/enroll.html"

@@ -14,8 +14,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 
 from apps.accounts.models import Profile
-from apps.website.models import EnrollmentInquiry, ContactMessage
-
+from apps.website.models import  ContactMessage
+from apps.enrollment.models import EnrollmentInquiry
 
 # ================================
 # 🔁 DASHBOARD REDIRECT
@@ -87,18 +87,38 @@ class HomeView(TemplateView):
 # ================================
 class AdminDashboardView(BaseView):
     allowed_roles = ['ADMIN']
-    template_name = "core/dashboard.html"
+    template_name = "dashboard/admin.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # 🔹 Imports (keep inside for safety)
+        from django.contrib.auth.models import User
+        from apps.accounts.models import Student, Teacher
+        from apps.enrollment.models import EnrollmentInquiry
+        from apps.website.models import ContactMessage
+
+        # ================================
+        # 📊 SYSTEM STATS
+        # ================================
+        context['total_users'] = User.objects.count()
+        context['total_students'] = Student.objects.count()
+        context['total_teachers'] = Teacher.objects.count()
+        context['pending_applications'] = EnrollmentInquiry.objects.filter(status='PENDING').count()
+
+        # ================================
+        # 📋 RECENT DATA
+        # ================================
         context['recent_users'] = User.objects.order_by('-date_joined')[:5]
+        context['applications'] = EnrollmentInquiry.objects.order_by('-created_at')[:5]
         context['messages'] = ContactMessage.objects.order_by('-created_at')[:5]
+
+        # ================================
+        # 🔔 NOTIFICATIONS
+        # ================================
         context['new_messages'] = ContactMessage.objects.filter(is_read=False).count()
-        context['enrollments'] = EnrollmentInquiry.objects.order_by('-created_at')[:5]
 
         return context
-
 
 # ================================
 # 🧑‍💼 STAFF DASHBOARD
@@ -107,6 +127,18 @@ class StaffDashboardView(BaseView):
     allowed_roles = ['STAFF']
     template_name = "dashboard/staff.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        from apps.enrollment.models import EnrollmentInquiry
+
+        context['pending'] = EnrollmentInquiry.objects.filter(status='PENDING').count()
+        context['approved'] = EnrollmentInquiry.objects.filter(status='APPROVED').count()
+        context['rejected'] = EnrollmentInquiry.objects.filter(status='REJECTED').count()
+
+        context['applications'] = EnrollmentInquiry.objects.order_by('-created_at')[:5]
+
+        return context
 
 # ================================
 # 👨‍🏫 TEACHER DASHBOARD
@@ -145,6 +177,8 @@ class ParentDashboardView(BaseView):
 # ================================
 from apps.courses.models import Course
 
+from apps.enrollment.models import EnrollmentInquiry
+
 class GuestDashboardView(BaseView):
     allowed_roles = ['GUEST']
     template_name = "dashboard/guest.html"
@@ -152,11 +186,20 @@ class GuestDashboardView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['courses'] = Course.objects.filter(active=True)
+        courses = Course.objects.all()
+
+        # 🔥 get all applications for this user
+        user_apps = EnrollmentInquiry.objects.filter(
+            user=self.request.user
+        ).select_related('course')
+
+        # 🔥 map: course_id → application
+        app_dict = {app.course_id: app for app in user_apps}
+
+        context['courses'] = courses
+        context['applications'] = app_dict   # ✅ IMPORTANT
 
         return context
-
-
 # ================================
 # 🎓 STUDENT COURSES
 # ================================
@@ -226,3 +269,24 @@ class AlumniDashboardView(BaseView):
         return context
 
 
+from apps.enrollment.models import EnrollmentInquiry
+
+class StudentDashboardView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "dashboard/student.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        # 🎓 batch enrollments
+        context['enrollments'] = get_student_enrollments(user)
+
+        # 📋 approved applications
+        context['approved_apps'] = EnrollmentInquiry.objects.filter(
+            user=user,
+            status='APPROVED'
+        )
+
+        return context

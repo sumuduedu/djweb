@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.enrollment.views import apply_student, apply_teacher, apply_parent
+
 
 from .views import (
     HomeView,
@@ -34,7 +34,5 @@ urlpatterns = [
     path('student/courses/', StudentCoursesView.as_view(), name='student_courses'),
     path('student/attendance/', StudentAttendanceView.as_view(), name='student_attendance'),
 
-    path('apply/student/<int:course_id>/', apply_student, name='apply_student'),
-    path('apply/teacher/<int:course_id>/', apply_teacher, name='apply_teacher'),
-    path('apply/parent/<int:course_id>/', apply_parent, name='apply_parent'),
+
 ]

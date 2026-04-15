@@ -2,46 +2,130 @@
 
 {% block content %}
 
-<div class="p-6 bg-gray-100 min-h-screen text-center">
+<div class="min-h-screen bg-gray-100 py-10 px-4">
 
-    <h1 class="text-2xl font-bold mb-6">👤 Welcome Guest</h1>
-
-    <div class="bg-white p-6 rounded-2xl shadow max-w-3xl mx-auto">
-
-        <p class="text-gray-600 mb-6">
-            You are not enrolled in any courses yet.
+    <!-- 🔷 HEADER -->
+    <div class="max-w-6xl mx-auto text-center mb-10">
+        <h1 class="text-3xl font-bold text-gray-800">
+            👤 Guest Dashboard
+        </h1>
+        <p class="text-gray-500 mt-2">
+            Browse courses and submit your application to begin learning.
         </p>
+    </div>
 
-        <!-- 🔥 COURSE LIST -->
+    <!-- 🔷 MAIN CARD -->
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8">
+
         {% if courses %}
-            <h2 class="text-lg font-semibold mb-4">Available Courses</h2>
+            <h2 class="text-xl font-semibold text-gray-700 mb-6">
+                📚 Available Courses
+            </h2>
 
-            {% for course in courses %}
-                <div class="border p-4 rounded-lg mb-4 text-left">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                    <h3 class="font-bold text-lg">{{ course.title }}</h3>
+               {% for course in courses %}
+<div class="bg-gray-50 border rounded-xl p-5 hover:shadow-lg transition flex flex-col">
 
-                    <div class="mt-3 flex gap-2">
+    <h3 class="text-lg font-bold text-gray-800 mb-2">
+        {{ course.title }}
+    </h3>
 
-                        <a href="{% url 'core:apply_student' course.id %}"
-                           class="bg-green-600 text-white px-3 py-1 rounded">
-                            Apply as Student
-                        </a>
+    {% if course.description %}
+    <p class="text-sm text-gray-500 mb-4">
+        {{ course.description }}
+    </p>
+    {% endif %}
 
+    <div class="mt-auto pt-4 flex flex-col gap-2">
 
+        {% if applications|length > 0 and course.id in applications %}
 
-                        <a href="{% url 'core:apply_parent' course.id %}"
-                           class="bg-yellow-600 text-white px-3 py-1 rounded">
-                            Apply as Parent
-                        </a>
+            {% with app=applications.course.id %}
+            {% endwith %}
 
-                    </div>
+        {% endif %}
 
+        {% if course.id in applications %}
+
+            {% with app=applications|dictsort:course.id %}
+            {% endwith %}
+
+        {% endif %}
+
+        {% comment %} SAFE ACCESS USING for loop {% endcomment %}
+        {% with app=None %}
+        {% for key, value in applications.items %}
+            {% if key == course.id %}
+                {% with app=value %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+
+        {% if app %}
+
+            {% if app.status == 'PENDING' %}
+                <span class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">
+                    ⏳ Pending
+                </span>
+
+            {% elif app.status == 'APPROVED' %}
+                <span class="bg-green-600 text-white px-3 py-1 rounded text-sm">
+                    ✔ Approved
+                </span>
+
+            {% elif app.status == 'REJECTED' %}
+                <div class="flex flex-col gap-1">
+                    <span class="bg-red-500 text-white px-3 py-1 rounded text-sm">
+                        ❌ Rejected
+                    </span>
+
+                    {% if app.rejection_reason %}
+                        <p class="text-xs text-red-500">
+                            {{ app.rejection_reason }}
+                        </p>
+                    {% endif %}
+
+                    <a href="{% url 'enrollment:apply_student' course.id %}"
+                       class="bg-green-600 text-white px-3 py-1 rounded text-sm">
+                        Apply Again
+                    </a>
                 </div>
-            {% endfor %}
+            {% endif %}
 
         {% else %}
-            <p>No courses available.</p>
+
+            <!-- APPLY BUTTON -->
+            <div class="flex gap-2">
+                <a href="{% url 'enrollment:apply_student' course.id %}"
+                   class="bg-green-600 text-white px-4 py-2 rounded text-sm">
+                    Apply as a Student
+                </a>
+
+                <a href="{% url 'enrollment:apply_parent' course.id %}"
+                   class="bg-yellow-500 text-white px-4 py-2 rounded text-sm">
+                    Apply as a Parent
+                </a>
+            </div>
+
+        {% endif %}
+
+        {% endwith %}
+
+    </div>
+
+</div>
+{% endfor %}
+
+            </div>
+
+        {% else %}
+            <!-- EMPTY STATE -->
+            <div class="text-center py-10">
+                <p class="text-gray-500 text-lg">
+                    🚫 No courses available right now.
+                </p>
+            </div>
         {% endif %}
 
     </div>

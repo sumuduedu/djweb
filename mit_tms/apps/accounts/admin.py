@@ -74,5 +74,9 @@ class StaffAdmin(admin.ModelAdmin):
 # ================================
 @admin.register(Parent)
 class ParentAdmin(admin.ModelAdmin):
-    list_display = ("user", "student", "relationship")
-    search_fields = ("user__username", "student__full_name")
+    list_display = ("user", "get_students", "relationship")
+
+    def get_students(self, obj):
+        return ", ".join([s.full_name for s in obj.students.all()]) or "No students"
+
+    get_students.short_description = "Students"

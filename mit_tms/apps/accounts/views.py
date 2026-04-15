@@ -140,7 +140,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 # ================================
 class AccountSettingsView(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ['role', 'image']
+    fields = ['image']
     template_name = "accounts/settings.html"
     success_url = reverse_lazy('accounts:profile')
 
@@ -271,3 +271,29 @@ class UserDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "User deleted successfully")
         return super().delete(request, *args, **kwargs)
+
+
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+
+class ToggleUserStatusView(LoginRequiredMixin, AdminRequiredMixin, View):
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+
+        # 🔒 prevent admin disabling himself
+        if user == request.user:
+            messages.error(request, "You cannot deactivate your own account.")
+            return redirect('accounts:user_list')
+
+        # 🔁 toggle status
+        user.is_active = not user.is_active
+        user.save()
+
+        if user.is_active:
+            messages.success(request, f"{user.username} activated.")
+        else:
+            messages.warning(request, f"{user.username} deactivated.")
+
+        return redirect('accounts:user_list')

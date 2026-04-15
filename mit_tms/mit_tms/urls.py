@@ -19,6 +19,7 @@ urlpatterns = [
     path('app/', include('apps.core.urls')),
     path('app/courses/', include('apps.courses.urls')),
     path('app/batches/', include('apps.batch.urls')),
+    path('app/enrollment/', include('apps.enrollment.urls')),
 
     # ================= OPTIONAL =================
     path('auth/', include('allauth.urls')),  # only if used
