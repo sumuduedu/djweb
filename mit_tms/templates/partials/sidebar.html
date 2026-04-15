@@ -1,5 +1,7 @@
 <aside id="sidebar"
-       class="w-64 bg-gray-900 text-white flex flex-col transition-all duration-300">
+    class="fixed md:static z-50 inset-y-0 left-0 w-64 bg-gray-900 text-white
+           transform -translate-x-full md:translate-x-0
+           transition-transform duration-300">
 
     <!-- LOGO -->
     <div class="p-5 border-b border-gray-800">
@@ -157,9 +159,9 @@
 <script>
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
 
-    sidebar.classList.toggle('w-20');
-    sidebar.classList.toggle('w-64');
-    sidebar.classList.toggle('sidebar-collapsed');
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
 }
 </script>
