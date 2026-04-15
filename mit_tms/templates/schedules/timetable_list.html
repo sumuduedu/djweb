@@ -40,7 +40,7 @@
             <p class="text-sm text-gray-500">Manage all scheduled sessions</p>
         </div>
 
-        <a href="{% url 'batch:timetable_create' %}"
+        <a href="{% url 'schedule:timetable_create' %}"
            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
             + Add Entry
         </a>
@@ -112,9 +112,9 @@
     </td>
 
     <td class="p-4 text-right space-x-2">
-        <a href="{% url 'batch:timetable_detail' t.pk %}" class="text-indigo-600">View</a>
-        <a href="{% url 'batch:timetable_update' t.pk %}" class="text-yellow-600">Edit</a>
-        <a href="{% url 'batch:timetable_delete' t.pk %}" class="text-red-600">Delete</a>
+        <a href="{% url 'schedule:timetable_detail' t.pk %}" class="text-indigo-600">View</a>
+        <a href="{% url 'schedule:timetable_update' t.pk %}" class="text-yellow-600">Edit</a>
+        <a href="{% url 'schedule:timetable_delete' t.pk %}" class="text-red-600">Delete</a>
     </td>
 
 </tr>

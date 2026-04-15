@@ -36,7 +36,7 @@ def generate_timetable_view(request, pk):
 
 class TimetableListView(LoginRequiredMixin, ListView):
     model = Timetable
-    template_name = "schedule/timetable_list.html"
+    template_name = "schedules/timetable_list.html"
     context_object_name = "timetables"
     ordering = ["-date"]
 
@@ -48,7 +48,7 @@ class TimetableListView(LoginRequiredMixin, ListView):
 class TimetableCreateView(LoginRequiredMixin, CreateView):
     model = Timetable
     form_class = TimetableForm
-    template_name = "schedule/timetable_form.html"
+    template_name = "schedules/timetable_form.html"
     success_url = reverse_lazy("schedule:list")
 
 
@@ -59,7 +59,7 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
 class TimetableUpdateView(LoginRequiredMixin, UpdateView):
     model = Timetable
     form_class = TimetableForm
-    template_name = "schedule/timetable_form.html"
+    template_name = "schedules/timetable_form.html"
     success_url = reverse_lazy("schedule:list")
 
 
@@ -69,7 +69,7 @@ class TimetableUpdateView(LoginRequiredMixin, UpdateView):
 
 class TimetableDeleteView(LoginRequiredMixin, DeleteView):
     model = Timetable
-    template_name = "schedule/timetable_confirm_delete.html"
+    template_name = "schedules/timetable_confirm_delete.html"
     success_url = reverse_lazy("schedule:list")
 
 
@@ -78,7 +78,7 @@ class TimetableDeleteView(LoginRequiredMixin, DeleteView):
 # =========================
 
 class TimetableCalendarView(LoginRequiredMixin, TemplateView):
-    template_name = "schedule/timetable_calendar.html"
+    template_name = "schedules/timetable_calendar.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -121,7 +121,7 @@ from apps.batch.models import Batch
 
 class GanttChartView(DetailView):
     model = Batch
-    template_name = "batch/gantt.html"
+    template_name = "schedules/gantt.html"
     context_object_name = "batch"
 
     def get_context_data(self, **kwargs):
@@ -150,7 +150,7 @@ from apps.batch.models import Batch
 class ModulePlanCreateView(LoginRequiredMixin, CreateView):
     model = ModulePlan
     form_class = ModulePlanForm
-    template_name = "schedule/module_plan_form.html"
+    template_name = "schedules/module_plan_form.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.batch = get_object_or_404(Batch, pk=kwargs['batch_id'])
