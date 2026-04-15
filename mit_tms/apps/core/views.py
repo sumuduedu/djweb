@@ -11,13 +11,16 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-
-from apps.accounts.models import Profile
-from apps.website.models import Enrollment, ContactMessage
-from .forms import CustomSignupForm
-
 from django.contrib.auth import login
 
+from apps.accounts.models import Profile
+from apps.website.models import EnrollmentInquiry, ContactMessage
+
+
+
+# ================================
+# 🔷 BASE VIEW (ROLE CONTROL)
+# ================================
 class BaseView(LoginRequiredMixin, TemplateView):
     allowed_roles = None
 
@@ -36,21 +39,31 @@ class BaseView(LoginRequiredMixin, TemplateView):
         context["profile"] = self.profile
         context["role"] = self.profile.role
 
-        # 🎯 Template helpers
+        # 🔥 Role flags (important for sidebar)
         context["is_admin"] = self.profile.role == "ADMIN"
+        context["is_staff"] = self.profile.role == "STAFF"
         context["is_teacher"] = self.profile.role == "TEACHER"
         context["is_student"] = self.profile.role == "STUDENT"
+        context["is_parent"] = self.profile.role == "PARENT"
+        context["is_guest"] = self.profile.role == "GUEST"
 
-        # Optional related objects
+        # Safe access
         context["student"] = getattr(self.request.user, "student", None)
         context["teacher"] = getattr(self.request.user, "teacher", None)
 
         return context
 
+
+# ================================
+# 🌐 HOME
+# ================================
 class HomeView(TemplateView):
     template_name = "website/home.html"
 
 
+# ================================
+# 👑 ADMIN DASHBOARD
+# ================================
 class AdminDashboardView(BaseView):
     allowed_roles = ['ADMIN']
     template_name = "core/dashboard.html"
@@ -61,71 +74,121 @@ class AdminDashboardView(BaseView):
         context['recent_users'] = User.objects.order_by('-date_joined')[:5]
         context['messages'] = ContactMessage.objects.order_by('-created_at')[:5]
         context['new_messages'] = ContactMessage.objects.filter(is_read=False).count()
-        context['enrollments'] = Enrollment.objects.order_by('-created_at')[:5]
+        context['enrollments'] = EnrollmentInquiry.objects.order_by('-created_at')[:5]
 
         return context
+
+
+# ================================
+# 🧑‍💼 STAFF DASHBOARD
+# ================================
+class StaffDashboardView(BaseView):
+    allowed_roles = ['STAFF']
+    template_name = "dashboard/staff.html"
+
+
+# ================================
+# 👨‍🏫 TEACHER DASHBOARD
+# ================================
+class TeacherDashboardView(BaseView):
+    allowed_roles = ['TEACHER']
+    template_name = "dashboard/teacher.html"
+
+
+# ================================
+# 🎓 STUDENT DASHBOARD
+# ================================
+from apps.core.gateway import get_student_enrollments
+
 
 class StudentDashboardView(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/student.html"
 
-class TeacherDashboardView(BaseView):
-    allowed_roles = ['TEACHER']
-    template_name = "dashboard/teacher.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['enrollments'] = get_student_enrollments(self.request.user)
+
+        return context
+# ================================
+# 👨‍👩‍👧 PARENT DASHBOARD
+# ================================
+class ParentDashboardView(BaseView):
+    allowed_roles = ['PARENT']
+    template_name = "dashboard/parent.html"
+
+
+# ================================
+# 👤 GUEST DASHBOARD
+# ================================
+from apps.courses.models import Course
+
+class GuestDashboardView(BaseView):
+    allowed_roles = ['GUEST']
+    template_name = "dashboard/guest.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['courses'] = Course.objects.filter(active=True)
+
+        return context
+
+
+# ================================
+# 🔁 DASHBOARD REDIRECT
+# ================================
 @login_required
 def dashboard_redirect(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if profile.role == 'ADMIN':
         return redirect('admin_dashboard')
+    elif profile.role == 'STAFF':
+        return redirect('staff_dashboard')
     elif profile.role == 'TEACHER':
         return redirect('teacher_dashboard')
     elif profile.role == 'STUDENT':
         return redirect('student_dashboard')
+    elif profile.role == 'PARENT':
+        return redirect('parent_dashboard')
+    elif profile.role == 'ALUMNI':
+        return redirect('alumni_dashboard')
 
-    return redirect('student_dashboard')   # 🔥 fallback
+    return redirect('guest_dashboard')
+# ================================
+# 🎓 STUDENT COURSES
+# ================================
+class StudentCoursesView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "student/courses.html"
 
-class SignupView(View):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    def get(self, request):
-        return render(request, 'auth/signup.html', {
-            'form': CustomSignupForm()
-        })
+        student = getattr(self.request.user, "student", None)
 
-    def post(self, request):
-        form = CustomSignupForm(request.POST)
+        if student:
+            from apps.core.gateway import get_student_enrollments
+            context['enrollments'] = get_student_enrollments(self.request.user)
+        else:
+            context['enrollments'] = []
 
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
+        return context
 
-            # 🔐 Token
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
 
-            domain = get_current_site(request).domain
-            activation_link = f"http://{domain}/activate/{uid}/{token}/"
+# ================================
+# 📅 STUDENT ATTENDANCE
+# ================================
+class StudentAttendanceView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "student/attendance.html"
 
-            # 📧 Email
-            send_mail(
-                subject="Activate Your Account",
-                message=(
-                    f"Hi {user.username},\n\n"
-                    f"Click below to activate your account:\n\n"
-                    f"{activation_link}\n\n"
-                    f"If you didn't register, ignore this."
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
 
-            return render(request, 'auth/signup_success.html', {
-                'email': user.email
-            })
-
-        return render(request, 'auth/signup.html', {'form': form})
+# ================================
+# 🔓 ACTIVATE ACCOUNT
+# ================================
 class ActivateAccountView(View):
 
     def get(self, request, uidb64, token):
@@ -139,26 +202,27 @@ class ActivateAccountView(View):
             user.is_active = True
             user.save()
 
-            login(request, user)   # 🔥 AUTO LOGIN
+            login(request, user)
 
-            return redirect('dashboard')   # 🔥 go to dashboard
+            return redirect('dashboard')   # 🔥 smart redirect
 
         return render(request, 'auth/activation_failed.html')
 
-class StudentCoursesView(BaseView):
-    allowed_roles = ['STUDENT']
-    template_name = "student/courses.html"
+
+class AlumniDashboardView(BaseView):
+    allowed_roles = ['ALUMNI']
+    template_name = "dashboard/alumni.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        student = self.request.user.student
+        student = getattr(self.request.user, "student", None)
 
-        context['enrollments'] = Enrollment.objects.filter(student=student)
+        if student:
+            context['enrollments'] = get_student_enrollments(self.request.user)
+        else:
+            context['enrollments'] = []
 
         return context
 
 
-class StudentAttendanceView(BaseView):
-    allowed_roles = ['STUDENT']
-    template_name = "student/attendance.html"

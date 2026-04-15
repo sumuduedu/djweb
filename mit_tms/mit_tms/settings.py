@@ -52,6 +52,7 @@ LOCAL_APPS = [
     'apps.accounts.apps.AccountsConfig',   # ✅ ADD THIS
     'apps.batch.apps.BatchConfig',
      'apps.scheduling.apps.SchedulingConfig',
+    'apps.enrollment.apps.EnrollmentConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -183,7 +184,7 @@ ACCOUNT_SIGNUP_FIELDS = [
 ]
 
 # 🔥 Email settings
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_UNIQUE_EMAIL = True
 
 

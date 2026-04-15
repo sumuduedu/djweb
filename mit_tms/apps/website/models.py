@@ -65,7 +65,7 @@ class SentMessage(models.Model):
 from django.db import models
 from apps.courses.models import Course
 
-class Enrollment(models.Model):
+class EnrollmentInquiry(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
     phone = models.CharField(max_length=20)

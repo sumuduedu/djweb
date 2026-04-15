@@ -186,3 +186,4 @@ class ModulePlan(models.Model):
 
     def __str__(self):
         return f"{self.module.title} ({self.start_date} - {self.end_date})"
+

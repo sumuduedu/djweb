@@ -4,33 +4,31 @@ from django.dispatch import receiver
 
 from allauth.account.signals import user_signed_up
 
-from .models import Profile, Student, Teacher
+from .models import Profile, Student, Teacher, Staff, Parent
 
 
 # ================================
-# 🔷 CREATE PROFILE + DEFAULT ROLE
+# 🔷 CREATE PROFILE (DEFAULT = GUEST)
 # ================================
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        profile, _ = Profile.objects.get_or_create(user=instance)
-
-        # 🔥 Ensure default role
-        if not profile.role:
-            profile.role = 'STUDENT'
-            profile.save()
+        Profile.objects.create(
+            user=instance,
+            role='GUEST'   # 🔥 DEFAULT ROLE
+        )
 
 
 # ================================
-# 🔷 GOOGLE / SOCIAL LOGIN ROLE ASSIGN
+# 🔷 GOOGLE / SOCIAL LOGIN
 # ================================
 @receiver(user_signed_up)
 def assign_role_social_login(request, user, **kwargs):
     profile, _ = Profile.objects.get_or_create(user=user)
 
-    # 🔥 Default role for social users
+    # 🔥 ensure role exists
     if not profile.role:
-        profile.role = 'STUDENT'
+        profile.role = 'GUEST'
         profile.save()
 
 
@@ -49,18 +47,17 @@ def store_previous_role(sender, instance, **kwargs):
 
 
 # ================================
-# 🔷 CREATE STUDENT / TEACHER BASED ON ROLE
+# 🔷 CREATE / REMOVE ROLE MODELS
 # ================================
 @receiver(post_save, sender=Profile)
-def create_role_model(sender, instance, created, **kwargs):
+def create_role_models(sender, instance, created, **kwargs):
 
     user = instance.user
 
-    # 🔥 Skip superuser
+    # 🔥 skip superuser
     if user.is_superuser:
         return
 
-    # 🔥 Check if role changed
     role_changed = (
         created or
         getattr(instance, "_previous_role", None) != instance.role
@@ -69,25 +66,67 @@ def create_role_model(sender, instance, created, **kwargs):
     if not role_changed:
         return
 
-    # 🔥 STUDENT ROLE
+    full_name = user.get_full_name() or user.username
+
+    # ============================
+    # 🎓 STUDENT
+    # ============================
     if instance.role == 'STUDENT':
         Student.objects.get_or_create(
             user=user,
-            defaults={
-                "full_name": user.get_full_name() or user.username
-            }
+            defaults={"full_name": full_name}
         )
-        Teacher.objects.filter(user=user).delete()
 
-    # 🔥 TEACHER ROLE
+        Teacher.objects.filter(user=user).delete()
+        Staff.objects.filter(user=user).delete()
+        Parent.objects.filter(user=user).delete()
+
+    # ============================
+    # 👨‍🏫 TEACHER
+    # ============================
     elif instance.role == 'TEACHER':
         Teacher.objects.get_or_create(
             user=user,
-            defaults={
-                "full_name": user.get_full_name() or user.username
-            }
+            defaults={"full_name": full_name}
         )
+
         Student.objects.filter(user=user).delete()
+        Staff.objects.filter(user=user).delete()
+        Parent.objects.filter(user=user).delete()
+
+    # ============================
+    # 🧑‍💼 STAFF
+    # ============================
+    elif instance.role == 'STAFF':
+        Staff.objects.get_or_create(
+            user=user,
+            defaults={"full_name": full_name}
+        )
+
+        Student.objects.filter(user=user).delete()
+        Teacher.objects.filter(user=user).delete()
+        Parent.objects.filter(user=user).delete()
+
+    # ============================
+    # 👨‍👩‍👧 PARENT
+    # ============================
+    elif instance.role == 'PARENT':
+        Parent.objects.get_or_create(
+            user=user
+        )
+
+        Student.objects.filter(user=user).delete()
+        Teacher.objects.filter(user=user).delete()
+        Staff.objects.filter(user=user).delete()
+
+    # ============================
+    # 👤 GUEST / 🎓 ALUMNI
+    # ============================
+    elif instance.role in ['GUEST', 'ALUMNI']:
+        Student.objects.filter(user=user).delete()
+        Teacher.objects.filter(user=user).delete()
+        Staff.objects.filter(user=user).delete()
+        Parent.objects.filter(user=user).delete()
 
 
 # ================================
@@ -107,3 +146,8 @@ def update_names(sender, instance, **kwargs):
     if teacher:
         teacher.full_name = full_name
         teacher.save()
+
+    staff = getattr(instance, "staff", None)
+    if staff:
+        staff.full_name = full_name
+        staff.save()

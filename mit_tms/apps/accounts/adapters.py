@@ -10,6 +10,8 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         email = data.get('email')
 
         if email:
+            user.email = email   # 🔥 ensure email is set
+
             base_username = email.split('@')[0]
             username = base_username
             counter = 1
@@ -24,4 +26,24 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         return user
 
     def is_auto_signup_allowed(self, request, sociallogin):
-        return True   # 🔥 FORCE auto signup
+        return True   # 🔥 always allow auto signup
+
+    def pre_social_login(self, request, sociallogin):
+        """
+        🔥 CONNECT EXISTING USERS (VERY IMPORTANT)
+        Prevent duplicate accounts
+        """
+
+        email = sociallogin.account.extra_data.get('email')
+
+        if not email:
+            return
+
+        try:
+            user = User.objects.get(email=email)
+
+            # 🔥 connect Google account to existing user
+            sociallogin.connect(request, user)
+
+        except User.DoesNotExist:
+            pass

@@ -220,13 +220,13 @@ class SentMessageDetailView(LoginRequiredMixin, DetailView):
     template_name = "core/sent_detail.html"
     context_object_name = "msg"
 
-from apps.website.models import Enrollment
+from apps.website.models import EnrollmentInquiry
 
 class EnrollView(TemplateView):
     template_name = "website/enroll.html"
 
     def post(self, request, *args, **kwargs):
-        Enrollment.objects.create(
+        EnrollmentInquiry.objects.create(
             name=request.POST.get('name'),
             email=request.POST.get('email'),
             phone=request.POST.get('phone'),

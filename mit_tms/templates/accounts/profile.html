@@ -11,9 +11,8 @@
         <!-- 🔷 HEADER -->
         <div class="flex items-center gap-4">
 
-            <!-- 🔥 PROFILE IMAGE -->
+            <!-- PROFILE IMAGE -->
             <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500 bg-gray-200">
-
                 {% if request.user.profile and request.user.profile.image %}
                     <img src="{{ request.user.profile.image.url }}"
                          class="w-full h-full object-cover">
@@ -22,7 +21,6 @@
                         {{ request.user.username|slice:":1"|upper }}
                     </div>
                 {% endif %}
-
             </div>
 
             <!-- USER INFO -->
@@ -36,32 +34,23 @@
                 </p>
 
                 <p class="text-xs text-gray-400 mt-1">
-                    Role:
-                    {% if request.user.profile %}
-                        {{ request.user.profile.role }}
-                    {% else %}
-                        Not Assigned
-                    {% endif %}
+                    Role: {{ profile.role|default:"-" }}
                 </p>
             </div>
 
         </div>
 
-        <!-- 🔷 DETAILS -->
+        <!-- 🔷 COMMON DETAILS -->
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
 
             <div>
                 <p class="text-gray-400">Username</p>
-                <p class="font-medium text-gray-800">
-                    {{ request.user.username }}
-                </p>
+                <p class="font-medium text-gray-800">{{ request.user.username }}</p>
             </div>
 
             <div>
                 <p class="text-gray-400">Email</p>
-                <p class="font-medium text-gray-800">
-                    {{ request.user.email }}
-                </p>
+                <p class="font-medium text-gray-800">{{ request.user.email }}</p>
             </div>
 
             <div>
@@ -74,9 +63,74 @@
             <div>
                 <p class="text-gray-400">Last Login</p>
                 <p class="font-medium text-gray-800">
-                    {{ request.user.last_login|date:"M d, Y H:i" }}
+                    {% if request.user.last_login %}
+                        {{ request.user.last_login|date:"M d, Y H:i" }}
+                    {% else %}
+                        -
+                    {% endif %}
                 </p>
             </div>
+
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- 🎯 ROLE-SPECIFIC SECTION -->
+        <!-- ===================================================== -->
+        <div class="mt-8 border-t pt-6">
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                Role Details
+            </h3>
+
+            <!-- 🎓 STUDENT -->
+            {% if is_student and student %}
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p><strong>Full Name:</strong> {{ student.full_name }}</p>
+                </div>
+            {% endif %}
+
+            <!-- 👨‍🏫 TEACHER -->
+            {% if is_teacher and teacher %}
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p><strong>Full Name:</strong> {{ teacher.full_name }}</p>
+                </div>
+            {% endif %}
+
+            <!-- 🧑‍💼 STAFF -->
+            {% if is_staff and staff %}
+                <div class="bg-orange-50 p-4 rounded-lg">
+                    <p><strong>Full Name:</strong> {{ staff.full_name }}</p>
+                </div>
+            {% endif %}
+
+            <!-- 👨‍👩‍👧 PARENT -->
+            {% if is_parent and parent %}
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <p><strong>Student:</strong> {{ parent.student.full_name }}</p>
+                    <p><strong>Relationship:</strong> {{ parent.relationship }}</p>
+                </div>
+            {% endif %}
+
+            <!-- 🎓 ALUMNI -->
+            {% if is_alumni %}
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p>🎓 You are an alumni of this institute.</p>
+                </div>
+            {% endif %}
+
+            <!-- 👤 GUEST -->
+            {% if is_guest %}
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p>You are currently a guest user.</p>
+                </div>
+            {% endif %}
+
+            <!-- 👑 ADMIN -->
+            {% if is_admin %}
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p>👑 You have full system access.</p>
+                </div>
+            {% endif %}
 
         </div>
 

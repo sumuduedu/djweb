@@ -21,7 +21,7 @@
 
                 <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200 border">
 
-                    {% if request.user.profile.image %}
+                    {% if request.user.profile and request.user.profile.image %}
                         <img src="{{ request.user.profile.image.url }}"
                              class="w-full h-full object-cover">
                     {% else %}
@@ -65,7 +65,7 @@
                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
             </div>
 
-            <!-- 🔷 PASSWORD -->
+            <!-- 🔐 PASSWORD -->
             <div>
                 <label class="block text-sm text-gray-600 mb-1">
                     New Password
@@ -75,6 +75,43 @@
                        placeholder="Leave blank to keep current password"
                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
             </div>
+
+            <!-- 🔥 CONFIRM PASSWORD (NEW - IMPORTANT) -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">
+                    Confirm Password
+                </label>
+
+                <input type="password" name="confirm_password"
+                       placeholder="Re-enter password"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+
+            <!-- 🔥 ROLE DISPLAY (READ ONLY) -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">
+                    Role
+                </label>
+
+                <div class="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700">
+                    {{ profile.role }}
+                </div>
+            </div>
+
+            <!-- 🔥 ERROR MESSAGES -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="p-3 rounded-lg text-sm
+                        {% if message.tags == 'error' %}
+                            bg-red-100 text-red-700
+                        {% else %}
+                            bg-green-100 text-green-700
+                        {% endif %}
+                    ">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
             <!-- 🔷 ACTION BUTTON -->
             <div class="flex justify-end">
