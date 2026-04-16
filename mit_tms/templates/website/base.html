@@ -1,22 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% block title %}MIT Computer Training Center{% endblock %}</title>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <!-- Tailwind (compiled) -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
+<link rel="stylesheet" href="{% static 'css/layout.css' %}">
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
@@ -26,24 +25,55 @@
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
         <!-- Logo -->
-        <a href="{% url 'home' %}" class="flex items-center gap-3">
-            <img src="/static/images/logo.jpg" class="w-12 h-12 rounded-xl shadow-md">
-            <div>
-                <h1 class="text-lg font-bold text-gray-900 leading-tight">
-                    MIT Computer Training Center
-                </h1>
-                <p class="text-xs text-gray-500">Future IT Skills</p>
-            </div>
-        </a>
+    {% load static %}
+<a href="{% url 'home' %}" class="flex items-center gap-3 group">
 
+    <!-- Logo -->
+    <div class="relative flex items-center justify-center">
+
+        <img src="{% static 'images/logo.png' %}"
+             alt="MIT Computer Training Center Logo"
+             class="w-16 h-16 object-contain transition duration-300 group-hover:scale-105 drop-shadow-md">
+
+        <!-- subtle glow -->
+        <div class="absolute inset-0 rounded-full bg-indigo-500 opacity-0 blur-md transition duration-300 group-hover:opacity-20"></div>
+
+    </div>
+
+    <!-- Text -->
+    <div class="leading-tight">
+<h1 class="text-xl leading-tight text-gray-900 transition group-hover:text-indigo-600">
+
+    <!-- MIT -->
+    <span class="font-[Poppins] font-extrabold tracking-wide text-indigo-600">
+        MIT
+    </span>
+
+    <!-- Text -->
+    <span class="font-[Inter] font-medium ml-1 text-gray-700">
+        Computer Training Center
+    </span>
+
+</h1>
+
+        <p class="text-xs text-gray-500 tracking-wide">
+            Future IT Skills
+        </p>
+    </div>
+
+</a>
         <!-- Desktop Menu -->
         <nav class="hidden md:flex items-center gap-8 font-medium">
 
-            <a href="{% url 'home' %}" class="hover:text-blue-600 transition">Home</a>
-            <a href="{% url 'about' %}" class="hover:text-blue-600 transition">About</a>
-            <a href="{% url 'public_courses' %}" class="hover:text-blue-600 transition">Courses</a>
-            <a href="{% url 'blog_list' %}" class="hover:text-blue-600 transition">Blog</a>
-            <a href="{% url 'contact' %}" class="hover:text-blue-600 transition">Contact</a>
+           <div class="flex items-center gap-6">
+
+    <a href="{% url 'home' %}" class="nav-link">Home</a>
+    <a href="{% url 'about' %}" class="nav-link">About</a>
+    <a href="{% url 'public_courses' %}" class="nav-link">Courses</a>
+    <a href="{% url 'blog_list' %}" class="nav-link">Blog</a>
+    <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+
+</div>
 
             <!-- Search
             <form action="{% url 'public_courses' %}" method="get" class="hidden lg:block">
@@ -116,55 +146,100 @@
 </main>
 
 <!-- ================= FOOTER ================= -->
-<footer class="bg-gray-900 text-gray-300 mt-10">
-    <div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-10">
+<footer class="relative text-gray-300 mt-20 overflow-hidden">
 
-        <!-- About -->
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500"></div>
+
+    <!-- Soft Glow -->
+    <div class="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-white/20 blur-3xl rounded-full"></div>
+    <div class="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-cyan-300/20 blur-3xl rounded-full"></div>
+
+    <!-- Content -->
+    <div class="relative max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-12">
+
+        <!-- BRAND -->
         <div>
-            <h3 class="text-white text-lg font-semibold mb-3">
+            <h3 class="text-white text-2xl font-bold mb-4">
                 MIT Computer Training Center
             </h3>
-            <p class="text-sm leading-relaxed">
-                Providing high-quality IT and vocational education with practical skills and career-focused training.
+
+            <p class="text-sm text-blue-100 leading-relaxed">
+                Delivering high-quality ICT and vocational education with a strong focus on
+                practical skills and real-world career readiness.
             </p>
+
+            <p class="mt-4 text-sm text-white/80 font-medium">
+                Empowering Future IT Professionals 🚀
+            </p>
+
+            <!-- Social -->
+            <div class="flex gap-4 mt-6">
+                <a href="#" class="social-icon">🌐</a>
+                <a href="#" class="social-icon">📘</a>
+                <a href="#" class="social-icon">▶️</a>
+                <a href="#" class="social-icon">💼</a>
+            </div>
         </div>
 
-        <!-- Links -->
+        <!-- NAVIGATION -->
         <div>
-            <h3 class="text-white text-lg font-semibold mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm">
-                <li><a href="{% url 'home' %}" class="hover:text-white">Home</a></li>
-                <li><a href="{% url 'about' %}" class="hover:text-white">About</a></li>
-                <li><a href="{% url 'public_courses' %}" class="hover:text-white">Courses</a></li>
-                <li><a href="{% url 'contact' %}" class="hover:text-white">Contact</a></li>
+            <h3 class="text-white text-lg font-semibold mb-4">
+                Explore
+            </h3>
+
+            <ul class="space-y-3 text-sm">
+
+                <li><a href="{% url 'home' %}" class="footer-link">Home</a></li>
+                <li><a href="{% url 'about' %}" class="footer-link">About Us</a></li>
+                <li><a href="{% url 'public_courses' %}" class="footer-link">Courses</a></li>
+                <li><a href="{% url 'blog_list' %}" class="footer-link">Blog</a></li>
+                <li><a href="{% url 'contact' %}" class="footer-link">Contact</a></li>
+
             </ul>
         </div>
 
-        <!-- Contact -->
+        <!-- CONTACT -->
         <div>
-            <h3 class="text-white text-lg font-semibold mb-3">Contact</h3>
-            <p class="text-sm">📧 info@mit.lk</p>
-            <p class="text-sm">📞 +94 773051133</p>
-            <p class="text-sm">📞 +94 112226361</p>
-            <p class="text-sm">📍 14/A/2/1, Bopitiya, Pamunugama, Sri Lanka</p>
+            <h3 class="text-white text-lg font-semibold mb-4">
+                Contact
+            </h3>
+
+            <div class="space-y-3 text-sm text-blue-100">
+
+                <p>📧 info@mit.lk</p>
+                <p>📞 +94 77 305 1133</p>
+                <p>☎️ +94 11 222 6361</p>
+
+                <p class="leading-relaxed">
+                    📍 14/A/2/1, Bopitiya,<br>
+                    Pamunugama, Sri Lanka
+                </p>
+
+            </div>
         </div>
 
     </div>
 
-    <div class="text-center text-xs border-t border-gray-700 py-4">
-        © {% now "Y" %} MIT Computer Training Center. All rights reserved.
+    <!-- Bottom -->
+    <div class="relative border-t border-white/20">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between text-sm text-white/80">
+
+            <p>
+                © {% now "Y" %} MIT Computer Training Center. All rights reserved.
+            </p>
+
+            <div class="flex gap-6 mt-3 md:mt-0">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+
+        </div>
     </div>
+
 </footer>
 
-<!-- ================= SCRIPT ================= -->
-<script>
-    const btn = document.getElementById("menuBtn");
-    const menu = document.getElementById("mobileMenu");
 
-    btn.addEventListener("click", () => {
-        menu.classList.toggle("hidden");
-    });
-</script>
 <!-- Chat Box -->
 <div id="chatBox" class="fixed bottom-5 right-5 w-80 bg-white shadow-xl rounded-xl hidden flex flex-col">
 
@@ -186,33 +261,9 @@
     💬
 </button>
 
-<script>
-function toggleChat() {
-    document.getElementById("chatBox").classList.toggle("hidden");
-}
+{% load static %}
 
-function sendMessage() {
-    const input = document.getElementById("userInput");
-    const message = input.value;
-
-    fetch("/chat/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({ message: message })
-    })
-    .then(res => res.json())
-    .then(data => {
-        const messages = document.getElementById("messages");
-
-        messages.innerHTML += `<div>👤 ${message}</div>`;
-        messages.innerHTML += `<div>🤖 ${data.reply}</div>`;
-
-        input.value = "";
-    });
-}
-</script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/chat.js' %}"></script>
 </body>
 </html>

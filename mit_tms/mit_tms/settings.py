@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Application definition
@@ -152,7 +152,7 @@ SITE_ID = 1
 # STATIC & MEDIA FILES
 # ===============================
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
@@ -202,3 +202,5 @@ ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.MySocialAccountAdapter'
 
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

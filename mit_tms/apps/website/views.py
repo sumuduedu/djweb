@@ -19,13 +19,33 @@ client = OpenAI(api_key=settings.OPENAI_API_KEY)
 # 🌐 PUBLIC VIEWS
 # ===============================
 
+from django.views.generic import TemplateView
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
+from django.views.generic import TemplateView
+from django.shortcuts import redirect
+
+
 class HomeView(TemplateView):
     template_name = "website/home.html"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('/app/dashboard/')
+            return redirect('dashboard')
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'hero_title_prefix': "Build Your Future with",
+            'hero_title_highlight': "IT Skills",
+            'hero_description': "Practical training, real-world experience, and career-focused learning."
+        })
+
+        return context
 
 
 class AboutView(TemplateView):

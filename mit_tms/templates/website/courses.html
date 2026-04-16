@@ -5,19 +5,7 @@
 {% block content %}
 
 <!-- ================= HERO ================= -->
-<section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-20 text-center">
-    <div class="max-w-4xl mx-auto px-6">
-
-        <h1 class="text-4xl md:text-5xl font-bold">
-            Explore Our Courses
-        </h1>
-
-        <p class="mt-4 text-lg text-blue-100">
-            Practical, career-focused programs designed to build your future in IT.
-        </p>
-
-    </div>
-</section>
+{% include 'components/hero.html' with title_prefix="Start Learning with Our" title_highlight="Courses" description="Hands-on, career-oriented programs designed to help you succeed in the digital world." %}
 
 <!-- ================= COURSES ================= -->
 <section class="py-20 bg-gray-50">
