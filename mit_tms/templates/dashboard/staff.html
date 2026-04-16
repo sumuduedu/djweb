@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+    <!-- HEADER -->
+    <div class="max-w-6xl mx-auto mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">🧑‍💼 Staff Dashboard</h1>
+        <p class="text-gray-500">Manage applications and operations</p>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 mb-8">
+
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+            <h2 class="text-gray-500">Pending</h2>
+            <p class="text-2xl font-bold text-yellow-500">{{ pending }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+            <h2 class="text-gray-500">Approved</h2>
+            <p class="text-2xl font-bold text-green-600">{{ approved }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+            <h2 class="text-gray-500">Rejected</h2>
+            <p class="text-2xl font-bold text-red-500">{{ rejected }}</p>
+        </div>
+
+    </div>
+
+    <!-- APPLICATION LIST -->
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow">
+
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-semibold">📋 Applications</h2>
+
+            <a href="{% url 'enrollment:application_list' %}"
+               class="text-blue-600 hover:underline">
+                Manage →
+            </a>
+        </div>
+
+        <ul class="space-y-3">
+            {% for app in applications %}
+            <li class="border p-4 rounded-lg flex justify-between items-center">
+
+                <div>
+                    <p class="font-semibold">{{ app.user.username }}</p>
+                    <p class="text-sm text-gray-500">{{ app.course.title }}</p>
+                </div>
+
+                <span class="px-2 py-1 rounded text-white text-sm
+                    {% if app.status == 'PENDING' %} bg-yellow-500
+                    {% elif app.status == 'APPROVED' %} bg-green-600
+                    {% else %} bg-red-500 {% endif %}">
+                    {{ app.status }}
+                </span>
+
+            </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+</div>
+
+{% endblock %}

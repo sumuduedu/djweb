@@ -1,0 +1,50 @@
+{% extends 'website/base.html' %}
+{% block content %}
+
+<section class="max-w-4xl mx-auto px-6 py-12">
+
+    <!-- COVER -->
+    {% if post.cover %}
+    <img src="{{ post.cover.url }}"
+         class="w-full h-80 object-cover rounded-2xl mb-8">
+    {% endif %}
+
+    <!-- TITLE -->
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">
+        {{ post.title }}
+    </h1>
+
+    <!-- META -->
+    <div class="text-gray-500 text-sm mb-6">
+        {{ post.created_at|date:"F d, Y" }} • {{ post.views }} views
+    </div>
+
+    <!-- CONTENT -->
+    <div class="prose max-w-none">
+        {{ post.content|linebreaks }}
+    </div>
+
+</section>
+
+<!-- RELATED POSTS -->
+<section class="max-w-6xl mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold mb-6">Related Posts</h2>
+
+    <div class="grid md:grid-cols-3 gap-6">
+        {% for r in related_posts %}
+        <a href="{% url 'blog_detail' r.slug %}"
+           class="bg-white p-4 rounded-xl shadow hover:shadow-lg">
+
+            <h3 class="font-semibold text-gray-800">
+                {{ r.title }}
+            </h3>
+
+            <p class="text-sm text-gray-500 mt-2">
+                {{ r.created_at|date:"M d, Y" }}
+            </p>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

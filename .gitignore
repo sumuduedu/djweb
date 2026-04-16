@@ -1,4 +1,19 @@
-en/
+# Python
 __pycache__/
 *.pyc
+venv/
+env/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Node
+node_modules/
+
+# Environment
 .env
+
+# OS
+.DS_Store

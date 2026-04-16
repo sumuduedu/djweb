@@ -19,13 +19,33 @@ client = OpenAI(api_key=settings.OPENAI_API_KEY)
 # 🌐 PUBLIC VIEWS
 # ===============================
 
+from django.views.generic import TemplateView
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
+from django.views.generic import TemplateView
+from django.shortcuts import redirect
+
+
 class HomeView(TemplateView):
     template_name = "website/home.html"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('/app/dashboard/')
+            return redirect('dashboard')
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'hero_title_prefix': "Build Your Future with",
+            'hero_title_highlight': "IT Skills",
+            'hero_description': "Practical training, real-world experience, and career-focused learning."
+        })
+
+        return context
 
 
 class AboutView(TemplateView):
@@ -220,13 +240,13 @@ class SentMessageDetailView(LoginRequiredMixin, DetailView):
     template_name = "core/sent_detail.html"
     context_object_name = "msg"
 
-from apps.website.models import Enrollment
+from apps.enrollment.models import EnrollmentInquiry
 
 class EnrollView(TemplateView):
     template_name = "website/enroll.html"
 
     def post(self, request, *args, **kwargs):
-        Enrollment.objects.create(
+        EnrollmentInquiry.objects.create(
             name=request.POST.get('name'),
             email=request.POST.get('email'),
             phone=request.POST.get('phone'),
@@ -236,3 +256,48 @@ class EnrollView(TemplateView):
 
         messages.success(request, "✅ Enrollment submitted successfully!")
         return redirect('enroll')
+
+from django.views.generic import ListView, DetailView
+from django.db.models import F
+from .models import Post
+
+
+class PublicBlogListView(ListView):
+    model = Post
+    template_name = 'website/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 6  # optional (adds pagination)
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True).order_by('-created_at')
+
+
+class PublicBlogDetailView(DetailView):
+    model = Post
+    template_name = 'website/blog_detail.html'
+    context_object_name = 'post'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        # 🔥 Efficient view count increment (no race condition)
+        Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+
+        # refresh object
+        obj.refresh_from_db()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['related_posts'] = Post.objects.filter(
+            category=self.object.category,
+            is_published=True
+        ).exclude(id=self.object.id)[:3]
+
+        return context

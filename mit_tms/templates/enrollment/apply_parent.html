@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow mt-10">
+
+    <h2 class="text-xl font-bold mb-4">
+        👨‍👩‍👧 Apply as Parent - {{ course.title }}
+    </h2>
+
+    {% if application %}
+        <div class="bg-gray-200 text-gray-700 p-3 rounded mb-4 text-sm text-center">
+
+            {% if application.status == 'PENDING' %}
+                ⏳ You have already applied. Waiting for approval.
+            {% elif application.status == 'APPROVED' %}
+                ✔ Your application is approved.
+            {% elif application.status == 'REJECTED' %}
+                ❌ Your application was rejected.
+                {% if application.rejection_reason %}
+                    <div class="text-xs mt-1">
+                        {{ application.rejection_reason }}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <!-- PHONE -->
+        <input type="text" name="phone"
+               value="{{ application.phone|default:'' }}"
+               placeholder="Phone"
+               class="w-full border p-2 rounded"
+               {% if application %}readonly{% endif %} required>
+
+        <!-- ADDRESS -->
+        <textarea name="address"
+                  placeholder="Address"
+                  class="w-full border p-2 rounded"
+                  {% if application %}readonly{% endif %} required>{{ application.address|default:'' }}</textarea>
+
+        <!-- STUDENT NAME -->
+        <input type="text" name="student_name"
+               value="{{ application.student_name|default:'' }}"
+               placeholder="Student Name"
+               class="w-full border p-2 rounded"
+               {% if application %}readonly{% endif %} required>
+
+        <!-- STUDENT AGE -->
+        <input type="number" name="student_age"
+               value="{{ application.student_age|default:'' }}"
+               placeholder="Student Age"
+               class="w-full border p-2 rounded"
+               {% if application %}readonly{% endif %} required>
+
+        <!-- RELATIONSHIP -->
+        <input type="text" name="relationship"
+               value="{{ application.relationship|default:'' }}"
+               placeholder="Relationship (Father/Mother/Guardian)"
+               class="w-full border p-2 rounded"
+               {% if application %}readonly{% endif %} required>
+
+        <!-- NOTES -->
+        <textarea name="notes"
+                  placeholder="Additional notes"
+                  class="w-full border p-2 rounded"
+                  {% if application %}readonly{% endif %}>{{ application.notes|default:'' }}</textarea>
+
+        <!-- BUTTON -->
+        {% if not application %}
+            <button class="bg-blue-600 text-white px-4 py-2 rounded">
+                Submit Application
+            </button>
+        {% endif %}
+
+    </form>
+
+</div>
+
+{% endblock %}

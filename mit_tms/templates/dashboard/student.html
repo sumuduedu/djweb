@@ -6,11 +6,32 @@
 
     <h1 class="text-2xl font-bold mb-6">🎓 Student Dashboard</h1>
 
+    <!-- 🔔 STATUS MESSAGE -->
+    {% if approved_apps and not enrollments %}
+    <div class="bg-blue-100 text-blue-800 p-4 rounded mb-6">
+        🎉 Your application has been approved!
+
+        <br><br>
+
+        📌 You are not yet assigned to a batch.
+        Please wait for batch allocation or contact admin.
+    </div>
+    {% endif %}
+
+    {% if enrollments %}
+    <div class="bg-green-100 text-green-800 p-4 rounded mb-6">
+        ✔ You are enrolled in a batch.
+    </div>
+    {% endif %}
+
+    <!-- 🔷 STATS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <div class="bg-white p-5 rounded-2xl shadow">
             <h3 class="text-gray-500">My Courses</h3>
-            <p class="text-2xl font-bold text-blue-600">3</p>
+            <p class="text-2xl font-bold text-blue-600">
+                {{ enrollments|length }}
+            </p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
@@ -25,6 +46,26 @@
 
     </div>
 
+    <!-- 🎓 COURSE LIST -->
+    <div class="bg-white p-6 rounded-2xl shadow mt-6">
+        <h2 class="text-xl font-semibold mb-4">My Courses</h2>
+
+        {% if enrollments %}
+            <ul class="space-y-2">
+                {% for e in enrollments %}
+                    <li class="border p-3 rounded">
+                        {{ e.course.title }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">
+                You are not enrolled in any courses yet.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- 👤 PROFILE -->
     <div class="bg-white p-6 rounded-2xl shadow mt-6">
         <h2 class="text-xl font-semibold mb-4">My Profile</h2>
 

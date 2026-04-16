@@ -62,19 +62,29 @@ class SentMessage(models.Model):
     def __str__(self):
         return self.to_email
 
-from django.db import models
-from apps.courses.models import Course
 
-class Enrollment(models.Model):
-    name = models.CharField(max_length=200)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
-    message = models.TextField(blank=True)
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    content = models.TextField()
+    cover = models.ImageField(upload_to='blog/')
+
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+
+    is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    is_contacted = models.BooleanField(default=False)
+    views = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
-        return f"{self.name} - {self.course.title}"

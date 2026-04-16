@@ -15,7 +15,7 @@
         <div class="flex items-center gap-4">
 
             <!-- Profile Image -->
-            {% if user_obj.profile.image %}
+            {% if user_obj.profile and user_obj.profile.image %}
                 <img src="{{ user_obj.profile.image.url }}"
                      class="w-16 h-16 rounded-full object-cover border">
             {% else %}
@@ -33,17 +33,25 @@
                     {{ user_obj.email|default:"No email provided" }}
                 </p>
 
-                <span class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium
-                    {% if user_obj.profile.role == 'ADMIN' %}
-                        bg-red-100 text-red-700
-                    {% elif user_obj.profile.role == 'TEACHER' %}
-                        bg-green-100 text-green-700
-                    {% else %}
-                        bg-blue-100 text-blue-700
-                    {% endif %}
-                ">
-                    {{ user_obj.profile.role }}
-                </span>
+              <span class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium
+    {% if user_obj.profile.role == 'ADMIN' %}
+        bg-red-100 text-red-700
+    {% elif user_obj.profile.role == 'STAFF' %}
+        bg-orange-100 text-orange-700
+    {% elif user_obj.profile.role == 'TEACHER' %}
+        bg-green-100 text-green-700
+    {% elif user_obj.profile.role == 'STUDENT' %}
+        bg-blue-100 text-blue-700
+    {% elif user_obj.profile.role == 'PARENT' %}
+        bg-purple-100 text-purple-700
+    {% elif user_obj.profile.role == 'ALUMNI' %}
+        bg-indigo-100 text-indigo-700
+    {% else %}
+        bg-gray-100 text-gray-700
+    {% endif %}
+">
+   {{ user_obj.profile.role|default:"-" }}
+</span>
             </div>
 
         </div>
@@ -111,7 +119,11 @@
             <div>
                 <p class="text-gray-500">Last Login</p>
                 <p class="font-medium text-gray-800">
-                    {{ user_obj.last_login|date:"Y-m-d H:i"|default:"-" }}
+                    {% if user_obj.last_login %}
+    {{ user_obj.last_login|date:"Y-m-d H:i" }}
+{% else %}
+    -
+{% endif %}
                 </p>
             </div>
 
@@ -140,9 +152,19 @@
 
         <div class="bg-white shadow rounded-xl p-4 text-center">
             <p class="text-xs text-gray-500">Status</p>
-            <p class="text-lg font-bold text-blue-700">
-                Active
-            </p>
+        <p class="text-lg font-bold
+    {% if user_obj.is_active %}
+        text-green-700
+    {% else %}
+        text-red-700
+    {% endif %}
+">
+    {% if user_obj.is_active %}
+        Active
+    {% else %}
+        Inactive
+    {% endif %}
+</p>
         </div>
 
     </div>

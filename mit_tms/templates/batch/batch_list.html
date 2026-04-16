@@ -26,9 +26,9 @@
                 <tr>
                     <th class="p-4">Batch</th>
                     <th class="p-4">Course</th>
-                    <th class="p-4">Academic Year</th>
+                    <th class="p-4">Teacher</th>
                     <th class="p-4">Start Date</th>
-                    <th class="p-4">Schedule</th>
+                    <th class="p-4">Capacity</th>
                     <th class="p-4 text-right">Actions</th>
                 </tr>
             </thead>
@@ -48,7 +48,7 @@
                     </td>
 
                     <td class="p-4 text-gray-600">
-                        {{ batch.academic_year.name|default:"-" }}
+                        {{ batch.teacher.full_name|default:"Not Assigned" }}
                     </td>
 
                     <td class="p-4 text-gray-600">
@@ -56,8 +56,7 @@
                     </td>
 
                     <td class="p-4 text-gray-600">
-                        {{ batch.hours_per_day|default:"0" }} hrs/day ·
-                        {{ batch.days_per_week|default:"0" }} days/week
+                        {{ batch.capacity }}
                     </td>
 
                     <td class="p-4 text-right space-x-3">
@@ -77,8 +76,8 @@
                             Delete
                         </a>
 
-                        <!-- 📅 Timetable (per batch - FIXED) -->
-                        <a href="{% url 'batch:timetable_list' %}?batch={{ batch.id }}"
+                        <!-- 📅 Timetable (FIXED → schedule app) -->
+                        <a href="{% url 'batch:batch_list' %}?batch={{ batch.id }}"
                            class="text-indigo-600 hover:text-indigo-800 font-medium">
                             Timetable
                         </a>

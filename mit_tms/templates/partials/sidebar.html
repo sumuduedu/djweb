@@ -1,5 +1,7 @@
 <aside id="sidebar"
-       class="w-64 bg-gray-900 text-white flex flex-col transition-all duration-300">
+    class="fixed md:static z-50 inset-y-0 left-0 w-64 bg-gray-900 text-white
+           transform -translate-x-full md:translate-x-0
+           transition-transform duration-300">
 
     <!-- LOGO -->
     <div class="p-5 border-b border-gray-800">
@@ -11,20 +13,21 @@
     <!-- NAV -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
-        <!-- ================= MAIN ================= -->
+
+
+        <!-- ================= ADMIN ================= -->
+        {% if is_admin %}
+      <!-- ================= MAIN ================= -->
         <p class="section-title px-3 text-xs text-gray-400 uppercase mb-2">
             Main
         </p>
 
         <!-- ALL USERS -->
-        <a href="{% url 'dashboard' %}" class="nav-link">
+        <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
             <span class="icon text-lg">📊</span>
             <span class="menu-text">Dashboard</span>
         </a>
 
-
-        <!-- ================= ADMIN ================= -->
-        {% if is_admin %}
 
         <!-- FULL ACCESS (YOUR ORIGINAL MENU) -->
 
@@ -42,12 +45,12 @@
             Planning
         </p>
 
-        <a href="{% url 'batch:calendar' %}" class="nav-link">
+        <a href="{% url 'schedule:calendar' %}" class="nav-link">
             <span class="icon text-lg">📅</span>
             <span class="menu-text">Calendar</span>
         </a>
 
-        <a href="{% url 'batch:timetable_list' %}" class="nav-link">
+        <a href="{% url 'schedule:timetable_list' %}" class="nav-link">
             <span class="icon text-lg">📅</span>
             <span class="menu-text">Timetable</span>
         </a>
@@ -81,7 +84,7 @@
             <span class="menu-text">Batches</span>
         </a>
 
-        <a href="{% url 'batch:timetable_list' %}" class="nav-link">
+        <a href="{% url 'schedule:timetable_list' %}" class="nav-link">
             <span class="icon text-lg">📅</span>
             <span class="menu-text">Timetable</span>
         </a>
@@ -96,12 +99,12 @@
             Student
         </p>
 
-        <a href="{% url 'student_courses' %}" class="nav-link">
+        <a href="{% url 'core:student_courses' %}" class="nav-link">
             <span class="icon text-lg">📚</span>
             <span class="menu-text">My Courses</span>
         </a>
 
-        <a href="{% url 'student_attendance' %}" class="nav-link">
+        <a href="{% url 'core:student_attendance' %}" class="nav-link">
             <span class="icon text-lg">📅</span>
             <span class="menu-text">Attendance</span>
         </a>
@@ -156,9 +159,9 @@
 <script>
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
 
-    sidebar.classList.toggle('w-20');
-    sidebar.classList.toggle('w-64');
-    sidebar.classList.toggle('sidebar-collapsed');
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
 }
 </script>

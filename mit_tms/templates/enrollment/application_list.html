@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📋 Applications</h1>
+        <p class="text-gray-500">Manage course applications</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">User</th>
+                        <th class="p-4">Course</th>
+                        <th class="p-4">Role</th>
+                        <th class="p-4">Phone</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4 text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for app in applications %}
+                    <tr class="border-t hover:bg-gray-50">
+
+                        <!-- USER -->
+                        <td class="p-4 font-medium">
+                            {{ app.user.username }}
+                        </td>
+
+                        <!-- COURSE -->
+                        <td class="p-4">
+                            {{ app.course.title }}
+                        </td>
+
+                        <!-- ROLE -->
+                        <td class="p-4">
+                            {{ app.role_type }}
+                        </td>
+
+                        <!-- PHONE -->
+                        <td class="p-4 text-gray-500">
+                            {{ app.phone }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-white text-xs
+                                {% if app.status == 'PENDING' %} bg-yellow-500
+                                {% elif app.status == 'APPROVED' %} bg-green-600
+                                {% else %} bg-red-500 {% endif %}">
+                                {{ app.status }}
+                            </span>
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="p-4 text-center">
+
+                            {% if app.status == 'PENDING' %}
+
+                                <div class="flex justify-center gap-2">
+
+                                    <!-- APPROVE -->
+                                    <form method="post"
+                                          action="{% url 'enrollment:approve_application' app.id %}">
+                                        {% csrf_token %}
+                                        <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <!-- REJECT -->
+                                   <form method="post" action="{% url 'enrollment:reject_application' app.id %}">
+    {% csrf_token %}
+
+    <input type="text" name="reason"
+           placeholder="Reason..."
+           required
+           class="border px-2 py-1 rounded text-sm w-32">
+
+    <button class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+        Reject
+    </button>
+</form>
+
+                                </div>
+
+                            {% else %}
+                                <span class="text-gray-400 text-sm">Processed</span>
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="p-6 text-center text-gray-400">
+                            No applications found
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

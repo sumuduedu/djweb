@@ -25,10 +25,10 @@
     <!-- 🔷 Form Card -->
     <div class="bg-white shadow rounded-xl p-6">
 
-        <form method="post" class="space-y-5">
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
             {% csrf_token %}
 
-            <!-- 🔷 Django Form Fields -->
+            <!-- 🔷 Django Fields -->
             {% for field in form %}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -51,7 +51,7 @@
                 </div>
             {% endfor %}
 
-            <!-- 🔷 Password -->
+            <!-- 🔐 Password -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Password
@@ -64,7 +64,7 @@
                 </p>
             </div>
 
-            <!-- 🔷 Role -->
+            <!-- 🔥 ROLE (UPDATED FULL LIST) -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Role
@@ -73,25 +73,45 @@
                 <select name="role"
                         class="w-full border rounded px-3 py-2">
 
-                    <option value="ADMIN"
-                        {% if object.profile.role == "ADMIN" %}selected{% endif %}>
-                        Admin
-                    </option>
-
-                    <option value="TEACHER"
-                        {% if object.profile.role == "TEACHER" %}selected{% endif %}>
-                        Teacher
+                    <option value="GUEST"
+                        {% if object and object.profile.role == "GUEST" %}selected{% endif %}>
+                        Guest
                     </option>
 
                     <option value="STUDENT"
-                        {% if object.profile.role == "STUDENT" %}selected{% endif %}>
+                        {% if object and object.profile.role == "STUDENT" %}selected{% endif %}>
                         Student
+                    </option>
+
+                    <option value="TEACHER"
+                        {% if object and object.profile.role == "TEACHER" %}selected{% endif %}>
+                        Teacher
+                    </option>
+
+                    <option value="STAFF"
+                        {% if object and object.profile.role == "STAFF" %}selected{% endif %}>
+                        Staff
+                    </option>
+
+                    <option value="PARENT"
+                        {% if object and object.profile.role == "PARENT" %}selected{% endif %}>
+                        Parent
+                    </option>
+
+                    <option value="ALUMNI"
+                        {% if object and object.profile.role == "ALUMNI" %}selected{% endif %}>
+                        Alumni
+                    </option>
+
+                    <option value="ADMIN"
+                        {% if object and object.profile.role == "ADMIN" %}selected{% endif %}>
+                        Admin
                     </option>
 
                 </select>
             </div>
 
-            <!-- 🔷 Non-field errors -->
+            <!-- ❗ Non-field errors -->
             {% if form.non_field_errors %}
                 <div class="bg-red-100 text-red-700 p-3 rounded">
                     {% for error in form.non_field_errors %}
@@ -103,13 +123,11 @@
             <!-- 🔷 Buttons -->
             <div class="flex justify-between items-center pt-4">
 
-                <!-- Cancel -->
                 <a href="{% url 'accounts:user_list' %}"
                    class="text-gray-600 hover:underline">
                     Cancel
                 </a>
 
-                <!-- Submit -->
                 <button type="submit"
                         class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
                     {% if object %}

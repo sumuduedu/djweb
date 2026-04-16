@@ -101,7 +101,7 @@
         </div>
 
         <!-- Google -->
-        <a href="/accounts/google/login/"
+       <a href="/auth/google/login/"
            class="w-full flex items-center justify-center gap-3 border border-gray-300 py-2.5 rounded-lg hover:bg-gray-50 hover:shadow-sm transition">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
             <span class="text-sm font-medium text-gray-700">
@@ -112,7 +112,7 @@
         <!-- Footer -->
         <p class="text-center text-sm text-gray-600 mt-6">
             Already have an account?
-            <a href="{% url 'login' %}" class="text-blue-600 font-medium hover:underline">
+            <a href="{% url 'accounts:login' %}" class="text-blue-600 font-medium hover:underline">
                 Sign In
             </a>
         </p>
