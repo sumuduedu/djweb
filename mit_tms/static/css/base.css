@@ -1,0 +1,28 @@
+/* ================= VARIABLES ================= */
+
+:root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --bg-glass: rgba(255,255,255,0.6);
+
+    --text-dark: #0f172a;
+    --text-light: #64748b;
+}
+
+/* ================= GLOBAL ================= */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    background: var(--bg-soft);
+}
+
+section {
+    position: relative;
+    overflow: hidden;
+}

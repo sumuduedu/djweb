@@ -1,0 +1,57 @@
+<section class="relative text-white py-32 text-center overflow-hidden">
+
+    <!-- Animated Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e3a8a] to-[#2563eb] animate-gradient"></div>
+
+    <!-- Glow Lights -->
+    <div class="absolute top-[-150px] left-[-150px] w-[600px] h-[600px] bg-cyan-400 opacity-20 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-[-150px] right-[-150px] w-[600px] h-[600px] bg-blue-400 opacity-20 rounded-full blur-3xl animate-float glow-delay"></div>
+
+    <!-- Tech Grid Overlay -->
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+
+    <!-- Glass Effect -->
+    <div class="absolute inset-0 bg-white/5 backdrop-blur-md"></div>
+
+    <!-- Content -->
+    <div class="relative max-w-5xl mx-auto px-6">
+
+        <!-- Title -->
+        <h1 class="font-extrabold leading-tight text-center mx-auto max-w-4xl hero-title">
+
+            <!-- Prefix -->
+            <span class="block md:whitespace-nowrap text-[clamp(2.2rem,4vw,3.8rem)] tracking-tight fade-up">
+                {{ title_prefix }}
+            </span>
+
+            <!-- Highlight -->
+            <span class="block mt-3 text-[clamp(2.8rem,5vw,4.8rem)] bg-gradient-to-r from-cyan-200 via-white to-blue-200 bg-clip-text text-transparent animate-shimmer fade-up delay-1">
+                {{ title_highlight }}
+            </span>
+
+        </h1>
+
+        <!-- Description -->
+        <p class="mt-6 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed fade-up delay-2">
+            {{ description }}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="mt-10 flex justify-center gap-4 fade-up delay-3">
+
+            {% if button_text %}
+            <a href="{{ button_link }}"
+               class="inline-block px-8 py-3 bg-white text-blue-700 font-semibold rounded-xl shadow-lg hover:scale-105 hover:shadow-2xl transition duration-300">
+                {{ button_text }}
+            </a>
+            {% endif %}
+
+            <a href="#about"
+               class="px-8 py-3 border border-white rounded-xl hover:bg-white hover:text-blue-700 transition">
+                Learn More
+            </a>
+
+        </div>
+
+    </div>
+</section>
