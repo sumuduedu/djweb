@@ -43,18 +43,3 @@ window.addEventListener("scroll", () => {
         el.style.transform = `translateY(${y}px)`;
     });
 });
-
-<!-- ================= SCRIPT ================= -->
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const btn = document.getElementById("menuBtn");
-    const menu = document.getElementById("mobileMenu");
-
-    if (btn && menu) {
-        btn.addEventListener("click", function () {
-            menu.classList.toggle("hidden");
-        });
-    }
-
-});

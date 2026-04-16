@@ -85,3 +85,24 @@
     color: #4f46e5;
     transform: translateY(-3px);
 }
+
+.social-circle {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.social-circle:hover {
+    background: white;
+    color: #4f46e5; /* your primary */
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}

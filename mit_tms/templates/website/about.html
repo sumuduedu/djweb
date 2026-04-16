@@ -86,24 +86,29 @@
 
 
 <!-- ================= FOUNDER ================= -->
-<section class="py-20 bg-gray-50">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+<section class="py-24 bg-gradient-to-b from-white to-gray-50">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
 
         <!-- IMAGE -->
-        <div>
+        <div class="relative group">
+
             <img src="/static/images/instructor.png"
-                 class="rounded-2xl shadow-xl w-full object-cover"
+                 class="rounded-2xl shadow-2xl w-full object-cover transition duration-500 group-hover:scale-105"
                  alt="Founder">
+
+            <!-- subtle overlay -->
+            <div class="absolute inset-0 bg-indigo-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition"></div>
+
         </div>
 
         <!-- CONTENT -->
         <div>
 
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">
                 Founder & Lead Instructor
             </h2>
 
-            <h3 class="text-xl font-semibold text-blue-600 mb-4">
+            <h3 class="text-xl font-semibold text-indigo-600 mb-6">
                 Don Sumudu S. Hettiarachchi
             </h3>
 
@@ -111,55 +116,53 @@
             <p class="text-gray-600 mb-4 leading-relaxed">
                 Don Sumudu S. Hettiarachchi is the founder and proprietor of MIT Computer Training Center,
                 with over <strong>20+ years of experience</strong> in ICT education and vocational training.
-                He is a dedicated educator, IT professional, and mentor who has played a pivotal role
-                in developing skilled students for both academic and industry success.
             </p>
 
-            <p class="text-gray-600 mb-4 leading-relaxed">
+            <p class="text-gray-600 mb-6 leading-relaxed">
                 Since establishing the institute in <strong>1999</strong>, he has been committed to delivering
-                <strong>practical, hands-on, and career-oriented learning experiences</strong>, especially
-                in rural communities such as Bopitiya, where he pioneered ICT education.
+                <strong>practical, hands-on, and career-oriented learning experiences</strong>, especially in rural communities.
             </p>
-
-<p class="text-gray-600 mb-4 leading-relaxed">
-    Don Sumudu S. Hettiarachchi is the founder and proprietor of MIT Computer Training Center,
-    with over <strong>20+ years of experience</strong> in ICT education and vocational training.
-    He is a <strong>qualified NVQ Assessor</strong>, educator, and IT professional dedicated to
-    developing skilled and industry-ready students.
-</p>
 
             <!-- QUALIFICATIONS -->
-            <div class="bg-white p-6 rounded-xl shadow border mb-6">
-                <h4 class="font-semibold text-gray-800 mb-3">🎓 Academic Qualifications</h4>
+            <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 mb-6">
+
+                <h4 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    🎓 Academic Qualifications
+                </h4>
 
                 <ul class="text-gray-600 space-y-2 text-sm">
-
-                    <li>✔ Master of Information Technology (MIT) – SLIIT, Sri Lanka</li>
-
-                    <li>✔ Postgraduate Diploma in Education (PGDE) – PSB University, Cambodia</li>
-
-                    <li>✔ Bachelor of Information Technology (BIT) – University of Colombo School of Computing</li>
-
+                    <li>✔ Master of Information Technology (MIT) – SLIIT</li>
+                    <li>✔ Postgraduate Diploma in Education (PGDE)</li>
+                    <li>✔ Bachelor of Information Technology (BIT)</li>
                 </ul>
+
             </div>
 
             <!-- EXPERTISE -->
-            <div class="bg-white p-6 rounded-xl shadow border mb-6">
-                <h4 class="font-semibold text-gray-800 mb-3">💼 Areas of Expertise</h4>
+            <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 mb-8">
+
+                <h4 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    💼 Areas of Expertise
+                </h4>
 
                 <ul class="text-gray-600 space-y-2 text-sm">
-                    <li>✔ Vocational Education & Training (NVQ Framework)</li>
-                    <li>✔ ICT & Software Development Training</li>
-                    <li>✔ Educational Technology & Learning Systems</li>
-                    <li>✔ Student Skill Development & Assessment</li>
+                    <li>✔ Vocational Education & Training (NVQ)</li>
+                    <li>✔ ICT & Software Development</li>
+                    <li>✔ Educational Technology</li>
+                    <li>✔ Student Assessment</li>
                 </ul>
+
             </div>
 
-            <!-- LINKEDIN -->
+            <!-- CTA -->
             <a href="https://www.linkedin.com/in/sumudu-hettiarachchi-70174010/"
                target="_blank"
-               class="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-blue-700 transition">
-                🔗 View Full Professional Profile
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                      bg-gradient-to-r from-indigo-600 to-blue-500
+                      text-white font-medium shadow-md
+                      hover:shadow-xl hover:scale-105 transition">
+
+                🔗 View Full Profile
             </a>
 
         </div>
