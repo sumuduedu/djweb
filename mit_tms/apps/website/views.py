@@ -236,3 +236,48 @@ class EnrollView(TemplateView):
 
         messages.success(request, "✅ Enrollment submitted successfully!")
         return redirect('enroll')
+
+from django.views.generic import ListView, DetailView
+from django.db.models import F
+from .models import Post
+
+
+class PublicBlogListView(ListView):
+    model = Post
+    template_name = 'website/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 6  # optional (adds pagination)
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True).order_by('-created_at')
+
+
+class PublicBlogDetailView(DetailView):
+    model = Post
+    template_name = 'website/blog_detail.html'
+    context_object_name = 'post'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        # 🔥 Efficient view count increment (no race condition)
+        Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+
+        # refresh object
+        obj.refresh_from_db()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['related_posts'] = Post.objects.filter(
+            category=self.object.category,
+            is_published=True
+        ).exclude(id=self.object.id)[:3]
+
+        return context

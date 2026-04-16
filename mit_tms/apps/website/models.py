@@ -64,4 +64,27 @@ class SentMessage(models.Model):
 
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    content = models.TextField()
+    cover = models.ImageField(upload_to='blog/')
+
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+
+    is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    views = models.PositiveIntegerField(default=0)
 
