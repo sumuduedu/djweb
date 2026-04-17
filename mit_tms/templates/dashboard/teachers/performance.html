@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">📊 Class Performance</h1>
+        <p class="text-gray-500">Analyze student performance and trends</p>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="grid md:grid-cols-3 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Average Class Score</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ avg_class_score }}%</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">At Risk Students</h3>
+            <p class="text-2xl font-bold text-red-600">{{ at_risk_count }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Total Students</h3>
+            <p class="text-2xl font-bold">{{ performance|length }}</p>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        {% if performance %}
+
+        <table class="w-full text-sm border">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 border">Student</th>
+                    <th class="p-3 border">Course</th>
+                    <th class="p-3 border">Avg Score</th>
+                    <th class="p-3 border">Attendance</th>
+                    <th class="p-3 border">Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in performance %}
+                <tr>
+                    <td class="p-3 border">{{ p.student }}</td>
+                    <td class="p-3 border">{{ p.course }}</td>
+                    <td class="p-3 border">{{ p.avg_score }}%</td>
+                    <td class="p-3 border">{{ p.attendance }}%</td>
+                    <td class="p-3 border">
+                        <span class="text-xs px-2 py-1 rounded
+                            {% if p.status == 'GOOD' %}
+                                bg-green-100 text-green-700
+                            {% else %}
+                                bg-red-100 text-red-700
+                            {% endif %}
+                        ">
+                            {{ p.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        {% else %}
+            <p class="text-center text-gray-500 py-6">No performance data available</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

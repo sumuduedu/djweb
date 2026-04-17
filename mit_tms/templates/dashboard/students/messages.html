@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">💬 Messages</h1>
+        <p class="text-gray-500">Communicate with your instructors</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+        <!-- 📥 LEFT: CONTACTS / THREADS -->
+        <div class="bg-white rounded-2xl shadow p-4">
+
+            <h2 class="font-semibold mb-4">Conversations</h2>
+
+            {% if threads %}
+                <div class="space-y-3">
+
+                    {% for t in threads %}
+                    <div class="p-3 rounded-lg cursor-pointer hover:bg-gray-100
+                        {% if t.active %} bg-blue-50 {% endif %}">
+
+                        <p class="font-medium">
+                            {{ t.name }}
+                        </p>
+
+                        <p class="text-xs text-gray-500">
+                            {{ t.last_message|truncatechars:30 }}
+                        </p>
+
+                    </div>
+                    {% endfor %}
+
+                </div>
+            {% else %}
+                <p class="text-gray-500 text-sm">No conversations</p>
+            {% endif %}
+
+        </div>
+
+        <!-- 💬 RIGHT: CHAT AREA -->
+        <div class="md:col-span-2 bg-white rounded-2xl shadow p-4 flex flex-col">
+
+            {% if messages %}
+
+            <!-- MESSAGES -->
+            <div class="flex-1 space-y-3 overflow-y-auto mb-4">
+
+                {% for m in messages %}
+                <div class="flex
+                    {% if m.sender == request.user %}
+                        justify-end
+                    {% else %}
+                        justify-start
+                    {% endif %}
+                ">
+
+                    <div class="max-w-xs p-3 rounded-xl
+                        {% if m.sender == request.user %}
+                            bg-blue-600 text-white
+                        {% else %}
+                            bg-gray-200 text-gray-800
+                        {% endif %}
+                    ">
+                        <p class="text-sm">{{ m.text }}</p>
+
+                        <p class="text-xs mt-1 opacity-70">
+                            {{ m.timestamp }}
+                        </p>
+                    </div>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- SEND MESSAGE -->
+            <form method="post" class="flex gap-2">
+                {% csrf_token %}
+
+                <input type="text" name="message"
+                       class="flex-1 border rounded-lg px-3 py-2"
+                       placeholder="Type a message...">
+
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    Send
+                </button>
+            </form>
+
+            {% else %}
+
+            <!-- EMPTY -->
+            <div class="flex-1 flex items-center justify-center text-gray-500">
+                💬 Select a conversation to start chatting
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

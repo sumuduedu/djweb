@@ -70,13 +70,25 @@
                                 <div class="flex justify-center gap-2">
 
                                     <!-- APPROVE -->
-                                    <form method="post"
-                                          action="{% url 'enrollment:approve_application' app.id %}">
-                                        {% csrf_token %}
-                                        <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
-                                            Approve
-                                        </button>
-                                    </form>
+                                   <form method="post"
+      action="{% url 'enrollment:approve_application' app.id %}">
+    {% csrf_token %}
+
+    <!-- 🔽 Batch Selection -->
+    <select name="batch_id"
+            class="border px-2 py-1 rounded text-sm">
+      {% for batch in app.course.batches.all %}
+            <option value="{{ batch.id }}">
+                {{ batch.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <!-- ✅ Approve Button -->
+    <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+        Approve
+    </button>
+</form>
 
                                     <!-- REJECT -->
                                    <form method="post" action="{% url 'enrollment:reject_application' app.id %}">

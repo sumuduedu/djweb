@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📅 My Attendance</h1>
+        <p class="text-gray-500">Track your attendance and participation</p>
+    </div>
+
+    <!-- 📊 SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Total Sessions</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ total_sessions }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm"> Present</h3>
+            <p class="text-3xl font-bold text-green-600">{{ present_count }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Absent</h3>
+            <p class="text-3xl font-bold text-red-600">{{ absent_count }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Attendance %</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ attendance_percentage }}%</p>
+        </div>
+
+    </div>
+
+    <!-- 📈 PROGRESS BAR -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-lg font-semibold mb-3">Attendance Progress</h2>
+
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="h-4 rounded-full
+                {% if attendance_percentage >= 75 %}
+                    bg-green-500
+                {% elif attendance_percentage >= 50 %}
+                    bg-yellow-500
+                {% else %}
+                    bg-red-500
+                {% endif %}
+            "
+            style="width: {{ attendance_percentage }}%">
+            </div>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-2">
+            {% if attendance_percentage >= 75 %}
+                ✔ Good attendance
+            {% elif attendance_percentage >= 50 %}
+                ⚠ Needs improvement
+            {% else %}
+                🚨 Critical attendance level
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 🚨 ALERT -->
+    {% if attendance_percentage < 50 %}
+    <div class="bg-red-100 text-red-800 p-4 rounded-xl mb-6">
+        ⚠ Your attendance is very low. This may affect your performance.
+    </div>
+    {% endif %}
+
+    <!-- 📋 ATTENDANCE TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Attendance History</h2>
+
+        {% if attendance_records %}
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left border">
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr>
+                        <th class="p-3 border">Date</th>
+                        <th class="p-3 border">Course</th>
+                        <th class="p-3 border">Batch</th>
+                        <th class="p-3 border">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for record in attendance_records %}
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="p-3 border">
+                            {{ record.date }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ record.batch.course.title }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ record.batch.name }}
+                        </td>
+
+                        <td class="p-3 border">
+                            <span class="px-2 py-1 text-xs rounded
+                                {% if record.status == 'PRESENT' %}
+                                    bg-green-100 text-green-700
+                                {% else %}
+                                    bg-red-100 text-red-700
+                                {% endif %}
+                            ">
+                                {{ record.status }}
+                            </span>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+        <div class="text-center py-10 text-gray-500">
+            📭 No attendance records available yet
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

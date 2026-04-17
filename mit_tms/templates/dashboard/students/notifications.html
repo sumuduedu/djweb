@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">🔔 Notifications</h1>
+            <p class="text-gray-500">Stay updated with your activities</p>
+        </div>
+
+        <!-- MARK ALL READ -->
+        <a href="#" class="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Mark All as Read
+        </a>
+    </div>
+
+    <!-- 📊 SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Total Notifications</h3>
+            <p class="text-3xl font-bold text-blue-600">
+                {{ notifications|length }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Unread</h3>
+            <p class="text-3xl font-bold text-red-600">
+                {{ unread_count }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- 🔔 NOTIFICATION LIST -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Recent Notifications</h2>
+
+        {% if notifications %}
+
+        <div class="space-y-4">
+
+            {% for n in notifications %}
+            <div class="p-4 rounded-xl border flex justify-between items-start
+                {% if not n.is_read %}
+                    bg-blue-50 border-blue-200
+                {% else %}
+                    bg-gray-50
+                {% endif %}
+            ">
+
+                <!-- LEFT -->
+                <div>
+                    <p class="font-medium">
+                        {{ n.message }}
+                    </p>
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        {{ n.created_at }}
+                    </p>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="text-right">
+
+                    <!-- TYPE -->
+                    <span class="text-xs px-2 py-1 rounded
+                        {% if n.type == 'ALERT' %}
+                            bg-red-100 text-red-700
+                        {% elif n.type == 'INFO' %}
+                            bg-blue-100 text-blue-700
+                        {% else %}
+                            bg-gray-100 text-gray-700
+                        {% endif %}
+                    ">
+                        {{ n.type }}
+                    </span>
+
+                    <!-- ACTION -->
+                    {% if not n.is_read %}
+                    <div class="mt-2">
+                        <a href="#" class="text-xs text-blue-600 hover:underline">
+                            Mark as Read
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY -->
+        <div class="text-center py-10 text-gray-500">
+            🎉 No notifications yet
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

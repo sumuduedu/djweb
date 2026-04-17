@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <h1 class="text-3xl font-bold mb-6">📊 Reports</h1>
+
+    <div class="grid md:grid-cols-4 gap-6">
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Total Students</h3>
+            <p class="text-2xl font-bold">{{ reports.total_students }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Active Courses</h3>
+            <p class="text-2xl font-bold">{{ reports.active_courses }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Monthly Income</h3>
+            <p class="text-2xl font-bold text-green-600">
+                Rs. {{ reports.monthly_income }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Pending Payments</h3>
+            <p class="text-2xl font-bold text-red-600">
+                {{ reports.pending_payments }}
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

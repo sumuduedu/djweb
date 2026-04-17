@@ -1,77 +1,202 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <div class="p-6 bg-gray-100 min-h-screen">
 
-    <h1 class="text-2xl font-bold mb-6">🎓 Student Dashboard</h1>
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">🎓 Student Dashboard</h1>
+            <p class="text-gray-500">Welcome back, {{ student.full_name }}</p>
+        </div>
+    </div>
 
-    <!-- 🔔 STATUS MESSAGE -->
+    <!-- 🚨 SMART ALERTS -->
+    {% if risk_level == "HIGH" %}
+    <div class="bg-red-100 text-red-800 p-4 rounded-xl mb-6">
+        ⚠️ You are at risk of underperforming. Please complete pending tasks and contact your instructor.
+    </div>
+    {% elif risk_level == "MEDIUM" %}
+    <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl mb-6">
+        ⚡ Your performance is dropping. Try to stay consistent!
+    </div>
+    {% endif %}
+
+    <!-- 🔔 STATUS ALERTS -->
     {% if approved_apps and not enrollments %}
-    <div class="bg-blue-100 text-blue-800 p-4 rounded mb-6">
-        🎉 Your application has been approved!
-
-        <br><br>
-
-        📌 You are not yet assigned to a batch.
-        Please wait for batch allocation or contact admin.
+    <div class="bg-blue-100 text-blue-800 p-4 rounded-xl mb-6">
+        🎉 Your application has been approved! Waiting for batch assignment...
     </div>
     {% endif %}
 
     {% if enrollments %}
-    <div class="bg-green-100 text-green-800 p-4 rounded mb-6">
-        ✔ You are enrolled in a batch.
+    <div class="bg-green-100 text-green-800 p-4 rounded-xl mb-6">
+        ✔ You are enrolled in {{ enrollments|length }} course(s)
     </div>
     {% endif %}
 
-    <!-- 🔷 STATS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- 📊 STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
 
         <div class="bg-white p-5 rounded-2xl shadow">
-            <h3 class="text-gray-500">My Courses</h3>
-            <p class="text-2xl font-bold text-blue-600">
-                {{ enrollments|length }}
-            </p>
+            <h3 class="text-gray-500 text-sm">My Courses</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ enrollments|length }}</p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
-            <h3 class="text-gray-500">Completed Tasks</h3>
-            <p class="text-2xl font-bold text-green-600">15</p>
+            <h3 class="text-gray-500 text-sm">Pending Tasks</h3>
+            <p class="text-3xl font-bold text-red-600">{{ pending_tasks_count }}</p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
-            <h3 class="text-gray-500">Performance</h3>
-            <p class="text-2xl font-bold text-purple-600">Good</p>
+            <h3 class="text-gray-500 text-sm">Completed Tasks</h3>
+            <p class="text-3xl font-bold text-green-600">{{ completed_tasks_count }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Overall Progress</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ progress }}%</p>
         </div>
 
     </div>
 
-    <!-- 🎓 COURSE LIST -->
-    <div class="bg-white p-6 rounded-2xl shadow mt-6">
-        <h2 class="text-xl font-semibold mb-4">My Courses</h2>
+
+    <!-- 🎓 COURSES -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">My Courses & Batches</h2>
 
         {% if enrollments %}
-            <ul class="space-y-2">
-                {% for e in enrollments %}
-                    <li class="border p-3 rounded">
-                        {{ e.course.title }}
-                    </li>
+        <div class="grid md:grid-cols-2 gap-6">
+
+            {% for e in enrollments %}
+            <div class="border rounded-xl p-5 hover:shadow-lg transition">
+
+                <h3 class="text-lg font-bold text-blue-600">
+                    {{ e.batch.course.title }}
+                </h3>
+
+                <p class="text-sm text-gray-600 mt-1">
+                    📦 Batch: {{ e.batch.name }}
+                </p>
+
+                <p class="text-sm text-gray-500">
+                    👨‍🏫 Teacher: {{ e.batch.teacher|default:"Not assigned" }}
+                </p>
+
+                <span class="inline-block mt-3 text-xs px-2 py-1 rounded
+                    {% if e.status == 'ACTIVE' %}
+                        bg-green-100 text-green-700
+                    {% elif e.status == 'COMPLETED' %}
+                        bg-blue-100 text-blue-700
+                    {% else %}
+                        bg-red-100 text-red-700
+                    {% endif %}
+                ">
+                    {{ e.status }}
+                </span>
+
+                <div class="mt-4">
+                    <a href="{% url 'batch:batch_detail' e.batch.id %}"
+                       class="inline-block text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        View Details →
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <div class="text-center py-10 text-gray-500">
+            🚫 You are not enrolled in any courses yet.
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- 📈 PROGRESS BAR -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-lg font-semibold mb-3">Progress Tracker</h2>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="bg-blue-600 h-4 rounded-full" style="width: {{ progress }}%"></div>
+        </div>
+    </div>
+
+    <!-- 📅 DEADLINES & TASKS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">Upcoming Deadlines</h2>
+
+        {% if upcoming_tasks %}
+            <ul class="space-y-3">
+                {% for task in upcoming_tasks %}
+                <li class="p-3 border rounded-lg flex justify-between">
+                    <span>{{ task.title }}</span>
+                    <span class="text-sm text-gray-500">Due: {{ task.due_date }}</span>
+                </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="text-gray-500">
-                You are not enrolled in any courses yet.
-            </p>
+            <p class="text-gray-500">No upcoming deadlines 🎉</p>
         {% endif %}
     </div>
 
-    <!-- 👤 PROFILE -->
-    <div class="bg-white p-6 rounded-2xl shadow mt-6">
-        <h2 class="text-xl font-semibold mb-4">My Profile</h2>
+    <!-- 📝 ASSIGNMENTS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">Assignments</h2>
 
-        <p><strong>Name:</strong> {{ student.full_name }}</p>
-        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        {% if assignments %}
+        <ul class="space-y-3">
+            {% for a in assignments %}
+            <li class="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                    <p class="font-medium">{{ a.title }}</p>
+                    <p class="text-xs text-gray-500">Status: {{ a.status }}</p>
+                </div>
+                <a href="#" class="text-blue-600 text-sm">View →</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500">No assignments available</p>
+        {% endif %}
     </div>
+
+    <!-- 🏆 RESULTS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">Grades / Results</h2>
+
+        {% if results %}
+        <ul class="space-y-2">
+            {% for r in results %}
+            <li class="flex justify-between border-b pb-2">
+                <span>{{ r.course }}</span>
+                <span class="font-bold">{{ r.grade }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500">No results yet</p>
+        {% endif %}
+    </div>
+
+    <!-- 🔔 NOTIFICATIONS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">Notifications</h2>
+
+        {% if notifications %}
+        <ul class="space-y-3">
+            {% for n in notifications %}
+            <li class="p-3 bg-gray-50 rounded-lg">
+                {{ n.message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500">No new notifications</p>
+        {% endif %}
+    </div>
+
 
 </div>
 

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold">📦 Batches</h1>
+            <p class="text-gray-500">Manage course batches</p>
+        </div>
+
+        <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            + Create Batch
+        </a>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="grid md:grid-cols-3 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Total Batches</h3>
+            <p class="text-2xl font-bold">{{ total }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Active</h3>
+            <p class="text-2xl font-bold text-green-600">{{ active }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Completed</h3>
+            <p class="text-2xl font-bold text-blue-600">
+                {{ total|add:"-active" }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        {% if batches %}
+
+        <table class="w-full text-sm border">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 border">Batch</th>
+                    <th class="p-3 border">Course</th>
+                    <th class="p-3 border">Teacher</th>
+                    <th class="p-3 border">Students</th>
+                    <th class="p-3 border">Start Date</th>
+                    <th class="p-3 border">Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for b in batches %}
+                <tr>
+                    <td class="p-3 border font-medium">{{ b.name }}</td>
+                    <td class="p-3 border">{{ b.course }}</td>
+                    <td class="p-3 border">{{ b.teacher }}</td>
+                    <td class="p-3 border">{{ b.students }}</td>
+                    <td class="p-3 border">{{ b.start_date }}</td>
+                    <td class="p-3 border">
+                        <span class="text-xs px-2 py-1 rounded
+                            {% if b.status == 'ACTIVE' %}
+                                bg-green-100 text-green-700
+                            {% else %}
+                                bg-blue-100 text-blue-700
+                            {% endif %}
+                        ">
+                            {{ b.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        {% else %}
+            <p class="text-center text-gray-500 py-6">No batches found</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

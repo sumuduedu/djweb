@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">🧠 Performance Insights</h1>
+        <p class="text-gray-500">AI-driven analysis of your learning progress</p>
+    </div>
+
+    <!-- ⚠️ RISK LEVEL -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-lg font-semibold mb-3">Risk Level</h2>
+
+        <p class="text-2xl font-bold
+            {% if risk_level == 'HIGH' %}
+                text-red-600
+            {% elif risk_level == 'MEDIUM' %}
+                text-yellow-600
+            {% else %}
+                text-green-600
+            {% endif %}
+        ">
+            {{ risk_level }}
+        </p>
+
+    </div>
+
+    <!-- 📊 KEY METRICS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Attendance</h3>
+            <p class="text-3xl font-bold text-blue-600">
+                {{ attendance }}%
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Progress</h3>
+            <p class="text-3xl font-bold text-green-600">
+                {{ progress }}%
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Average Score</h3>
+            <p class="text-3xl font-bold text-purple-600">
+                {{ average_score }}%
+            </p>
+        </div>
+
+    </div>
+
+    <!-- 📈 INSIGHTS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-xl font-semibold mb-4">Key Insights</h2>
+
+        <ul class="space-y-3">
+
+            {% for insight in insights %}
+            <li class="p-3 bg-gray-50 rounded-lg">
+                📌 {{ insight }}
+            </li>
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+    <!-- 💡 RECOMMENDATIONS -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Recommended Actions</h2>
+
+        <ul class="space-y-3">
+
+            {% for rec in recommendations %}
+            <li class="p-3 bg-blue-50 rounded-lg">
+                ✔ {{ rec }}
+            </li>
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+</div>
+
+{% endblock %}

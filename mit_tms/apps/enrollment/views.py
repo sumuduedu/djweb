@@ -9,8 +9,8 @@ from django.contrib import messages
 from apps.courses.models import Course
 from .models import EnrollmentInquiry
 from .services import enroll_student
-
-
+from apps.batch.models import Batch
+from apps.enrollment.models import Enrollment
 # ================================
 # 🎓 ENROLL TO BATCH
 # ================================
@@ -53,14 +53,13 @@ from django.contrib.auth.models import User
 
 from apps.accounts.models import Student, Parent
 from .models import EnrollmentInquiry
-
+from django.db import IntegrityError
 
 class ApproveApplicationView(AdminRequiredMixin, View):
 
     def post(self, request, pk):
         app = get_object_or_404(EnrollmentInquiry, id=pk)
 
-        # 🚫 prevent re-processing
         if app.status != 'PENDING':
             messages.warning(request, "This application has already been processed.")
             return redirect('enrollment:application_list')
@@ -68,32 +67,43 @@ class ApproveApplicationView(AdminRequiredMixin, View):
         user = app.user
         profile = user.profile
 
+        # 🔽 GET SELECTED BATCH
+        batch_id = request.POST.get('batch_id')
+        batch = None
+
+        if batch_id:
+            batch = get_object_or_404(Batch, id=batch_id)
+
+            # 🔐 SECURITY CHECK
+            if batch.course != app.course:
+                messages.error(request, "Invalid batch selected.")
+                return redirect('enrollment:application_list')
+
         # ============================
         # 🔥 UPDATE ROLE
         # ============================
         profile.role = app.role_type
         profile.save()
 
+        student = None  # we’ll assign later
+
         # ============================
-        # 🎓 STUDENT APPLICATION
+        # 🎓 STUDENT
         # ============================
         if app.role_type == 'STUDENT':
-            # nothing extra needed (signals handle student creation)
-            pass
+            student = user.student  # assuming OneToOne
 
         # ============================
-        # 👨‍🏫 TEACHER APPLICATION
+        # 👨‍🏫 TEACHER
         # ============================
         elif app.role_type == 'TEACHER':
-            # handled by signals
-            pass
+            pass  # handled elsewhere
 
         # ============================
-        # 👨‍👩‍👧 PARENT APPLICATION
+        # 👨‍👩‍👧 PARENT → CREATE CHILD STUDENT
         # ============================
         elif app.role_type == 'PARENT':
 
-            # 🔥 SAFE USERNAME GENERATION
             base_username = app.student_name.lower().replace(" ", "")
             username = base_username
             counter = 1
@@ -102,7 +112,6 @@ class ApproveApplicationView(AdminRequiredMixin, View):
                 username = f"{base_username}{counter}"
                 counter += 1
 
-            # 🔥 CREATE STUDENT USER
             student_user = User.objects.create(
                 username=username,
                 is_active=True
@@ -110,22 +119,28 @@ class ApproveApplicationView(AdminRequiredMixin, View):
             student_user.set_password("12345678")  # ⚠️ change later
             student_user.save()
 
-            # 🔥 CREATE STUDENT PROFILE
             student = Student.objects.create(
                 user=student_user,
                 full_name=app.student_name
             )
 
-            # 🔥 ENSURE PARENT EXISTS
             parent, _ = Parent.objects.get_or_create(user=user)
-
-            # 🔥 LINK MANY-TO-MANY
             student.parents.add(parent)
 
-            print(f"✅ Linked {student.full_name} → {parent.user.username}")
+        # ============================
+        # 🎯 CREATE ENROLLMENT (NEW)
+        # ============================
+        if student and batch:
+            try:
+                Enrollment.objects.create(
+                    student=student,
+                    batch=batch
+                )
+            except IntegrityError:
+                messages.warning(request, "Student already enrolled in this batch.")
 
         # ============================
-        # ✅ FINALIZE APPLICATION
+        # ✅ FINALIZE
         # ============================
         app.status = 'APPROVED'
         app.save()
@@ -304,3 +319,4 @@ class ApplyParentView(LoginRequiredMixin, View):
 
         messages.success(request, "Parent application submitted successfully!")
         return redirect('core:dashboard')
+

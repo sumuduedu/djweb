@@ -82,5 +82,10 @@ class Enrollment(models.Model):
         default='ACTIVE'
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'batch'], name='unique_student_batch')
+        ]
+
     def __str__(self):
         return f"{self.student.full_name} → {self.batch}"

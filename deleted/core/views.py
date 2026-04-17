@@ -167,6 +167,8 @@ class TeacherDashboardView(BaseView):
 # ================================
 from apps.core.gateway import get_student_enrollments
 
+from apps.enrollment.models import EnrollmentInquiry
+from apps.accounts.models import Student
 
 class StudentDashboardView(BaseView):
     allowed_roles = ['STUDENT']
@@ -175,7 +177,27 @@ class StudentDashboardView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['enrollments'] = get_student_enrollments(self.request.user)
+        user = self.request.user
+
+        # 🔽 student profile
+        student = getattr(user, 'student', None)
+
+        # 🔽 enrollments (IMPORTANT: include batch + course)
+        enrollments = get_student_enrollments(user).select_related(
+            'batch__course', 'batch__teacher'
+        )
+
+        # 🔽 approved applications
+        approved_apps = EnrollmentInquiry.objects.filter(
+            user=user,
+            status='APPROVED'
+        )
+
+        context.update({
+            'student': student,
+            'enrollments': enrollments,
+            'approved_apps': approved_apps,
+        })
 
         return context
 # ================================
@@ -219,7 +241,7 @@ class GuestDashboardView(BaseView):
 # ================================
 class StudentCoursesView(BaseView):
     allowed_roles = ['STUDENT']
-    template_name = "student/courses.html"
+    template_name = "dashboard/students/courses.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -240,7 +262,12 @@ class StudentCoursesView(BaseView):
 # ================================
 class StudentAttendanceView(BaseView):
     allowed_roles = ['STUDENT']
-    template_name = "student/attendance.html"
+    template_name = "dashboard/students/attendance.html"
+
+
+class StudentPaymentView(BaseView):
+    allowed_roles = ['STUDENT']
+    template_name = "dashboard/students/payment.html"
 
 
 # ================================

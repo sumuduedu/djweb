@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">📊 Analytics Dashboard</h1>
+        <p class="text-gray-500">Overview of class performance</p>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="grid md:grid-cols-4 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Students</h3>
+            <p class="text-2xl font-bold">{{ total_students }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Avg Attendance</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ avg_attendance }}%</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Avg Score</h3>
+            <p class="text-2xl font-bold text-green-600">{{ avg_score }}%</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">At Risk</h3>
+            <p class="text-2xl font-bold text-red-600">{{ at_risk }}</p>
+        </div>
+
+    </div>
+
+    <!-- COURSE PERFORMANCE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Course Performance</h2>
+
+        <table class="w-full text-sm border">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 border">Course</th>
+                    <th class="p-3 border">Average Score</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for c in course_data %}
+                <tr>
+                    <td class="p-3 border">{{ c.course }}</td>
+                    <td class="p-3 border">{{ c.avg_score }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

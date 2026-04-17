@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <h1 class="text-3xl font-bold mb-6">⚠️ Risk Analysis</h1>
+
+    <!-- RISK STATUS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-xl font-semibold mb-3">Your Risk Level</h2>
+
+        <p class="text-2xl font-bold
+            {% if risk_level == 'HIGH' %}
+                text-red-600
+            {% elif risk_level == 'MEDIUM' %}
+                text-yellow-600
+            {% else %}
+                text-green-600
+            {% endif %}
+        ">
+            {{ risk_level }}
+        </p>
+
+    </div>
+
+    <!-- DETAILS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-lg font-semibold mb-3">Details</h2>
+
+        <p>📊 Attendance: {{ attendance }}%</p>
+        <p>📈 Progress: {{ progress }}%</p>
+
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-lg font-semibold mb-3">Recommendations</h2>
+
+        {% if risk_level == "HIGH" %}
+            <ul class="list-disc ml-5 text-red-600">
+                <li>Attend all classes regularly</li>
+                <li>Complete pending assignments immediately</li>
+                <li>Contact your teacher for support</li>
+            </ul>
+
+        {% elif risk_level == "MEDIUM" %}
+            <ul class="list-disc ml-5 text-yellow-600">
+                <li>Improve consistency</li>
+                <li>Focus on weak subjects</li>
+            </ul>
+
+        {% else %}
+            <ul class="list-disc ml-5 text-green-600">
+                <li>Keep up the good work 🎉</li>
+            </ul>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow space-y-6">
+
+    <h2 class="text-2xl font-bold">
+        {% if object %}✏️ Edit Post{% else %}➕ Create Blog Post{% endif %}
+    </h2>
+
+    <!-- 🔔 Errors -->
+    {% if form.errors %}
+    <div class="bg-red-100 text-red-700 p-3 rounded">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- ========================= -->
+        <!-- 🔷 BASIC INFO -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Basic Information</h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>Title</label>
+                    {{ form.title }}
+                </div>
+
+                <div>
+                    <label>Slug</label>
+                    {{ form.slug }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label>Category</label>
+                {{ form.category }}
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 CONTENT -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Content</h3>
+
+            <div>
+                <label>Content</label>
+                {{ form.content }}
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 MEDIA -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Media</h3>
+
+            <div>
+                <label>Featured Image</label>
+                {{ form.image }}
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 PUBLISHING -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Publishing</h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>Status</label>
+                    {{ form.is_published }}
+                </div>
+
+                <div>
+                    <label>Author</label>
+                    {{ form.author }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 METRICS (OPTIONAL) -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Metrics</h3>
+
+            <div>
+                <label>Views</label>
+                {{ form.views }}
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 ACTIONS -->
+        <!-- ========================= -->
+        <div class="flex justify-between pt-4">
+            <a href="{% url 'blog_list' %}" class="text-gray-600">
+                Cancel
+            </a>
+
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                {% if object %}Update Post{% else %}Create Post{% endif %}
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

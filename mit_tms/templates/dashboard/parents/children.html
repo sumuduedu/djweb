@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <h1 class="text-3xl font-bold mb-6">👨‍👩‍👧 My Children</h1>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+        {% for c in children %}
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h2 class="font-semibold text-lg">{{ c.name }}</h2>
+            <p class="text-sm text-gray-600">📘 {{ c.course }}</p>
+            <p class="text-sm text-gray-500">📦 {{ c.batch }}</p>
+
+            <span class="inline-block mt-2 text-xs px-2 py-1 rounded bg-green-100 text-green-700">
+                {{ c.status }}
+            </span>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -74,6 +74,15 @@ document.addEventListener('click', function(e) {
         menu.classList.add('hidden');
     }
 });
+
+ setTimeout(function () {
+        document.querySelectorAll('.flash-message').forEach(function (el) {
+            el.style.transition = "opacity 0.5s ease";
+            el.style.opacity = "0";
+
+            setTimeout(() => el.remove(), 500); // remove after fade
+        });
+    }, 5000); // 5 seconds
 </script>
 
 </body>
