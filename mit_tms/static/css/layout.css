@@ -1,13 +1,30 @@
 /* ================= SECTION SPACING ================= */
 
 .section {
-    padding: 5rem 0;
+    @apply py-16 md:py-20;
+}
+
+/* Variations (optional but very useful) */
+.section-sm {
+    @apply py-10 md:py-12;
+}
+
+.section-lg {
+    @apply py-20 md:py-28;
 }
 
 /* ================= CONTAINER ================= */
 
 .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 0 1.5rem;
+    @apply max-w-7xl mx-auto px-4 md:px-6;
+}
+
+/* Narrow container (forms, auth pages) */
+.container-sm {
+    @apply max-w-2xl mx-auto px-4;
+}
+
+/* Full width container (dashboard pages) */
+.container-fluid {
+    @apply w-full px-4 md:px-6;
 }

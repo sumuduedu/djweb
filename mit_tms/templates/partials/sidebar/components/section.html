@@ -1,0 +1,33 @@
+<div x-data="{ open: true }">
+
+    <button @click="open = !open"
+        class="w-full flex items-center px-3 py-2 text-xs uppercase text-gray-400 hover:text-white"
+        :class="$root.collapsed ? 'justify-center' : 'justify-between'">
+
+        <!-- TITLE -->
+  <div x-show="!$store.sidebar.collapsed"
+     x-transition:leave="transition-all duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="section-title overflow-hidden whitespace-nowrap">
+    {{ title }}
+</div>
+
+        <!-- ARROW -->
+        <span x-show="!$root.collapsed"
+              class="transition-transform"
+              :class="open ? 'rotate-0' : '-rotate-90'">
+            ▾
+        </span>
+
+    </button>
+
+    <!-- ITEMS -->
+    <div x-show="open && !$root.collapsed" x-transition class="space-y-1">
+        {% for item in items %}
+            {% include "partials/sidebar/components/link.html"
+               with url=item.url label=item.name icon=item.icon active=item.url badge=item.badge|default:'' %}
+        {% endfor %}
+    </div>
+
+</div>

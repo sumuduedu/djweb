@@ -5,27 +5,46 @@ from apps.accounts.models import Profile
 
 
 class BaseView(LoginRequiredMixin, TemplateView):
-    allowed_roles = None
+    allowed_roles = None  # e.g. ['ADMIN'], ['STAFF']
 
     def dispatch(self, request, *args, **kwargs):
-        self.profile, _ = Profile.objects.get_or_create(user=request.user)
+        user = request.user
 
-        if self.allowed_roles and self.profile.role not in self.allowed_roles:
-            raise PermissionDenied
+        # Ensure profile exists
+        self.profile, _ = Profile.objects.get_or_create(user=user)
+
+        # 🔥 SUPERUSER OVERRIDE (VERY IMPORTANT)
+        if user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+
+        # Normalize role (avoid case issues)
+        user_role = (self.profile.role or "").upper()
+
+        # Role check
+        if self.allowed_roles:
+            allowed = [r.upper() for r in self.allowed_roles]
+
+            if user_role not in allowed:
+                raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["profile"] = self.profile
-        context["role"] = self.profile.role
+        role = (self.profile.role or "").upper()
 
-        context["is_admin"] = self.profile.role == "ADMIN"
-        context["is_staff"] = self.profile.role == "STAFF"
-        context["is_teacher"] = self.profile.role == "TEACHER"
-        context["is_student"] = self.profile.role == "STUDENT"
-        context["is_parent"] = self.profile.role == "PARENT"
-        context["is_guest"] = self.profile.role == "GUEST"
+        context.update({
+            "profile": self.profile,
+            "role": role,
+
+            # Role flags (used in sidebar/templates)
+            "is_admin": role == "ADMIN" or self.request.user.is_superuser,
+            "is_staff": role == "STAFF",
+            "is_teacher": role == "TEACHER",
+            "is_student": role == "STUDENT",
+            "is_parent": role == "PARENT",
+            "is_guest": role == "GUEST",
+        })
 
         return context

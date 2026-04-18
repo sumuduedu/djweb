@@ -85,7 +85,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mit_tms.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -96,7 +95,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                                'apps.core.context_processors.user_roles',
+
+                # ✅ YOUR CUSTOM
+                'apps.core.context_processors.user_roles',
+                'apps.core.context_processors.sidebar_menu',
             ],
         },
     },

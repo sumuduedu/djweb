@@ -1,0 +1,48 @@
+<aside
+    :class="{
+        'sidebar-collapsed md:w-20': collapsed,
+        'md:w-64': !collapsed,
+        'translate-x-0': mobileOpen,
+        '-translate-x-full': !mobileOpen
+    }"
+ class="sidebar fixed md:static z-50 h-full
+           bg-gray-900 text-gray-200 border-r border-gray-800
+           transform md:translate-x-0 overflow-hidden        👈 add this
+           transition-[width,transform] duration-300 ease-in-out flex flex-col"
+>
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-800">
+        <h2 class="menu-text text-lg font-bold">MIT TMS</h2>
+    </div>
+
+    <!-- NAV -->
+    <nav class="flex-1 px-2 py-4 space-y-2 text-sm overflow-y-auto">
+
+        {% if is_admin %}
+            {% include "partials/sidebar/admin.html" %}
+        {% endif %}
+
+        {% if is_staff %}
+            {% include "partials/sidebar/staff.html" %}
+        {% endif %}
+
+        {% if is_teacher %}
+            {% include "partials/sidebar/teacher.html" %}
+        {% endif %}
+
+        {% if is_student %}
+            {% include "partials/sidebar/student.html" %}
+        {% endif %}
+
+        {% if is_parent %}
+            {% include "partials/sidebar/parent.html" %}
+        {% endif %}
+
+        {% if is_alumni %}
+            {% include "partials/sidebar/alumni.html" %}
+        {% endif %}
+
+    </nav>
+</aside>
+

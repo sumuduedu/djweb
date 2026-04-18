@@ -2,20 +2,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>{% block page_title %}MIT TMS{% endblock %}</title>
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<script src="https://unpkg.com/alpinejs" defer></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Alpine -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800 antialiased">
 
-<div class="flex min-h-screen">
+<div x-data="layout()" class="flex h-screen overflow-hidden">
 
     <!-- 🔷 SIDEBAR -->
-    {% include "partials/sidebar.html" %}
+
+        {% include "partials/sidebar/index.html" %}
+    </aside>
+
+    <!-- 🔲 OVERLAY -->
+    <div x-show="mobileOpen"
+         x-transition.opacity
+         @click="mobileOpen = false"
+         class="fixed inset-0 bg-black/40 md:hidden z-40">
+    </div>
 
     <!-- 🔷 MAIN -->
     <div class="flex-1 flex flex-col">
@@ -24,12 +39,13 @@
         {% include "partials/topbar.html" %}
 
         <!-- 🔷 CONTENT -->
-        <main class="p-6">
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                    <div class="flash-message flex justify-between items-center p-3 rounded bg-green-50 text-green-700 border">
                         {{ message }}
+                        <button onclick="this.parentElement.remove()">✕</button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -43,46 +59,30 @@
 
 </div>
 
-<!-- 🔷 GLOBAL SCRIPT -->
+<!-- 🔧 ALPINE -->
 <script>
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
+function layout() {
+    return {
+        collapsed: false,
+        mobileOpen: false,
 
-    sidebar.classList.toggle('w-20');
-    sidebar.classList.toggle('w-64');
+        init() {
+            if (window.innerWidth < 768) {
+                this.collapsed = true;
+            }
 
-    document.querySelectorAll('.menu-text').forEach(el => {
-        el.classList.toggle('hidden');
-    });
+            const saved = localStorage.getItem('sidebarCollapsed');
+            if (saved !== null) {
+                this.collapsed = saved === 'true';
+            }
+        },
 
-    document.querySelectorAll('.section-title').forEach(el => {
-        el.classList.toggle('hidden');
-    });
-
-    document.querySelectorAll('.nav-link').forEach(el => {
-        el.classList.toggle('justify-center');
-    });
-}
-
-function toggleUserMenu() {
-    document.getElementById('userMenu').classList.toggle('hidden');
-}
-
-document.addEventListener('click', function(e) {
-    const menu = document.getElementById('userMenu');
-    if (!e.target.closest('#userMenu') && !e.target.closest('button')) {
-        menu.classList.add('hidden');
+        toggleCollapse() {
+            this.collapsed = !this.collapsed;
+            localStorage.setItem('sidebarCollapsed', this.collapsed);
+        }
     }
-});
-
- setTimeout(function () {
-        document.querySelectorAll('.flash-message').forEach(function (el) {
-            el.style.transition = "opacity 0.5s ease";
-            el.style.opacity = "0";
-
-            setTimeout(() => el.remove(), 500); // remove after fade
-        });
-    }, 5000); // 5 seconds
+}
 </script>
 
 </body>

@@ -1,0 +1,102 @@
+  <p class="section-title px-3 text-xs text-gray-400 uppercase mt-4 mb-2 tracking-wide">
+            Teacher Panel
+        </p>
+
+        <!-- 🏠 DASHBOARD -->
+        <a href="{% url 'core:teacher_dashboard' %}" class="nav-link flex items-center gap-3">
+            <span>🏠</span>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- 📚 TEACHING -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Teaching</p>
+
+        <a href="{% url 'course_list' %}" class="nav-link flex items-center gap-3">
+            <span>📘</span>
+            <span>Courses</span>
+        </a>
+
+        <a href="{% url 'batch:batch_list' %}" class="nav-link flex items-center gap-3">
+            <span>📦</span>
+            <span>Batches</span>
+        </a>
+
+        <a href="{% url 'schedule:timetable_list' %}" class="nav-link flex items-center gap-3">
+            <span>🗓️</span>
+            <span>Timetable</span>
+        </a>
+
+        <a href="{% url 'core:teacher_materials' %}" class="nav-link flex items-center gap-3">
+            <span>📂</span>
+            <span>Materials</span>
+        </a>
+
+        <!-- 📝 ACADEMIC -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Academic</p>
+
+        <a href="{% url 'core:teacher_assignments' %}" class="nav-link flex items-center gap-3">
+            <span>📝</span>
+            <span>Assignments</span>
+        </a>
+
+        <a href="{% url 'core:teacher_submissions' %}" class="nav-link flex items-center gap-3">
+            <span>📥</span>
+            <span>Submissions</span>
+        </a>
+
+        <a href="{% url 'core:teacher_attendance' %}" class="nav-link flex items-center gap-3">
+            <span>📊</span>
+            <span>Attendance</span>
+        </a>
+
+        <a href="{% url 'core:teacher_results' %}" class="nav-link flex items-center gap-3">
+            <span>🏆</span>
+            <span>Results / Grading</span>
+        </a>
+
+        <!-- 👨‍🎓 STUDENTS -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Students</p>
+
+        <a href="{% url 'core:teacher_students' %}" class="nav-link flex items-center gap-3">
+            <span>👨‍🎓</span>
+            <span>My Students</span>
+        </a>
+
+        <a href="{% url 'core:teacher_performance' %}" class="nav-link flex items-center gap-3">
+            <span>📈</span>
+            <span>Performance Tracking</span>
+        </a>
+
+        <!-- 🧠 INSIGHTS (🔥 YOUR SYSTEM POWER) -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Insights</p>
+
+        <a href="{% url 'core:teacher_risk_students' %}" class="nav-link flex items-center gap-3">
+            <span>⚠️</span>
+            <span>At-Risk Students</span>
+        </a>
+
+        <a href="{% url 'core:teacher_analytics' %}" class="nav-link flex items-center gap-3">
+            <span>🧠</span>
+            <span>Analytics</span>
+        </a>
+
+        <!-- 💬 COMMUNICATION -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Communication</p>
+
+        <a href="{% url 'core:teacher_notifications' %}" class="nav-link flex items-center gap-3">
+            <span>🔔</span>
+            <span>Notifications</span>
+        </a>
+
+        <a href="{% url 'core:teacher_messages' %}" class="nav-link flex items-center gap-3">
+            <span>💬</span>
+            <span>Messages</span>
+        </a>
+
+        <a href="{% url 'core:teacher_announcements' %}" class="nav-link flex items-center gap-3">
+            <span>📢</span>
+            <span>Announcements</span>
+        </a>
+
+        <!-- 👤 ACCOUNT -->
+        <p class="px-3 text-xs text-gray-400 uppercase mt-4 mb-2">Account</p>

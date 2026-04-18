@@ -1,4 +1,4 @@
-/* ================= VARIABLES ================= */
+/* ================= VARIABLES (DESIGN TOKENS) ================= */
 
 :root {
     --primary: #4f46e5;
@@ -12,17 +12,77 @@
 
     --text-dark: #0f172a;
     --text-light: #64748b;
+
+    --radius: 12px;
+    --transition: all 0.25s ease;
 }
 
 /* ================= GLOBAL ================= */
 
 body {
+    @apply antialiased;
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
     background: var(--bg-soft);
 }
 
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ================= TYPOGRAPHY ================= */
+
+h1, h2, h3, h4 {
+    @apply font-semibold text-gray-900;
+}
+
+p {
+    @apply text-gray-600 leading-relaxed;
+}
+
+/* ================= LINKS ================= */
+
+a {
+    @apply transition duration-200;
+    color: inherit;
+}
+
+a:hover {
+    color: var(--primary);
+}
+
+/* ================= SECTION ================= */
+
 section {
     position: relative;
     overflow: hidden;
+}
+
+/* Optional section background helper */
+.section-soft {
+    background: var(--bg-section);
+}
+
+/* ================= GLASS EFFECT ================= */
+
+.glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+}
+
+/* ================= SCROLLBAR (modern UI touch) ================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5f5;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a5b4fc;
 }
