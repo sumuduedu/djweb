@@ -3,6 +3,10 @@ from apps.core.gateway import get_student_enrollments
 from apps.enrollment.models import EnrollmentInquiry
 
 
+from apps.enrollment.models import EnrollmentInquiry
+from apps.courses.models import Assessment
+
+
 class StudentDashboardView(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/student.html"
@@ -12,29 +16,6 @@ class StudentDashboardView(BaseView):
 
         user = self.request.user
 
-        context['enrollments'] = get_student_enrollments(user)
-        context['approved_apps'] = EnrollmentInquiry.objects.filter(
-            user=user, status='APPROVED'
-        )
-
-        # ✅ ADD THIS
-        context['student_menu'] = [
-            {
-                "section": "Student Panel",
-                "items": [
-                    {"name": "Dashboard", "icon": "🏠", "url": "core:student_dashboard"},
-                ]
-            },
-            {
-                "section": "Learning",
-                "items": [
-                    {"name": "My Courses", "icon": "📘", "url": "core:student_courses"},
-                    {"name": "Assignments", "icon": "📝", "url": "core:student_assignments"},
-                    {"name": "Materials", "icon": "📂", "url": "core:student_materials"},
-                    {"name": "Attendance", "icon": "🗓️", "url": "core:student_attendance"},
-                ]
-            }
-        ]
 
         return context
 # ================================
@@ -46,7 +27,7 @@ class StudentCoursesView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['enrollments'] = get_student_enrollments(self.request.user)
+
         return context
 
 
