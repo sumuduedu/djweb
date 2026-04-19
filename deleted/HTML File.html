@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Application Form</title>
+
+<style>
+    body {
+        font-family: Arial;
+        margin: 20px;
+    }
+
+    .form-box {
+        border: 1px solid #000;
+        padding: 5px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+
+    .label {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #000;
+        padding: 4px;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+
+    button {
+        margin-top: 5px;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Application Form</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+<!-- 🔹 Personal Info -->
+
+<div class="grid-2">
+    <div class="form-box">
+        <div class="label">Full Name</div>
+        <input type="text" name="full_name" class="input">
+    </div>
+
+
+<div class="form-box">
+    <div class="label">NIC</div>
+    <input type="text" name="nic" class="input">
+</div>
+
+
+</div>
+
+<div class="grid-2">
+    <div class="form-box">
+        <div class="label">Date of Birth</div>
+        <input type="date" name="dob" class="input">
+    </div>
+
+
+<div class="form-box">
+    <div class="label">Phone</div>
+    <input type="text" name="phone" class="input">
+</div>
+
+
+</div>
+
+<div class="form-box">
+    <div class="label">Address</div>
+    <input type="text" name="address" class="input">
+</div>
+
+<div class="form-box">
+    <div class="label">Email</div>
+    <input type="email" name="email" class="input">
+</div>
+
+<hr>
+
+<!-- 🔹 O/L RESULTS -->
+
+<h3>O/L Results</h3>
+
+<table border="1" width="100%" id="olTable">
+    <tr>
+        <th>Subject</th>
+        <th>Grade</th>
+        <th>Action</th>
+    </tr>
+</table>
+
+<button type="button" onclick="addOLRow()">+ Add O/L Subject</button>
+
+<hr>
+
+<!-- 🔹 A/L STREAM -->
+
+<h3>A/L Stream</h3>
+
+<div class="form-box">
+    <select name="al_stream" class="input">
+        <option value="">Select Stream</option>
+        <option>Science</option>
+        <option>Commerce</option>
+        <option>Arts</option>
+        <option>Technology</option>
+    </select>
+</div>
+
+<!-- 🔹 A/L SUBJECTS -->
+
+<h3>A/L Subjects</h3>
+
+<table border="1" width="100%" id="alTable">
+    <tr>
+        <th>Subject</th>
+        <th>Grade</th>
+        <th>Action</th>
+    </tr>
+</table>
+
+<button type="button" onclick="addALRow()">+ Add A/L Subject</button>
+
+<hr>
+
+<!-- 🔹 OTHER A/L INFO -->
+
+<h3>Additional A/L Info</h3>
+
+<div class="grid-3">
+    <div class="form-box">
+        <div class="label">GIT</div>
+        <input name="git" class="input">
+    </div>
+
+```
+<div class="form-box">
+    <div class="label">English</div>
+    <input name="english" class="input">
+</div>
+
+<div class="form-box">
+    <div class="label">Z-Score</div>
+    <input name="z_score" class="input">
+</div>
+```
+
+</div>
+
+<br>
+
+<button type="submit">Submit Application</button>
+
+</form>
+
+<script>
+// 🔹 O/L dynamic
+function addOLRow() {
+    let table = document.getElementById("olTable");
+    let row = table.insertRow();
+
+    row.innerHTML = `
+        <td><input name="ol_subject[]" required></td>
+        <td>
+            <select name="ol_grade[]">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+                <option>S</option>
+                <option>F</option>
+            </select>
+        </td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove()">X</button></td>
+    `;
+}
+
+// 🔹 A/L dynamic
+function addALRow() {
+    let table = document.getElementById("alTable");
+    let row = table.insertRow();
+
+    row.innerHTML = `
+        <td><input name="al_subject[]" required></td>
+        <td>
+            <select name="al_grade[]">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+                <option>S</option>
+                <option>F</option>
+            </select>
+        </td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove()">X</button></td>
+    `;
+}
+</script>
+
+</body>
+</html>
