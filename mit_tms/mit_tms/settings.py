@@ -54,6 +54,7 @@ LOCAL_APPS = [
      'apps.scheduling.apps.SchedulingConfig',
     'apps.enrollment.apps.EnrollmentConfig',
     'apps.lessonplan.apps.LessonplanConfig',
+    'apps.careers.apps.CareersConfig',
 ]
 
 THIRD_PARTY_APPS = [

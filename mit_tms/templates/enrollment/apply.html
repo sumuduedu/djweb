@@ -3,13 +3,10 @@
 
 {% block content %}
 
-
-
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-10 px-4">
 
 <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8">
 
-<!-- BACK -->
 <a href="{% url 'core:dashboard' %}" class="back-btn">← Dashboard</a>
 
 <h2 class="title">🎓 Apply for {{ course.title }}</h2>
@@ -19,52 +16,32 @@
 
 <!-- PROGRESS -->
 <div class="progress">
-<div class="bar"><div id="progressBar"></div></div>
-</div>
-<!-- ELIGIBILITY SCORE -->
-<div class="section-card">
-
-<h3 class="section-title">📊 Eligibility Score</h3>
-
-<div class="score-box">
-
-<div class="score-circle">
-    <span id="scoreValue">0%</span>
+    <div class="bar"><div id="progressBar"></div></div>
 </div>
 
-<p class="text-sm text-gray-500 mt-2">
-Based on your O/L & A/L results
-</p>
-
-</div>
-
-</div>
-<!-- ================= STEP 1 ================= -->
+<!-- STEP 1 -->
 <div class="step" id="step1">
 
 <h3>🎯 Select Role</h3>
 
 <div class="role-grid">
-<div onclick="selectRole('STUDENT')" id="studentCard" class="role-card">
-🎓 <h4>Student</h4><p>Apply for yourself</p>
-</div>
+    <div onclick="selectRole('STUDENT')" id="studentCard" class="role-card">
+        🎓 <h4>Student</h4><p>Apply for yourself</p>
+    </div>
 
-<div onclick="selectRole('PARENT')" id="parentCard" class="role-card">
-👨‍👩‍👧 <h4>Parent</h4><p>Apply for child</p>
-</div>
+    <div onclick="selectRole('PARENT')" id="parentCard" class="role-card">
+        👨‍👩‍👧 <h4>Parent</h4><p>Apply for child</p>
+    </div>
 </div>
 
 <input type="hidden" name="role_type" id="role_type">
 
 </div>
 
-<!-- ================= STEP 2 ================= -->
-<!-- ================= STEP 2 ================= -->
+<!-- STEP 2 -->
 <div class="step hidden" id="step2">
 
-<!-- ================= PERSONAL ================= -->
 <div class="section-card">
-
 <h3 class="section-title">👤 Personal Information</h3>
 
 <div class="grid md:grid-cols-2 gap-4">
@@ -75,45 +52,36 @@ Based on your O/L & A/L results
 </div>
 
 <div class="field">
-<label>Email Address</label>
+<label>Email</label>
 <input value="{{ request.user.email }}" class="input bg-gray-100" readonly>
 </div>
 
 </div>
-
 </div>
 
-<!-- ================= CONTACT ================= -->
 <div class="section-card">
-
-<h3 class="section-title">📞 Contact Information</h3>
+<h3 class="section-title">📞 Contact</h3>
 
 <div class="grid md:grid-cols-2 gap-4">
 
 <div class="field">
-<label>Mobile Number <span class="req">*</span></label>
+<label>Mobile *</label>
 <input name="phone" class="input">
-<p class="hint">Format: 0771234567</p>
 </div>
 
 <div class="field">
-<label>Home Telephone</label>
+<label>Home Phone</label>
 <input name="home_phone" class="input">
 </div>
 
 </div>
-
 </div>
 
-<!-- ================= ADDRESS ================= -->
 <div class="section-card">
-
 <h3 class="section-title">🏠 Address</h3>
 
-<div class="space-y-4">
-
 <div class="field">
-<label>Current Address <span class="req">*</span></label>
+<label>Current Address *</label>
 <input name="current_address" class="input">
 </div>
 
@@ -122,82 +90,45 @@ Based on your O/L & A/L results
 <input name="permanent_address" class="input">
 </div>
 
+<div class="field">
+<label>Birthdate *</label>
+<input type="date" name="birthdate" class="input" required>
 </div>
 
 </div>
 
-<!-- ================= NIC ================= -->
 <div class="section-card">
-
-<h3 class="section-title">🪪 Identity Verification</h3>
-
-<p class="hint mb-3">
-Upload NIC to verify identity (Required for approval)
-</p>
-
-<div class="grid md:grid-cols-2 gap-4">
+<h3 class="section-title">🪪 NIC</h3>
 
 <div class="field">
 <label>NIC Number</label>
 <input name="nic_number" id="nic_number" class="input">
-<p id="nicError" class="error hidden">Invalid NIC format</p>
+<p id="nicError" class="error hidden">Invalid NIC</p>
 </div>
 
 <div class="field">
-<label>Upload NIC Copy</label>
+<label>NIC Copy</label>
 <input type="file" name="nic_copy" id="nicInput" class="input">
-<p class="hint">JPG/PNG, max 2MB</p>
 </div>
 
+<img id="nicPreview" class="preview-img hidden mt-3">
 </div>
 
-<img id="nicPreview" class="preview-img hidden mt-4">
-
-</div>
-
-<!-- ================= EDUCATION ================= -->
-<div class="section-card">
-
-<h3 class="section-title">🎓 Education</h3>
-
-<div class="field">
-<label>Highest Qualification</label>
-<input name="qualification" class="input">
-</div>
-
-</div>
-
-<!-- ================= PARENT ================= -->
+<!-- PARENT SECTION -->
 <div id="parentSection" class="section-card hidden">
 
-<h3 class="section-title">👨‍👩‍👧 Parent / Guardian Details</h3>
+<h3 class="section-title">👨‍👩‍👧 Parent Details</h3>
 
 <div class="grid md:grid-cols-2 gap-4">
 
-<div class="field">
-<label>Parent Name <span class="req">*</span></label>
-<input id="parent_name" name="parent_name" class="input">
-</div>
+<input id="parent_name" name="parent_name" placeholder="Parent Name" class="input">
+<input id="parent_email" name="parent_email" placeholder="Parent Email" class="input">
 
-<div class="field">
-<label>Parent Email <span class="req">*</span></label>
-<input id="parent_email" name="parent_email" class="input">
-</div>
+<input name="student_name" placeholder="Student Name" class="input">
 
-<div class="field">
-<label>Student Name <span class="req">*</span></label>
-<input name="student_name" class="input">
-</div>
+<input type="date" name="child_birthdate" class="input">
 
-<div class="field">
-<label>Student Age <span class="req">*</span></label>
-<input name="student_age" type="number" min="3" max="100" class="input">
-</div>
-
-<div class="field md:col-span-2">
-<label>Relationship</label>
-<input name="relationship" class="input">
-</div>
+<input name="relationship" placeholder="Relationship" class="input md:col-span-2">
 
 </div>
 
@@ -205,361 +136,120 @@ Upload NIC to verify identity (Required for approval)
 
 </div>
 
-<!-- ================= STEP 3 ================= -->
+<!-- STEP 3 -->
 <div class="step hidden" id="step3">
 
 <h3>📘 O/L Results</h3>
-
 <table id="olTable" class="table">
 <tr><th>Subject</th><th>Grade</th><th></th></tr>
 </table>
-
-<button type="button" onclick="addOL()">+ Add O/L</button>
+<button type="button" onclick="addOL()">+ Add</button>
 
 <h3 class="mt-4">📕 A/L Results</h3>
-
 <table id="alTable" class="table">
 <tr><th>Subject</th><th>Grade</th><th></th></tr>
 </table>
+<button type="button" onclick="addAL()">+ Add</button>
 
-<button type="button" onclick="addAL()">+ Add A/L</button>
-
-<!-- NOTES -->
-<textarea name="notes" placeholder="Additional Notes" class="input mt-4"></textarea>
+<textarea name="notes" placeholder="Notes" class="input mt-4"></textarea>
 
 </div>
 
 <!-- NAV -->
 <div class="nav">
-
 <button type="button" onclick="prevStep()">← Back</button>
-<button type="button" onclick="nextStep()" id="nextBtn">Next →</button>
+<button type="button" id="nextBtn" onclick="nextStep()">Next →</button>
 <button type="submit" id="submitBtn" class="hidden">Submit 🚀</button>
-
 </div>
 
 </form>
-
 </div>
 </div>
 
-<!-- JS -->
+<!-- ================= JS ================= -->
 <script>
 
-let step=1;
+let step = 1;
+
+const role_type = document.getElementById("role_type");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
 
 function showStep(s){
-document.querySelectorAll(".step").forEach(e=>e.classList.add("hidden"));
-document.getElementById("step"+s).classList.remove("hidden");
-document.getElementById("progressBar").style.width=(s*33)+"%";
+    document.querySelectorAll(".step").forEach(e=>e.classList.add("hidden"));
+    document.getElementById("step"+s).classList.remove("hidden");
 
-nextBtn.classList.toggle("hidden",s===3);
-submitBtn.classList.toggle("hidden",s!==3);
+    document.getElementById("progressBar").style.width = (s*33)+"%";
+
+    nextBtn.classList.toggle("hidden", s===3);
+    submitBtn.classList.toggle("hidden", s!==3);
 }
 
 function nextStep(){
-if(step===1 && !role_type.value){
-alert("Please select role");
-return;
-}
-step++; showStep(step);
+    if(!validateStep()) return;
+    step++;
+    showStep(step);
 }
 
 function prevStep(){
-if(step>1){step--; showStep(step);}
+    if(step > 1){
+        step--;
+        showStep(step);
+    }
 }
 
 // ROLE
 function selectRole(r){
-role_type.value=r;
+    role_type.value = r;
 
-studentCard.classList.remove("active");
-parentCard.classList.remove("active");
+    document.getElementById("studentCard").classList.remove("active");
+    document.getElementById("parentCard").classList.remove("active");
 
-if(r==="PARENT"){
-parentCard.classList.add("active");
-parentSection.classList.remove("hidden");
+    if(r === "PARENT"){
+        document.getElementById("parentCard").classList.add("active");
+        document.getElementById("parentSection").classList.remove("hidden");
 
-// autofill
-parent_name.value="{{ request.user.get_full_name|escapejs }}";
-parent_email.value="{{ request.user.email|escapejs }}";
+        document.getElementById("parent_name").value = "{{ request.user.get_full_name|escapejs }}";
+        document.getElementById("parent_email").value = "{{ request.user.email|escapejs }}";
 
-}else{
-studentCard.classList.add("active");
-parentSection.classList.add("hidden");
-}
-}
-
-// TABLES
-function addOL(){
-let r=olTable.insertRow();
-r.innerHTML=`<td><input name="ol_subject[]" class="input"></td>
-<td><select name="ol_grade[]" class="input">
-<option>A</option><option>B</option><option>C</option><option>S</option><option>F</option>
-</select></td>
-<td><button onclick="this.closest('tr').remove()">❌</button></td>`;
+    } else {
+        document.getElementById("studentCard").classList.add("active");
+        document.getElementById("parentSection").classList.add("hidden");
+    }
 }
 
-function addAL(){
-let r=alTable.insertRow();
-r.innerHTML=`<td><input name="al_subject[]" class="input"></td>
-<td><select name="al_grade[]" class="input">
-<option>A</option><option>B</option><option>C</option><option>S</option><option>F</option>
-</select></td>
-<td><button onclick="this.closest('tr').remove()">❌</button></td>`;
-}
-
-showStep(1);
-
-</script>
-
-
-<style>
-body { font-family: sans-serif; }
-
-.title {
-text-align:center;
-font-size:24px;
-margin-bottom:20px;
-}
-
-.back-btn {
-color:#555;
-text-decoration:none;
-}
-
-.progress .bar {
-width:100%;
-height:6px;
-background:#ddd;
-border-radius:10px;
-margin-bottom:20px;
-}
-
-#progressBar {
-height:6px;
-background:#2563eb;
-width:33%;
-border-radius:10px;
-transition:0.3s;
-}
-
-.role-grid {
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
-
-.role-card {
-border:2px solid #ddd;
-padding:20px;
-border-radius:12px;
-text-align:center;
-cursor:pointer;
-}
-
-.role-card.active {
-border-color:#2563eb;
-background:#eff6ff;
-}
-
-.input {
-width:100%;
-margin-top:10px;
-padding:8px;
-border-bottom:2px solid #ddd;
-}
-
-.table {
-width:100%;
-margin-top:10px;
-}
-
-.nav {
-display:flex;
-justify-content:space-between;
-margin-top:20px;
-}
-
-button {
-padding:8px 15px;
-border-radius:8px;
-}
-
-.hidden { display:none; }
-
-.section-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-.section-title {
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #374151;
-}
-
-.input {
-    width:100%;
-    padding:10px;
-    border:1px solid #ddd;
-    border-radius:8px;
-}
-
-.preview-img {
-    max-width:200px;
-    border-radius:10px;
-    border:1px solid #ddd;
-}
-
-.error {
-    color:#dc2626;
-    font-size:12px;
-}
-
-.score-box {
-    text-align:center;
-}
-
-.score-circle {
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    background:#2563eb;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    margin:auto;
-}
-.label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 4px;
-    color: #374151;
-}
-
-.hint {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.section-card {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    margin-top: 20px;
-}
-
-.section-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-.border-red-500 {
-    border: 1px solid #ef4444 !important;
-}
-</style>
-<script>
-
-function showError(input, message){
-    input.classList.add("border-red-500");
-    input.nextElementSibling?.remove();
-
-    let err = document.createElement("p");
-    err.className = "text-red-500 text-xs";
-    err.innerText = message;
-
-    input.parentNode.appendChild(err);
-}
-
-function clearErrors(){
-    document.querySelectorAll(".text-red-500").forEach(e=>e.remove());
-    document.querySelectorAll(".input").forEach(i=>i.classList.remove("border-red-500"));
-}
-
+// VALIDATION
 function validateStep(){
-
-    clearErrors();
 
     let valid = true;
 
-    // STEP 1
     if(step === 1){
         if(!role_type.value){
-            alert("Please select role");
+            alert("Select role");
             return false;
         }
     }
 
-    // STEP 2
     if(step === 2){
 
         const phone = document.querySelector("[name='phone']");
         const address = document.querySelector("[name='current_address']");
-        const nic = document.querySelector("[name='nic_number']");
 
-        if(!phone.value){
-            showError(phone, "Mobile number required");
-            valid = false;
-        } else if(!/^0\d{9}$/.test(phone.value)){
-            showError(phone, "Invalid phone number");
+        if(!/^0\d{9}$/.test(phone.value)){
+            alert("Invalid phone");
             valid = false;
         }
 
         if(!address.value){
-            showError(address, "Address required");
+            alert("Address required");
             valid = false;
-        }
-
-        if(nic.value && document.getElementById("nicError").classList.contains("hidden") === false){
-            showError(nic, "Invalid NIC");
-            valid = false;
-        }
-
-        // PARENT VALIDATION
-        if(role_type.value === "PARENT"){
-
-            const pname = document.getElementById("parent_name");
-            const pemail = document.getElementById("parent_email");
-            const sname = document.querySelector("[name='student_name']");
-            const sage = document.querySelector("[name='student_age']");
-
-            if(!pname.value){
-                showError(pname, "Parent name required");
-                valid = false;
-            }
-
-            if(!pemail.value || !/^\S+@\S+\.\S+$/.test(pemail.value)){
-                showError(pemail, "Valid email required");
-                valid = false;
-            }
-
-            if(!sname.value){
-                showError(sname, "Student name required");
-                valid = false;
-            }
-
-            if(!sage.value){
-                showError(sage, "Student age required");
-                valid = false;
-            }
         }
     }
 
-    // STEP 3
     if(step === 3){
-
-        const olRows = document.querySelectorAll("#olTable tr").length;
-        const alRows = document.querySelectorAll("#alTable tr").length;
-
-        if(olRows <= 1 && alRows <= 1){
-            alert("Please add at least O/L or A/L subjects");
+        if(document.querySelectorAll("#olTable tr").length <=1 &&
+           document.querySelectorAll("#alTable tr").length <=1){
+            alert("Add results");
             valid = false;
         }
     }
@@ -567,39 +257,130 @@ function validateStep(){
     return valid;
 }
 
-// OVERRIDE NEXT
-function nextStep(){
-    if(!validateStep()) return;
-    step++;
-    showStep(step);
+// TABLES
+function addOL(){
+    let r = olTable.insertRow();
+    r.innerHTML = `
+    <td><input name="ol_subject[]" class="input"></td>
+    <td>
+        <select name="ol_grade[]" class="input">
+        <option>A</option><option>B</option><option>C</option>
+        <option>S</option><option>F</option>
+        </select>
+    </td>
+    <td><button onclick="this.closest('tr').remove()">❌</button></td>`;
 }
 
-</script>
-<script>
+function addAL(){
+    let r = alTable.insertRow();
+    r.innerHTML = `
+    <td><input name="al_subject[]" class="input"></td>
+    <td>
+        <select name="al_grade[]" class="input">
+        <option>A</option><option>B</option><option>C</option>
+        <option>S</option><option>F</option>
+        </select>
+    </td>
+    <td><button onclick="this.closest('tr').remove()">❌</button></td>`;
+}
+
+// NIC validation + preview
+const nicInput = document.getElementById("nicInput");
+const preview = document.getElementById("nicPreview");
 
 nicInput.addEventListener("change", function(){
 
     const file = this.files[0];
 
-    if(file){
-        const allowed = ["image/jpeg", "image/png"];
+    if(!file) return;
 
-        if(!allowed.includes(file.type)){
-            alert("Only JPG or PNG allowed");
-            this.value = "";
-            return;
-        }
-
-        if(file.size > 2 * 1024 * 1024){
-            alert("Max file size 2MB");
-            this.value = "";
-            return;
-        }
-
-        preview.src = URL.createObjectURL(file);
-        preview.classList.remove("hidden");
+    if(!["image/jpeg","image/png"].includes(file.type)){
+        alert("Only JPG/PNG");
+        this.value="";
+        return;
     }
+
+    if(file.size > 2*1024*1024){
+        alert("Max 2MB");
+        this.value="";
+        return;
+    }
+
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
 });
 
+showStep(1);
+
 </script>
+
+<!-- ================= STYLE ================= -->
+<style>
+
+.title { text-align:center; font-size:24px; margin-bottom:20px; }
+
+.role-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.role-card {
+    border:2px solid #ddd;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.role-card.active {
+    border-color:#2563eb;
+    background:#eff6ff;
+}
+
+.input {
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    margin-top:5px;
+}
+
+.section-card {
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    margin-top:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.table { width:100%; margin-top:10px; }
+
+.nav {
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+}
+
+.hidden { display:none; }
+
+.preview-img {
+    max-width:200px;
+    border-radius:10px;
+}
+
+.error { color:red; font-size:12px; }
+
+.progress .bar {
+    width:100%;
+    height:6px;
+    background:#ddd;
+    border-radius:10px;
+}
+
+#progressBar {
+    height:6px;
+    background:#2563eb;
+    width:33%;
+    border-radius:10px;
+}
+
+</style>
+
 {% endblock %}

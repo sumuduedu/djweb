@@ -11,6 +11,7 @@ urlpatterns = [
 
     # ================= PUBLIC WEBSITE =================
     path('', include('apps.website.urls')),
+    path("careers/", include("apps.careers.urls")),
 
     # ================= ACCOUNTS (AUTH + PROFILE) =================
     path('accounts/', include('apps.accounts.urls')),
@@ -21,6 +22,7 @@ urlpatterns = [
     path('app/batches/', include('apps.batch.urls')),
     path('app/enrollment/', include('apps.enrollment.urls')),
     path('app/schedule/', include('apps.scheduling.urls')),
+
 
     # ================= OPTIONAL =================
     path('auth/', include('allauth.urls')),  # only if used

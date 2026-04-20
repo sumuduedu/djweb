@@ -1,4 +1,12 @@
-from .menu import ADMIN_MENU,STUDENT_MENU,GUEST_MENU
+from .menu import (
+    ADMIN_MENU,
+    STAFF_MENU,
+    TEACHER_MENU,
+    STUDENT_MENU,
+    PARENT_MENU,
+    ALUMNI_MENU,
+    GUEST_MENU,
+)
 
 
 def user_roles(request):
@@ -50,32 +58,47 @@ def remove_duplicates(menu):
 #         "notification_count": 5,
 #         "risk_count": 3,
 #     }
+
 def sidebar_menu(request):
     user = request.user
 
-    print("USER:", user)
-    print("AUTH:", user.is_authenticated)
+    # 🔒 Not logged in → guest menu
+    if not user.is_authenticated:
+        return {
+            "sidebar_items": remove_duplicates(GUEST_MENU),
+            "user_role": "GUEST",
+        }
 
-    if user.is_authenticated:
-        print("CHECKING ROLES...")
+    # 🎯 Role priority (top → bottom)
+    if user.is_superuser:
+        role = "ADMIN"
+        menu = ADMIN_MENU
 
-        if user.is_superuser:
-            print("ADMIN")
-            menu = remove_duplicates(ADMIN_MENU)
+    elif hasattr(user, "staff"):
+        role = "STAFF"
+        menu = STAFF_MENU
 
-        elif hasattr(user, 'student'):
-            print("STUDENT DETECTED")
-            menu = remove_duplicates(STUDENT_MENU)
+    elif hasattr(user, "teacher"):
+        role = "TEACHER"
+        menu = TEACHER_MENU
 
-        else:
-            print("GUEST")
-            menu = remove_duplicates(GUEST_MENU)
+    elif hasattr(user, "student"):
+        role = "STUDENT"
+        menu = STUDENT_MENU
+
+    elif hasattr(user, "parent"):
+        role = "PARENT"
+        menu = PARENT_MENU
+
+    elif hasattr(user, "alumni"):
+        role = "ALUMNI"
+        menu = ALUMNI_MENU
 
     else:
-        menu = []
-
-    print("MENU:", menu)
+        role = "GUEST"
+        menu = GUEST_MENU
 
     return {
-        "sidebar_items": menu,
+        "sidebar_items": remove_duplicates(menu),
+        "user_role": role,  # useful in templates
     }
