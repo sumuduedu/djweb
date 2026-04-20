@@ -1,4 +1,4 @@
-from .menu import ADMIN_MENU,STUDENT_MENU
+from .menu import ADMIN_MENU,STUDENT_MENU,GUEST_MENU
 
 
 def user_roles(request):
@@ -11,6 +11,7 @@ def user_roles(request):
         'is_staff_user': user.is_authenticated and hasattr(user, 'staff'),
         'is_parent': user.is_authenticated and hasattr(user, 'parent'),
         'is_alumni': user.is_authenticated and hasattr(user, 'alumni'),
+        'is_guest': user.is_authenticated and hasattr(user, 'guest'),
     }
 
 
@@ -52,21 +53,29 @@ def remove_duplicates(menu):
 def sidebar_menu(request):
     user = request.user
 
+    print("USER:", user)
+    print("AUTH:", user.is_authenticated)
+
     if user.is_authenticated:
+        print("CHECKING ROLES...")
+
         if user.is_superuser:
+            print("ADMIN")
             menu = remove_duplicates(ADMIN_MENU)
 
         elif hasattr(user, 'student'):
+            print("STUDENT DETECTED")
             menu = remove_duplicates(STUDENT_MENU)
 
         else:
-            menu = []
+            print("GUEST")
+            menu = remove_duplicates(GUEST_MENU)
 
     else:
         menu = []
 
+    print("MENU:", menu)
+
     return {
         "sidebar_items": menu,
-        "notification_count": 5,
-        "risk_count": 3,
     }

@@ -317,3 +317,13 @@ PARENT_MENU = [
         ]
     }
 ]
+
+GUEST_MENU = [
+    {
+        "section": "Guest Panel",
+        "items": [
+            {"name": "Dashboard", "icon": "🏠", "url": "core:guest_dashboard"},
+        ]
+    }
+
+]
