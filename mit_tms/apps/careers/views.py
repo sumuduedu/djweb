@@ -44,27 +44,45 @@ class JobDetailView(DetailView):
 # ========================
 # 📝 APPLY JOB
 # ========================
+from django.views.generic import CreateView
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 class ApplyJobView(LoginRequiredMixin, CreateView):
     model = Application
     fields = ["cv", "cover_letter"]
     template_name = "careers/apply_job.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # 🔥 Always load job once
+        self.job = get_object_or_404(Job, pk=self.kwargs["pk"])
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        job = get_object_or_404(Job, pk=self.kwargs["pk"])
 
-        # prevent duplicate apply
-        if Application.objects.filter(user=self.request.user, job=job).exists():
+        # prevent duplicate
+        if Application.objects.filter(user=self.request.user, job=self.job).exists():
             messages.warning(self.request, "You already applied.")
-            return redirect("careers:job_detail", pk=job.pk)
+            return redirect("careers:job_detail", pk=self.job.pk)
 
+        # assign values BEFORE save
         form.instance.user = self.request.user
-        form.instance.job = job
+        form.instance.job = self.job
 
-        messages.success(self.request, "Application submitted.")
+        messages.success(self.request, "Application submitted successfully.")
+
         return super().form_valid(form)
 
     def get_success_url(self):
-        return self.object.job.get_absolute_url() if hasattr(self.object.job, "get_absolute_url") else "/careers/jobs/"
+        # 🔥 SAFE redirect (no dependency on get_absolute_url)
+        return redirect("careers:job_detail", pk=self.job.pk).url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["job"] = self.job
+        context["profile"] = getattr(self.request.user, "studentprofile", None)
+        return context
 
 
 # ========================
@@ -181,6 +199,7 @@ class StudentProfileView(LoginRequiredMixin, UpdateView):
     template_name = "careers/student_profile.html"
     success_url = reverse_lazy("careers:profile")
 
+
     def get_object(self):
         profile, created = StudentProfile.objects.get_or_create(user=self.request.user)
         return profile
@@ -232,3 +251,15 @@ class StudentDetailView(DetailView):
     model = StudentProfile
     template_name = "careers/student_detail.html"
     context_object_name = "student"
+
+    def get_object(self):
+        student = super().get_object()
+
+        # 🔥 FIX skills for template
+        student.skills_list = [
+            s.strip().title()
+            for s in (student.skills or "").split(",")
+            if s.strip()
+        ]
+
+        return student

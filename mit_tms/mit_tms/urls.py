@@ -22,6 +22,9 @@ urlpatterns = [
     path('app/batches/', include('apps.batch.urls')),
     path('app/enrollment/', include('apps.enrollment.urls')),
     path('app/schedule/', include('apps.scheduling.urls')),
+    # mit_tms/urls.py
+    path("app/lessons/", include("apps.lessonplan.urls", namespace="lessonplan")),
+
 
 
     # ================= OPTIONAL =================

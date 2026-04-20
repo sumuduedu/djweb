@@ -1,12 +1,11 @@
 from .base import BaseView
 from apps.core.gateway import get_student_enrollments
-from apps.enrollment.models import EnrollmentInquiry
+from apps.careers.models import Job, Application
 
 
-from apps.enrollment.models import EnrollmentInquiry
-from apps.courses.models import Assessment
-
-
+# ================================
+# 🎓 STUDENT DASHBOARD
+# ================================
 class StudentDashboardView(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/student.html"
@@ -17,19 +16,34 @@ class StudentDashboardView(BaseView):
 
         user = self.request.user
 
+        # 📚 Enrollments
+        context["enrollments"] = get_student_enrollments(user)
+
+        # 💼 Jobs (limit for performance)
+        jobs = Job.objects.filter(is_active=True).order_by("-created_at")[:6]
+        context["jobs"] = jobs
+
+        # 📄 Applications
+        applications = Application.objects.filter(user=user).select_related("job")
+        context["applications"] = applications
+
+        # 🔥 Applied jobs (for UI check)
+        context["applied_job_ids"] = set(
+            applications.values_list("job_id", flat=True)
+        )
+
+        # 📊 Simple stats (optional)
+        context["total_applications"] = applications.count()
 
         return context
+
+
 # ================================
 # 📚 COURSES
 # ================================
 class StudentCoursesView(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/students/courses.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        return context
 
 
 # ================================
@@ -121,14 +135,15 @@ class StudentReceiptsView(BaseView):
 
 
 # ================================
-# 🧠 INSIGHTS (🔥 IMPORTANT)
+# 🧠 INSIGHTS
 # ================================
 class StudentInsights(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/students/insights.html"
 
+
 # ================================
-# ⚠️ STUDENT RISK (🔥 IMPORTANT)
+# ⚠️ STUDENT RISK
 # ================================
 class StudentRiskView(BaseView):
     allowed_roles = ['STUDENT']
@@ -137,13 +152,10 @@ class StudentRiskView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        user = self.request.user
-
         # 🔥 TEMP LOGIC (replace with ML later)
-        attendance = 60   # example
-        progress = 50     # example
+        attendance = 60
+        progress = 50
 
-        # Simple rule-based risk (temporary)
         if attendance < 50 or progress < 40:
             risk_level = "HIGH"
         elif attendance < 70:
@@ -159,8 +171,9 @@ class StudentRiskView(BaseView):
 
         return context
 
+
 # ================================
-# 💡 STUDENT RECOMMENDATIONS (🔥 IMPORTANT)
+# 💡 RECOMMENDATIONS
 # ================================
 class StudentRecommendationsView(BaseView):
     allowed_roles = ['STUDENT']
@@ -169,14 +182,13 @@ class StudentRecommendationsView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # 🔥 TEMP DATA (replace later with real + ML)
+        # 🔥 TEMP DATA (replace later with ML)
         attendance = 55
         progress = 45
         pending_tasks = 3
 
         recommendations = []
 
-        # Rule-based recommendations (for now)
         if attendance < 60:
             recommendations.append("Improve attendance by attending all sessions")
 

@@ -62,18 +62,32 @@ class Job(models.Model):
 # =========================
 # 👨‍🎓 STUDENT PROFILE (CV SYSTEM)
 # =========================
+from django.db import models
+from django.contrib.auth.models import User
+
+
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     full_name = models.CharField(max_length=255)
     bio = models.TextField(blank=True)
 
-    skills = models.TextField(help_text="Comma separated skills (e.g. Python, Excel)")
+    skills = models.TextField(
+        help_text="Comma separated skills (e.g. Python, Excel)"
+    )
+
+    # 🔥 Structured profile fields
+    education = models.TextField(blank=True)
+    training = models.TextField(blank=True)
     experience = models.TextField(blank=True)
 
-    cv = models.FileField(upload_to="cvs/")
+    # 📄 CV
+    cv = models.FileField(upload_to="cvs/", blank=True, null=True)
+
+    # 🌐 Visibility
     is_public = models.BooleanField(default=True)
 
+    # 🕒 Metadata
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

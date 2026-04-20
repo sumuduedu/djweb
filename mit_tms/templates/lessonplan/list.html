@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="p-6 space-y-6">
+
+    <!-- 🔷 HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">📘 Lesson Plans</h1>
+            <p class="text-gray-500 text-sm">Plan, manage, and track your teaching flow</p>
+        </div>
+
+        <a href="{% url 'lessonplan:create' %}"
+           class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl shadow hover:scale-105 transition">
+            ➕ Create Lesson
+        </a>
+    </div>
+
+    <!-- 🔍 SEARCH + FILTER -->
+    <div class="bg-white p-4 rounded-2xl shadow flex flex-col md:flex-row gap-3">
+
+        <input type="text" id="search"
+               placeholder="Search lesson title..."
+               class="flex-1 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+
+        <select id="filterCourse" class="px-4 py-2 border rounded-xl">
+            <option value="">All Courses</option>
+            {% for lesson in lessons %}
+                {% if lesson.task and lesson.task.module and lesson.task.module.course %}
+                <option value="{{ lesson.task.module.course.title }}">
+                    {{ lesson.task.module.course.title }}
+                </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+    </div>
+
+    <!-- 🔷 GRID VIEW (modern UI) -->
+    <div id="lessonContainer"
+         class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        {% for lesson in lessons %}
+        <div class="lesson-card bg-white p-5 rounded-2xl shadow hover:shadow-xl transition border border-gray-100"
+             data-title="{{ lesson.title|lower }}"
+             data-course="{{ lesson.task.module.course.title|default:'' }}">
+
+            <!-- Title -->
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">
+                {{ lesson.title }}
+            </h2>
+
+            <!-- Meta -->
+            <div class="text-sm text-gray-500 space-y-1 mb-3">
+                <p>📚 {{ lesson.task.module.course.title|default:"No Course" }}</p>
+                <p>📦 {{ lesson.task.module.title|default:"No Module" }}</p>
+                <p>📝 {{ lesson.task.title|default:"No Task" }}</p>
+            </div>
+
+            <!-- Info badges -->
+            <div class="flex justify-between items-center text-sm mb-4">
+                <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                    ⏱ {{ lesson.duration_minutes }} min
+                </span>
+
+                {% if lesson.date %}
+                <span class="bg-green-100 text-green-700 px-2 py-1 rounded">
+                    {{ lesson.date }}
+                </span>
+                {% else %}
+                <span class="bg-gray-100 text-gray-500 px-2 py-1 rounded">
+                    No Date
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-between items-center text-sm">
+
+                <a href="{% url 'lessonplan:detail' lesson.id %}"
+                   class="text-blue-600 hover:underline">
+                    View
+                </a>
+
+                <div class="flex gap-3">
+                    <a href="{% url 'lessonplan:update' lesson.id %}"
+                       class="text-yellow-600 hover:underline">
+                        Edit
+                    </a>
+
+                    <a href="{% url 'lessonplan:delete' lesson.id %}"
+                       class="text-red-600 hover:underline">
+                        Delete
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center text-gray-500 py-10">
+            No lesson plans found.
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- 🔥 INTERACTIVITY -->
+<script>
+const searchInput = document.getElementById("search");
+const filterCourse = document.getElementById("filterCourse");
+const cards = document.querySelectorAll(".lesson-card");
+
+function filterLessons() {
+    const search = searchInput.value.toLowerCase();
+    const course = filterCourse.value.toLowerCase();
+
+    cards.forEach(card => {
+        const title = card.dataset.title;
+        const courseName = card.dataset.course.toLowerCase();
+
+        const matchSearch = title.includes(search);
+        const matchCourse = course === "" || courseName.includes(course);
+
+        if (matchSearch && matchCourse) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+
+searchInput.addEventListener("keyup", filterLessons);
+filterCourse.addEventListener("change", filterLessons);
+</script>
+
+{% endblock %}

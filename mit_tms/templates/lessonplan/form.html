@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-5xl mx-auto p-6 space-y-6">
+
+    <!-- 🔷 HEADER -->
+    <div>
+        <h2 class="text-3xl font-bold text-gray-800">📘 Lesson Plan</h2>
+        <p class="text-gray-500 text-sm">Create and structure your lesson flow</p>
+    </div>
+
+    <form method="post" class="space-y-6 bg-white p-6 rounded-2xl shadow">
+        {% csrf_token %}
+
+        <!-- 🔹 LESSON FIELDS -->
+        <div class="grid md:grid-cols-2 gap-4">
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-semibold mb-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-500 text-sm">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 🔥 ACTIVITIES -->
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-semibold">🪜 Activities</h3>
+                <span class="text-xs text-gray-400">Drag to reorder</span>
+            </div>
+
+            <div id="activity-list" class="space-y-3">
+
+                {{ activities.management_form }}
+
+                {% for form in activities %}
+                <div class="activity-item bg-gray-50 border rounded-xl p-4 shadow-sm flex gap-3 items-start">
+
+                    <!-- Drag handle -->
+                    <div class="cursor-move text-gray-400 text-xl pt-2">☰</div>
+
+                    <div class="flex-1">
+
+                        {{ form.id }}
+
+                        <!-- Row -->
+                        <div class="grid md:grid-cols-2 gap-3">
+
+                            <div>
+                                <label class="text-sm font-medium">Type</label>
+                                {{ form.activity_type }}
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium">Duration (min)</label>
+                                {{ form.duration_minutes }}
+                            </div>
+
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mt-2">
+                            <label class="text-sm font-medium">Description</label>
+                            {{ form.description }}
+                        </div>
+
+                        <!-- Hidden order -->
+                        {{ form.order }}
+
+                        <!-- Delete -->
+                        {% if form.instance.pk %}
+                        <div class="mt-2 text-red-600 text-sm">
+                            {{ form.DELETE }} Delete
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- 🔘 ACTIONS -->
+        <div class="flex justify-end gap-3">
+            <a href="{% url 'lessonplan:list' %}"
+               class="px-4 py-2 rounded-xl border text-gray-600 hover:bg-gray-100">
+                Cancel
+            </a>
+
+            <button class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-xl shadow hover:scale-105 transition">
+                Save Lesson Plan
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- 🔥 SORTABLE -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<script>
+const list = document.getElementById("activity-list");
+
+new Sortable(list, {
+    animation: 150,
+    handle: ".cursor-move",   // 🔥 better UX
+
+    onEnd: function () {
+        updateOrder();
+    }
+});
+
+function updateOrder() {
+    const items = document.querySelectorAll(".activity-item");
+
+    items.forEach((item, index) => {
+        const orderInput = item.querySelector("input[name$='-order']");
+        if (orderInput) {
+            orderInput.value = index;
+        }
+    });
+}
+</script>
+
+<!-- Hide order field -->
+<style>
+input[name$='-order'] {
+    display: none;
+}
+</style>
+
+{% endblock %}

@@ -2,37 +2,38 @@
 {% block content %}
 
 <div class="p-6 bg-gray-100 min-h-screen">
-
+<a href="{% url 'careers:profile' %}">
+    Complete Profile →
+</a>
     <!-- HEADER -->
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">🎓 Student Dashboard</h1>
-            <p class="text-gray-500">Welcome back, {{ student.full_name }}</p>
+            <p class="text-gray-500">
+                Welcome back, {{ profile.full_name|default:request.user.username }}
+            </p>
+
+            <!-- Quick Actions -->
+            <div class="mt-2 flex gap-4 text-sm">
+                <a href="{% url 'careers:job_list' %}" class="text-blue-600 hover:underline">
+                    Browse Jobs
+                </a>
+                <a href="{% url 'careers:profile' %}" class="text-blue-600 hover:underline">
+                    Edit Profile
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- 🚨 SMART ALERTS -->
     {% if risk_level == "HIGH" %}
-    <div class="bg-red-100 text-red-800 p-4 rounded-xl mb-6">
-        ⚠️ You are at risk of underperforming. Please complete pending tasks and contact your instructor.
-    </div>
+        <div class="bg-red-100 text-red-800 p-4 rounded-xl mb-6">
+            ⚠️ You are at risk of underperforming.
+        </div>
     {% elif risk_level == "MEDIUM" %}
-    <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl mb-6">
-        ⚡ Your performance is dropping. Try to stay consistent!
-    </div>
-    {% endif %}
-
-    <!-- 🔔 STATUS ALERTS -->
-    {% if approved_apps and not enrollments %}
-    <div class="bg-blue-100 text-blue-800 p-4 rounded-xl mb-6">
-        🎉 Your application has been approved! Waiting for batch assignment...
-    </div>
-    {% endif %}
-
-    {% if enrollments %}
-    <div class="bg-green-100 text-green-800 p-4 rounded-xl mb-6">
-        ✔ You are enrolled in {{ enrollments|length }} course(s)
-    </div>
+        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl mb-6">
+            ⚡ Your performance is dropping.
+        </div>
     {% endif %}
 
     <!-- 📊 STATS -->
@@ -40,163 +41,143 @@
 
         <div class="bg-white p-5 rounded-2xl shadow">
             <h3 class="text-gray-500 text-sm">My Courses</h3>
-            <p class="text-3xl font-bold text-blue-600">{{ enrollments|length }}</p>
+            <p class="text-3xl font-bold text-blue-600">
+                {{ enrollments|length|default:0 }}
+            </p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
             <h3 class="text-gray-500 text-sm">Pending Tasks</h3>
-            <p class="text-3xl font-bold text-red-600">{{ pending_tasks_count }}</p>
+            <p class="text-3xl font-bold text-red-600">
+                {{ pending_tasks_count|default:0 }}
+            </p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
             <h3 class="text-gray-500 text-sm">Completed Tasks</h3>
-            <p class="text-3xl font-bold text-green-600">{{ completed_tasks_count }}</p>
+            <p class="text-3xl font-bold text-green-600">
+                {{ completed_tasks_count|default:0 }}
+            </p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow">
-            <h3 class="text-gray-500 text-sm">Overall Progress</h3>
-            <p class="text-3xl font-bold text-purple-600">{{ progress }}%</p>
+            <h3 class="text-gray-500 text-sm">Progress</h3>
+            <p class="text-3xl font-bold text-purple-600">
+                {{ progress|default:0 }}%
+            </p>
         </div>
 
     </div>
-
 
     <!-- 🎓 COURSES -->
-    <div class="bg-white p-6 rounded-2xl shadow">
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">My Courses</h2>
 
-        <h2 class="text-xl font-semibold mb-4">My Courses & Batches</h2>
+        {% for e in enrollments %}
+        <div class="border p-4 rounded mb-3">
+            <h3 class="font-bold text-blue-600">
+                {{ e.batch.course.title|default:"Course" }}
+            </h3>
+            <p class="text-sm text-gray-500">
+                Batch: {{ e.batch.name|default:"N/A" }}
+            </p>
+        </div>
+        {% empty %}
+            <p class="text-gray-400">No courses yet</p>
+        {% endfor %}
+    </div>
 
-        {% if enrollments %}
-        <div class="grid md:grid-cols-2 gap-6">
+    <!-- 📅 TASKS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4">Upcoming Tasks</h2>
 
-            {% for e in enrollments %}
-            <div class="border rounded-xl p-5 hover:shadow-lg transition">
-
-                <h3 class="text-lg font-bold text-blue-600">
-                    {{ e.batch.course.title }}
-                </h3>
-
-                <p class="text-sm text-gray-600 mt-1">
-                    📦 Batch: {{ e.batch.name }}
-                </p>
-
-                <p class="text-sm text-gray-500">
-                    👨‍🏫 Teacher: {{ e.batch.teacher|default:"Not assigned" }}
-                </p>
-
-                <span class="inline-block mt-3 text-xs px-2 py-1 rounded
-                    {% if e.status == 'ACTIVE' %}
-                        bg-green-100 text-green-700
-                    {% elif e.status == 'COMPLETED' %}
-                        bg-blue-100 text-blue-700
-                    {% else %}
-                        bg-red-100 text-red-700
-                    {% endif %}
-                ">
-                    {{ e.status }}
-                </span>
-
-                <div class="mt-4">
-                    <a href="{% url 'batch:batch_detail' e.batch.id %}"
-                       class="inline-block text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        View Details →
-                    </a>
-                </div>
-
+        {% for task in upcoming_tasks %}
+            <div class="border p-3 rounded mb-2 flex justify-between">
+                <span>{{ task.title }}</span>
+                <span class="text-sm text-gray-500">{{ task.due_date }}</span>
             </div>
-            {% endfor %}
-
-        </div>
-        {% else %}
-        <div class="text-center py-10 text-gray-500">
-            🚫 You are not enrolled in any courses yet.
-        </div>
-        {% endif %}
-
-    </div>
-
-    <!-- 📈 PROGRESS BAR -->
-    <div class="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 class="text-lg font-semibold mb-3">Progress Tracker</h2>
-        <div class="w-full bg-gray-200 rounded-full h-4">
-            <div class="bg-blue-600 h-4 rounded-full" style="width: {{ progress }}%"></div>
-        </div>
-    </div>
-
-    <!-- 📅 DEADLINES & TASKS -->
-    <div class="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 class="text-xl font-semibold mb-4">Upcoming Deadlines</h2>
-
-        {% if upcoming_tasks %}
-            <ul class="space-y-3">
-                {% for task in upcoming_tasks %}
-                <li class="p-3 border rounded-lg flex justify-between">
-                    <span>{{ task.title }}</span>
-                    <span class="text-sm text-gray-500">Due: {{ task.due_date }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500">No upcoming deadlines 🎉</p>
-        {% endif %}
-    </div>
-
-    <!-- 📝 ASSIGNMENTS -->
-    <div class="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 class="text-xl font-semibold mb-4">Assignments</h2>
-
-        {% if assignments %}
-        <ul class="space-y-3">
-            {% for a in assignments %}
-            <li class="p-3 border rounded-lg flex justify-between items-center">
-                <div>
-                    <p class="font-medium">{{ a.title }}</p>
-                    <p class="text-xs text-gray-500">Status: {{ a.status }}</p>
-                </div>
-                <a href="#" class="text-blue-600 text-sm">View →</a>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-gray-500">No assignments available</p>
-        {% endif %}
+        {% empty %}
+            <p class="text-gray-400">No upcoming tasks 🎉</p>
+        {% endfor %}
     </div>
 
     <!-- 🏆 RESULTS -->
     <div class="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 class="text-xl font-semibold mb-4">Grades / Results</h2>
+        <h2 class="text-xl font-semibold mb-4">Results</h2>
 
-        {% if results %}
-        <ul class="space-y-2">
-            {% for r in results %}
-            <li class="flex justify-between border-b pb-2">
+        {% for r in results %}
+            <div class="flex justify-between border-b pb-2">
                 <span>{{ r.course }}</span>
                 <span class="font-bold">{{ r.grade }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-gray-500">No results yet</p>
-        {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-gray-400">No results yet</p>
+        {% endfor %}
     </div>
 
-    <!-- 🔔 NOTIFICATIONS -->
+    <!-- 💼 CAREER -->
     <div class="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 class="text-xl font-semibold mb-4">Notifications</h2>
+        <h2 class="text-xl font-bold mb-4">💼 Career Opportunities</h2>
 
-        {% if notifications %}
-        <ul class="space-y-3">
-            {% for n in notifications %}
-            <li class="p-3 bg-gray-50 rounded-lg">
-                {{ n.message }}
-            </li>
+        <div class="grid md:grid-cols-2 gap-4">
+
+            {% for job in jobs %}
+            <div class="border p-4 rounded">
+
+                <h3 class="font-semibold">{{ job.title }}</h3>
+                <p class="text-sm text-gray-500">{{ job.location }}</p>
+
+                <div class="mt-3 flex justify-between items-center">
+
+                    <a href="{% url 'careers:job_detail' job.id %}"
+                       class="text-blue-600 text-sm">
+                        View →
+                    </a>
+
+                    {% if is_student %}
+                        {% if job.id in applied_job_ids %}
+                            <span class="text-green-600 text-xs">✔ Applied</span>
+                        {% else %}
+                            <a href="{% url 'careers:apply_job' job.id %}"
+                               class="bg-blue-600 text-white px-2 py-1 text-xs rounded">
+                                Apply
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-gray-400 text-xs">Students only</span>
+                    {% endif %}
+
+                </div>
+
+            </div>
+            {% empty %}
+                <p class="text-gray-400">No jobs available</p>
             {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-gray-500">No new notifications</p>
-        {% endif %}
+
+        </div>
     </div>
 
+    <!-- 📄 APPLICATIONS -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+        <h2 class="text-lg font-semibold mb-4">📄 My Applications</h2>
+
+        {% for app in applications %}
+            <div class="border p-3 rounded mb-2 flex justify-between items-center">
+                <span>{{ app.job.title }}</span>
+
+                <div class="flex gap-3 items-center">
+                    <span class="text-blue-600 text-sm">{{ app.status }}</span>
+
+                    <a href="{% url 'careers:job_detail' app.job.id %}"
+                       class="text-blue-500 text-xs">
+                        View
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-gray-400">No applications yet</p>
+        {% endfor %}
+    </div>
 
 </div>
 

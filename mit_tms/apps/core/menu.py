@@ -130,6 +130,8 @@ TEACHER_MENU = [
             {"name": "Batches", "icon": "📦", "url": "batch:batch_list"},
             {"name": "Timetable", "icon": "🗓️", "url": "schedule:timetable_list"},
             {"name": "Materials", "icon": "📂", "url": "core:teacher_materials"},
+            {"name": "Lesson Plan", "icon": "📂", "url": "lessonplan:list"},
+
         ]
     },
     {

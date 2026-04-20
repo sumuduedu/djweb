@@ -10,41 +10,55 @@ class BaseView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
 
-        # Ensure profile exists
-        self.profile, _ = Profile.objects.get_or_create(user=user)
+        # 🔥 Get profile ONCE (no unnecessary writes)
+        self.profile = getattr(user, "profile", None)
 
-        # 🔥 SUPERUSER OVERRIDE (VERY IMPORTANT)
+        if not self.profile:
+            self.profile = Profile.objects.create(user=user)
+
+        # 🔥 SUPERUSER OVERRIDE
         if user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
-        # Normalize role (avoid case issues)
-        user_role = (self.profile.role or "").upper()
+        # Normalize role
+        self.role = (self.profile.role or "").upper()
 
-        # Role check
+        # 🔥 Role check
         if self.allowed_roles:
             allowed = [r.upper() for r in self.allowed_roles]
 
-            if user_role not in allowed:
+            if self.role not in allowed:
                 raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
 
+    # 🔥 Helper methods (VERY USEFUL)
+    def has_role(self, *roles):
+        return self.role in [r.upper() for r in roles]
+
+    def is_student(self):
+        return self.role == "STUDENT"
+
+    def is_teacher(self):
+        return self.role == "TEACHER"
+
+    def is_admin(self):
+        return self.role == "ADMIN" or self.request.user.is_superuser
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        role = (self.profile.role or "").upper()
-
         context.update({
             "profile": self.profile,
-            "role": role,
+            "role": self.role,
 
-            # Role flags (used in sidebar/templates)
-            "is_admin": role == "ADMIN" or self.request.user.is_superuser,
-            "is_staff": role == "STAFF",
-            "is_teacher": role == "TEACHER",
-            "is_student": role == "STUDENT",
-            "is_parent": role == "PARENT",
-            "is_guest": role == "GUEST",
+            # 🔥 Role flags (clean + reusable)
+            "is_admin": self.is_admin(),
+            "is_staff": self.has_role("STAFF"),
+            "is_teacher": self.is_teacher(),
+            "is_student": self.is_student(),
+            "is_parent": self.has_role("PARENT"),
+            "is_guest": self.has_role("GUEST"),
         })
 
         return context
