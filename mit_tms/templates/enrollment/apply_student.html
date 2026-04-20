@@ -1,146 +1,128 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
-<div class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+<div class="min-h-screen bg-gray-100 py-10 px-4">
 
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow p-8">
+<div class="max-w-3xl mx-auto bg-white rounded-2xl shadow p-8">
 
-        <!-- 🔷 HEADER -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">
-            🎓 Apply for {{ course.title }}
-        </h2>
+<h2 class="text-2xl font-bold mb-4">
+🎓 Apply for {{ course.title }}
+</h2>
 
-        <p class="text-gray-500 mb-6">
-            Submit your details to enroll in this course.
-        </p>
+<form method="post" enctype="multipart/form-data" class="space-y-5">
+{% csrf_token %}
 
-        <!-- 🔔 STATUS MESSAGE -->
-        {% if application %}
+<!-- ROLE -->
+<select name="role_type" id="role_type" class="input-field">
+    <option value="STUDENT">Student</option>
+    <option value="PARENT">Parent</option>
+</select>
 
-            {% if application.status == 'PENDING' %}
-                <div class="bg-yellow-100 text-yellow-800 p-3 rounded mb-5 text-sm">
-                    ⏳ Your application is under review.
-                </div>
+<!-- USER -->
+<input value="{{ user.get_full_name }}" class="input-field bg-gray-100" readonly>
+<input value="{{ user.email }}" class="input-field bg-gray-100" readonly>
 
-            {% elif application.status == 'APPROVED' %}
-                <div class="bg-green-100 text-green-800 p-3 rounded mb-5 text-sm">
-                    ✔ Your application has been approved.
-                </div>
+<!-- CONTACT -->
+<input name="phone" placeholder="Mobile Number" class="input-field" required>
+<input name="home_phone" placeholder="Home Telephone" class="input-field">
 
-            {% elif application.status == 'REJECTED' %}
-                <div class="bg-red-100 text-red-800 p-3 rounded mb-5 text-sm">
-                    ❌ Your application was rejected.
-                    {% if application.rejection_reason %}
-                        <div class="mt-1 text-xs">
-                            Reason: {{ application.rejection_reason }}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endif %}
+<!-- ADDRESS -->
+<textarea name="current_address" placeholder="Current Address" class="input-field" required></textarea>
+<textarea name="permanent_address" placeholder="Permanent Address" class="input-field" required></textarea>
 
-        {% endif %}
+<!-- NIC -->
+<input name="nic_number" placeholder="NIC Number" class="input-field">
+<input type="file" name="nic_copy" class="input-field">
 
-        <!-- 🔥 FORM -->
-        <form method="post" class="space-y-5">
-            {% csrf_token %}
+<!-- QUALIFICATION -->
+<!-- QUALIFICATION -->
+<div class="space-y-4">
 
-            <!-- FULL NAME -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
-                </label>
-                <input type="text"
-                       value="{{ request.user.get_full_name|default:request.user.username }}"
-                       disabled
-                       class="w-full px-4 py-2 border rounded-lg bg-gray-100">
-            </div>
+<h3 class="font-semibold text-gray-700">🎓 Qualification</h3>
 
-            <!-- EMAIL -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                </label>
-                <input type="email"
-                       value="{{ request.user.email }}"
-                       disabled
-                       class="w-full px-4 py-2 border rounded-lg bg-gray-100">
-            </div>
+<!-- O/L -->
+<div>
+<h4 class="font-medium">📘 O/L Results</h4>
 
-            <!-- PHONE -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                </label>
-                <input type="text"
-                       name="phone"
-                       value="{{ application.phone|default:'' }}"
-                       required
-                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none
-                       {% if application and application.status != 'REJECTED' %}bg-gray-100{% endif %}"
-                       {% if application and application.status != 'REJECTED' %}readonly{% endif %}>
-            </div>
+<table id="olTable" class="w-full border text-sm mt-2">
+<tr class="bg-gray-100">
+<th class="p-2">Subject</th>
+<th class="p-2">Grade</th>
+<th></th>
+</tr>
+</table>
 
-            <!-- ADDRESS -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Address
-                </label>
-                <textarea name="address"
-                          rows="3"
-                          required
-                          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none
-                          {% if application and application.status != 'REJECTED' %}bg-gray-100{% endif %}"
-                          {% if application and application.status != 'REJECTED' %}readonly{% endif %}>{{ application.address|default:'' }}</textarea>
-            </div>
+<button type="button" onclick="addOLRow()" class="text-blue-600 text-sm mt-2">
++ Add O/L Subject
+</button>
+</div>
 
-            <!-- QUALIFICATION -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Highest Qualification
-                </label>
-                <input type="text"
-                       name="qualification"
-                       value="{{ application.qualification|default:'' }}"
-                       required
-                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none
-                       {% if application and application.status != 'REJECTED' %}bg-gray-100{% endif %}"
-                       {% if application and application.status != 'REJECTED' %}readonly{% endif %}>
-            </div>
+<!-- A/L -->
+<div>
+<h4 class="font-medium">📕 A/L Results</h4>
 
-            <!-- NOTES -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Additional Notes (Optional)
-                </label>
-                <textarea name="notes"
-                          rows="3"
-                          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none
-                          {% if application and application.status != 'REJECTED' %}bg-gray-100{% endif %}"
-                          {% if application and application.status != 'REJECTED' %}readonly{% endif %}>{{ application.notes|default:'' }}</textarea>
-            </div>
+<table id="alTable" class="w-full border text-sm mt-2">
+<tr class="bg-gray-100">
+<th class="p-2">Subject</th>
+<th class="p-2">Grade</th>
+<th></th>
+</tr>
+</table>
 
-            <!-- BUTTONS -->
-            <div class="flex justify-between items-center pt-4">
+<button type="button" onclick="addALRow()" class="text-blue-600 text-sm mt-2">
++ Add A/L Subject
+</button>
+</div>
 
-                <a href="{% url 'core:dashboard' %}"
-                   class="text-gray-500 hover:underline">
-                    ← Back
-                </a>
-
-                {% if not application or application.status == 'REJECTED' %}
-                    <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                        {% if application %}Update & Reapply{% else %}Submit Application{% endif %}
-                    </button>
-                {% endif %}
-
-            </div>
-
-        </form>
-
-    </div>
+<!-- EXTRA -->
+<div class="grid md:grid-cols-3 gap-4">
+<input name="english_grade" placeholder="English Grade" class="input-field">
+<input name="git_grade" placeholder="GIT Grade" class="input-field">
+<input name="z_score" placeholder="Z-Score" class="input-field">
+</div>
 
 </div>
+
+<!-- PARENT SECTION -->
+<div id="parentSection" class="hidden space-y-3 bg-gray-50 p-4 rounded">
+
+<h3 class="font-semibold">👨‍👩‍👧 Parent Details</h3>
+
+<input name="parent_name" placeholder="Parent Name" class="input-field">
+<input name="parent_email" placeholder="Parent Email" class="input-field">
+<input name="student_name" placeholder="Student Name" class="input-field">
+<input name="student_age" type="number" placeholder="Student Age" class="input-field">
+<input name="relationship" placeholder="Relationship" class="input-field">
+
+</div>
+
+<!-- NOTES -->
+<textarea name="notes" placeholder="Additional Notes" class="input-field"></textarea>
+
+<button class="bg-blue-600 text-white px-6 py-2 rounded">
+Submit Application
+</button>
+
+</form>
+</div>
+</div>
+
+<style>
+.input-field {
+width:100%;
+padding:10px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+</style>
+
+<script>
+const role = document.getElementById("role_type");
+const parent = document.getElementById("parentSection");
+
+role.addEventListener("change", () => {
+    parent.classList.toggle("hidden", role.value !== "PARENT");
+});
+</script>
 
 {% endblock %}

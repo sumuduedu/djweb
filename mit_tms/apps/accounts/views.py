@@ -24,13 +24,28 @@ from .models import Profile
 # ================================
 # 🔐 LOGIN VIEW
 # ================================
+from django.shortcuts import redirect
+
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
+from django.shortcuts import redirect
+
 class CustomLoginView(LoginView):
     template_name = 'auth/login.html'
     authentication_form = CustomLoginForm
 
+    def form_invalid(self, form):
+        # 🔥 Capture inactive error and redirect back to login
+        if form.non_field_errors():
+            for error in form.non_field_errors():
+                if "inactive" in error.lower():
+                    messages.error(self.request, error)
+                    return redirect('accounts:login')
+
+        return super().form_invalid(form)
+
     def get_success_url(self):
         return '/app/dashboard/'
-
 
 # ================================
 # 🔓 LOGOUT VIEW

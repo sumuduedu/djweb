@@ -26,6 +26,14 @@ class CustomLoginForm(AuthenticationForm):
         })
     )
 
+        # 🔥 ADD THIS METHOD
+    def confirm_login_allowed(self, user):
+        if not user.is_active:
+            raise forms.ValidationError(
+                "Your account is currently inactive. Please check your email for activation or contact the administrator.",
+                code='inactive',
+            )
+
 
 # ================================
 # 📝 SIGNUP FORM

@@ -10,13 +10,20 @@ class GuestDashboardView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        courses = Course.objects.all()
+        courses = list(Course.objects.all())
 
         user_apps = EnrollmentInquiry.objects.filter(
             user=self.request.user
         ).select_related('course')
 
+        # 🔥 map applications
+        app_map = {app.course_id: app for app in user_apps}
+
+        # 🔥 attach application to each course
+        for course in courses:
+            course.application = app_map.get(course.id)
+
         context['courses'] = courses
-        context['applications'] = {app.course_id: app for app in user_apps}
+        context['applications'] = app_map  # keep if needed
 
         return context

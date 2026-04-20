@@ -10,6 +10,7 @@ from apps.courses.models import Assessment
 class StudentDashboardView(BaseView):
     allowed_roles = ['STUDENT']
     template_name = "dashboard/student.html"
+    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

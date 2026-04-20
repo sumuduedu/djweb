@@ -24,6 +24,7 @@ urlpatterns = [
 
     # ================= OPTIONAL =================
     path('auth/', include('allauth.urls')),  # only if used
+
 ]
 
 

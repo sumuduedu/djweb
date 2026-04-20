@@ -53,6 +53,7 @@ LOCAL_APPS = [
     'apps.batch.apps.BatchConfig',
      'apps.scheduling.apps.SchedulingConfig',
     'apps.enrollment.apps.EnrollmentConfig',
+    'apps.lessonplan.apps.LessonplanConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -200,7 +201,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.MySocialAccountAdapter'
 
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')

@@ -47,3 +47,22 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
 
         except User.DoesNotExist:
             pass
+
+# apps/accounts/adapter.py
+
+# apps/accounts/adapter.py
+
+from allauth.account.adapter import DefaultAccountAdapter
+from django.shortcuts import redirect
+from django.contrib import messages
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+
+    def respond_user_inactive(self, request, user):
+        messages.error(
+            request,
+            "Your account is inactive. Please check your email or contact admin."
+        )
+
+        # 🔥 YOUR CUSTOM REDIRECT HERE
+        return redirect('accounts:login')   # or any page you want
