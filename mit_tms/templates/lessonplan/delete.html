@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-xl mx-auto p-6">
+
+    <div class="bg-white shadow rounded-2xl p-6 text-center">
+
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">
+            Delete Lesson Plan
+        </h2>
+
+        <p class="text-gray-600 mb-6">
+            Are you sure you want to delete
+            <strong>"{{ object.title }}"</strong>?
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="flex justify-center gap-4">
+
+                <a href="{% url 'lessonplan:list' %}"
+                   class="px-4 py-2 border rounded-lg text-gray-600">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Delete
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

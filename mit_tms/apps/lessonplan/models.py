@@ -1,11 +1,11 @@
 from django.db import models
 
-from django.db import models
 
-
+# ================================
+# 📘 LESSON PLAN
+# ================================
 class LessonPlan(models.Model):
 
-    # 🔗 Link only to Task (clean design)
     task = models.ForeignKey(
         "courses.Task",
         on_delete=models.SET_NULL,
@@ -14,7 +14,6 @@ class LessonPlan(models.Model):
         related_name="lesson_plans"
     )
 
-    # 👨‍🏫 Instructor (🔥 REQUIRED FIX)
     instructor = models.ForeignKey(
         "accounts.Teacher",
         on_delete=models.SET_NULL,
@@ -23,15 +22,14 @@ class LessonPlan(models.Model):
         related_name="lessons"
     )
 
-    # 🧾 Basic Info
     title = models.CharField(max_length=255)
     subject = models.CharField(max_length=255, blank=True)
     level = models.CharField(max_length=100)
     duration_minutes = models.IntegerField()
     date = models.DateField(null=True, blank=True)
 
-    # 🎯 Teaching Info
     competency = models.TextField(blank=True)
+
     competency_level = models.CharField(
         max_length=50,
         choices=[
@@ -42,14 +40,43 @@ class LessonPlan(models.Model):
         default='basic'
     )
 
-    materials = models.TextField(blank=True)
+    # 🔥 3 DOMAINS
+    cognitive = models.BooleanField(default=False)
+    psychomotor = models.BooleanField(default=False)
+    affective = models.BooleanField(default=False)
 
-    # 🕒 Tracking
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('draft', 'Draft'),
+            ('generated', 'Generated'),
+            ('updated', 'Updated'),
+        ],
+        default='draft'
+    )
+
+    materials = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
+    @property
+    def subject_name(self):
+        return self.task.module.title if self.task else ""
+
+    # 🔥 TOTAL TIME CALCULATION
+    def total_activity_time(self):
+        return sum(a.total_time for a in self.activities.all())
+
+    # 🔥 VALIDATION
+    def is_time_valid(self):
+        return self.total_activity_time() == self.duration_minutes
+
+
+# ================================
+# 🎯 LEARNING OUTCOME
+# ================================
 class LearningOutcome(models.Model):
     lesson = models.ForeignKey(
         LessonPlan,
@@ -61,16 +88,11 @@ class LearningOutcome(models.Model):
     def __str__(self):
         return f"Outcome - {self.lesson.title}"
 
-class LessonActivity(models.Model):
 
-    ACTIVITY_TYPES = [
-        ('intro', 'Introduction'),
-        ('presentation', 'Presentation'),
-        ('guided', 'Guided Practice'),
-        ('independent', 'Independent Practice'),
-        ('assessment', 'Assessment'),
-        ('closure', 'Closure'),
-    ]
+# ================================
+# 🪜 LESSON ACTIVITY (NVQ STYLE)
+# ================================
+class LessonActivity(models.Model):
 
     lesson = models.ForeignKey(
         LessonPlan,
@@ -78,21 +100,41 @@ class LessonActivity(models.Model):
         related_name='activities'
     )
 
-    activity_type = models.CharField(max_length=50, choices=ACTIVITY_TYPES)
-    description = models.TextField()
-    duration_minutes = models.IntegerField()
+    title = models.CharField(max_length=255)
 
-    order = models.PositiveIntegerField(default=0)  # 🔥 better than IntegerField
+    description = models.TextField()
+
+    # WHO DOES
+    trainer_activity = models.BooleanField(default=False)
+    trainee_activity = models.BooleanField(default=False)
+
+    # METHOD + RESOURCES
+    method = models.CharField(max_length=255, blank=True)
+    resources = models.TextField(blank=True)
+
+    # TIME
+    trainer_time = models.PositiveIntegerField(default=0)
+    trainee_time = models.PositiveIntegerField(default=0)
+    total_time = models.PositiveIntegerField(default=0)
+
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['order']
 
-    def __str__(self):
-        return f"{self.get_activity_type_display()} - {self.lesson.title}"
+    def save(self, *args, **kwargs):
+        self.total_time = self.trainer_time + self.trainee_time
+        super().save(*args, **kwargs)
 
-# models.py
-from django.conf import settings
+    def __str__(self):
+        return f"{self.title} - {self.lesson.title}"
+
+
+# ================================
+# 🏫 LESSON SESSION (DELIVERY)
+# ================================
 class LessonSession(models.Model):
+
     lesson = models.ForeignKey(
         "lessonplan.LessonPlan",
         on_delete=models.CASCADE,
@@ -105,7 +147,7 @@ class LessonSession(models.Model):
     )
 
     instructor = models.ForeignKey(
-        "accounts.Teacher",   # 🔥 FIXED (IMPORTANT)
+        "accounts.Teacher",
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -114,6 +156,8 @@ class LessonSession(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+
+    notes = models.TextField(blank=True)
 
     status = models.CharField(
         max_length=20,
@@ -125,14 +169,16 @@ class LessonSession(models.Model):
         default='scheduled'
     )
 
-    notes = models.TextField(blank=True)
-
     def __str__(self):
-        return f"{self.lesson.title} - {self.date}"
+        return f"{self.lesson.title} ({self.batch}) - {self.date}"
 
+
+# ================================
+# 📋 ATTENDANCE
+# ================================
 class Attendance(models.Model):
     session = models.ForeignKey(
-        LessonSession,
+        "lessonplan.LessonSession",
         on_delete=models.CASCADE,
         related_name="attendance"
     )
@@ -159,9 +205,13 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.student} - {self.status}"
 
+
+# ================================
+# 📊 PERFORMANCE
+# ================================
 class LessonPerformance(models.Model):
     session = models.ForeignKey(
-        LessonSession,
+        "lessonplan.LessonSession",   # 🔥 FIXED
         on_delete=models.CASCADE,
         related_name="performances"
     )
@@ -171,15 +221,12 @@ class LessonPerformance(models.Model):
         on_delete=models.CASCADE
     )
 
-    understanding_level = models.IntegerField(
-        help_text="1 (low) - 5 (high)"
-    )
+    understanding_level = models.IntegerField(help_text="1-5")
 
     participation_score = models.IntegerField(default=0)
     task_completion = models.BooleanField(default=False)
 
     score = models.FloatField(null=True, blank=True)
-
     feedback = models.TextField(blank=True)
 
     class Meta:

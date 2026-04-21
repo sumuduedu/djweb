@@ -3,27 +3,25 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from apps.accounts.models import Profile
 
-
 class BaseView(LoginRequiredMixin, TemplateView):
-    allowed_roles = None  # e.g. ['ADMIN'], ['STAFF']
+    allowed_roles = None
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
 
-        # 🔥 Get profile ONCE (no unnecessary writes)
         self.profile = getattr(user, "profile", None)
 
         if not self.profile:
-            self.profile = Profile.objects.create(user=user)
+            raise PermissionDenied("Profile missing")
 
-        # 🔥 SUPERUSER OVERRIDE
+        # Always define role
+        self.role = (self.profile.role or "GUEST").upper()
+
+        # Superuser bypass
         if user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
-        # Normalize role
-        self.role = (self.profile.role or "").upper()
-
-        # 🔥 Role check
+        # Role restriction
         if self.allowed_roles:
             allowed = [r.upper() for r in self.allowed_roles]
 
@@ -32,7 +30,6 @@ class BaseView(LoginRequiredMixin, TemplateView):
 
         return super().dispatch(request, *args, **kwargs)
 
-    # 🔥 Helper methods (VERY USEFUL)
     def has_role(self, *roles):
         return self.role in [r.upper() for r in roles]
 
@@ -51,8 +48,6 @@ class BaseView(LoginRequiredMixin, TemplateView):
         context.update({
             "profile": self.profile,
             "role": self.role,
-
-            # 🔥 Role flags (clean + reusable)
             "is_admin": self.is_admin(),
             "is_staff": self.has_role("STAFF"),
             "is_teacher": self.is_teacher(),
