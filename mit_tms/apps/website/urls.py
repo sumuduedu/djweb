@@ -7,6 +7,11 @@ from .views import (
     ReplyMessageView, DeleteMessageView,
     ComposeMessageView, SentMessageDetailView,
     PublicBlogListView, PublicBlogDetailView,
+        BlogListView,
+    BlogDetailView,
+    BlogCreateView,
+    BlogUpdateView,
+    BlogDeleteView
 )
 
 urlpatterns = [
@@ -36,4 +41,10 @@ urlpatterns = [
     path('compose/', ComposeMessageView.as_view(), name='compose'),
 
     path('enroll/', EnrollView.as_view(), name='enroll'),
+
+    path('user/blog/', BlogListView.as_view(), name='user_blog_list'),
+    path('create/', BlogCreateView.as_view(), name='user_blog_create'),
+    path('<slug:slug>/', BlogDetailView.as_view(), name='user_blog_detail'),
+    path('<slug:slug>/edit/', BlogUpdateView.as_view(), name='user_blog_update'),
+    path('<slug:slug>/delete/', BlogDeleteView.as_view(), name='user_blog_delete'),
 ]

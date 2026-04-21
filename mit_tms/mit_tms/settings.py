@@ -53,6 +53,8 @@ LOCAL_APPS = [
     'apps.batch.apps.BatchConfig',
      'apps.scheduling.apps.SchedulingConfig',
     'apps.enrollment.apps.EnrollmentConfig',
+    'apps.lessonplan.apps.LessonplanConfig',
+    'apps.careers.apps.CareersConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -85,7 +87,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mit_tms.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -96,7 +97,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                                'apps.core.context_processors.user_roles',
+
+                # ✅ YOUR CUSTOM
+                'apps.core.context_processors.user_roles',
+                'apps.core.context_processors.sidebar_menu',
             ],
         },
     },
@@ -198,7 +202,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.MySocialAccountAdapter'
 
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')

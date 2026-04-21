@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">📥 Submissions</h1>
+        <p class="text-gray-500">Review and grade student submissions</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        {% if submissions %}
+
+        <table class="w-full text-sm border">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 border">Student</th>
+                    <th class="p-3 border">Assignment</th>
+                    <th class="p-3 border">Submitted</th>
+                    <th class="p-3 border">Status</th>
+                    <th class="p-3 border">Score</th>
+                    <th class="p-3 border">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for s in submissions %}
+                <tr>
+                    <td class="p-3 border">{{ s.student }}</td>
+                    <td class="p-3 border">{{ s.assignment }}</td>
+                    <td class="p-3 border">{{ s.submitted_at }}</td>
+                    <td class="p-3 border">
+                        <span class="text-xs px-2 py-1 rounded
+                            {% if s.status == 'GRADED' %}
+                                bg-green-100 text-green-700
+                            {% else %}
+                                bg-yellow-100 text-yellow-700
+                            {% endif %}
+                        ">
+                            {{ s.status }}
+                        </span>
+                    </td>
+                    <td class="p-3 border">
+                        {{ s.score|default:"-" }}
+                    </td>
+                    <td class="p-3 border text-center">
+                        <a href="#" class="text-blue-600 hover:underline text-sm">
+                            Grade
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        {% else %}
+            <p class="text-center text-gray-500 py-6">No submissions found</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

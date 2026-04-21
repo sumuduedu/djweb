@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">📚 My Courses</h1>
+
+{% for c in courses %}
+<div class="bg-white p-4 rounded shadow mb-3">
+    <h2 class="font-semibold">{{ c.title }}</h2>
+    <p class="text-sm text-gray-500">{{ c.batches }} batches</p>
+</div>
+{% endfor %}
+
+{% endblock %}

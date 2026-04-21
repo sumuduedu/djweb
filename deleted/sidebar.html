@@ -1,0 +1,49 @@
+<aside id="sidebar"
+    class="fixed md:static z-50 inset-y-0 left-0 w-64 bg-gray-900 text-white
+           transform -translate-x-full md:translate-x-0
+           transition-transform duration-300">
+
+    <!-- LOGO -->
+    <div class="p-5 border-b border-gray-800">
+        <h2 id="logoText" class="text-xl font-bold tracking-wide">
+            MIT TMS
+        </h2>
+    </div>
+
+    <!-- NAV -->
+    <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+
+
+<nav id="sidebar" class="w-64 bg-[#0f172a] text-gray-300 flex flex-col">
+
+    {% if is_admin %}
+        {% include "partials/sidebar/admin.html" %}
+    {% endif %}
+
+    {% if is_staff %}
+        {% include "partials/sidebar/staff.html" %}
+    {% endif %}
+
+    {% if is_teacher %}
+        {% include "partials/sidebar/teacher.html" %}
+    {% endif %}
+
+    {% if is_student %}
+        {% include "partials/sidebar/student.html" %}
+    {% endif %}
+
+    {% if is_parent %}
+        {% include "partials/sidebar/parent.html" %}
+    {% endif %}
+
+    {% if is_alumni %}
+        {% include "partials/sidebar/alumni.html" %}
+    {% endif %}
+
+</nav>
+
+</aside>
+
+
+
+

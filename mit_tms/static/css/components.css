@@ -1,108 +1,146 @@
-/* ================= CARD ================= */
+/* ================= VARIABLES ================= */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-dark: #1f2937;
+}
 
+/* ================= CARD ================= */
 .card {
-    transition: all 0.35s ease;
-    border-radius: 16px;
+    @apply bg-white border border-gray-200 shadow-sm p-4 rounded-xl transition-all duration-300;
 }
 
 .card:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-6px) scale(1.01);
+    @apply shadow-md;
 }
 
-/* ================= NAV ================= */
+/* ================= SIDEBAR ================= */
+/* 🔥 upgraded to dark (only change) */
+.sidebar {
+    @apply relative bg-gray-900 text-gray-200 border-r border-gray-800;
+}
 
+/* ================= NAV LINK ================= */
 .nav-link {
-    position: relative;
-    font-weight: 500;
-    color: var(--text-dark);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative text-gray-300;
+    color: inherit;
+    will-change: transform; /* 🔥 smooth animation */
 }
 
 .nav-link:hover {
-    color: var(--primary);
-    transform: translateY(-1px);
+    @apply bg-gray-800 text-white;
+    transform: translateX(2px);
 }
 
-.nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -4px;
-    width: 0%;
-    height: 2px;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
-    border-radius: 2px;
-    transition: width 0.3s ease;
+/* ACTIVE LINK */
+.nav-link.active {
+    @apply bg-gray-800 text-white;
 }
 
-.nav-link:hover::after {
-    width: 100%;
+/* ================= ICON ================= */
+.icon {
+    @apply text-lg;
+}
+
+/* ================= TEXT ================= */
+.menu-text {
+    @apply whitespace-nowrap;
+}
+
+/* ================= SECTION ================= */
+.section-title {
+    @apply uppercase text-xs text-gray-400 tracking-wider;
+}
+
+/* ================= COLLAPSE (FINAL CLEAN VERSION) ================= */
+
+/* hide text completely */
+.sidebar-collapsed .menu-text,
+.sidebar-collapsed .section-title {
+    display: none !important;
+    opacity: 0;
+}
+
+/* center icons */
+.sidebar-collapsed .nav-link {
+    justify-content: center !important;
+    gap: 0 !important;
+}
+
+/* keep icon stable */
+.sidebar-collapsed .icon {
+    flex-shrink: 0;
+}
+/* ================= TOOLTIP ================= */
+/* 🔥 improved color slightly (not removed) */
+.sidebar-tooltip {
+    @apply absolute text-xs px-2 py-1 rounded-md bg-gray-900 text-white whitespace-nowrap opacity-0 pointer-events-none transition-all duration-200 shadow;
+    left: 100%;
+    margin-left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+}
+
+/* show tooltip */
+.sidebar.sidebar-collapsed .nav-link:hover .sidebar-tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(5px);
 }
 
 /* ================= BUTTON ================= */
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+.btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
 }
 
-.btn-primary:hover {
-    background: #4338ca;
+.btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700;
 }
 
 /* ================= FOOTER ================= */
-
-/* Footer Links */
 .footer-link {
-    position: relative;
-    color: rgba(255,255,255,0.85);
-    transition: all 0.3s ease;
+    @apply text-white/80 transition-all duration-300 relative;
 }
 
 .footer-link:hover {
-    color: white;
+    @apply text-white;
     transform: translateX(4px);
 }
 
-/* Social Icons */
+/* ================= SOCIAL ================= */
 .social-icon {
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @apply w-9 h-9 flex items-center justify-center rounded-full text-sm transition-all duration-300;
     background: rgba(255,255,255,0.15);
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    font-size: 16px;
 }
 
 .social-icon:hover {
-    background: white;
-    color: #4f46e5;
+    @apply bg-white text-indigo-600;
     transform: translateY(-3px);
 }
 
 .social-circle {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    @apply w-10 h-10 flex items-center justify-center rounded-full text-sm transition-all duration-300 text-white;
+    background: rgba(255,255,255,0.15);
 }
 
-/* Hover Effect */
 .social-circle:hover {
-    background: white;
-    color: #4f46e5; /* your primary */
+    @apply bg-white text-indigo-600 shadow-lg;
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
+
+/* ===== FINAL FIX (overrides everything safely) ===== */
+
+/* prevent flex cutting issue */
+.nav-link {
+    min-width: 0 !important;
+}
+
+/* text must not shrink weirdly */
+.menu-text {
+    @apply whitespace-nowrap overflow-hidden;
+    display: inline-block;
+    transition: opacity 0.2s ease;   /* smooth hide */
+}
+
+z

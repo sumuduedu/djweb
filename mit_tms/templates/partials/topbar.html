@@ -3,16 +3,28 @@
     <!-- 🔷 LEFT -->
     <div class="flex items-center gap-2 md:gap-4">
 
-        <!-- Sidebar Toggle -->
-        <button onclick="toggleSidebar()"
-                class="text-2xl md:text-xl text-gray-600 hover:text-black p-2 rounded-lg hover:bg-gray-100">
-            ☰
-        </button>
+        <!-- Collapse button (desktop) -->
+<header class="h-14 flex items-center justify-between px-4 bg-white border-b">
 
-        <!-- Page Title -->
+    <!-- Mobile menu -->
+    <button @click="mobileOpen = true" class="md:hidden text-xl p-2">
+        ☰
+    </button>
+
+
+    <!-- Desktop collapse -->
+    <button @click="toggleCollapse()" class="hidden md:block text-xl p-2">
+        ☰
+    </button>
+   <!-- Page Title -->
         <h1 class="text-sm md:text-lg font-semibold text-gray-800 truncate max-w-[120px] md:max-w-none">
             {% block header %}Dashboard{% endblock %}
         </h1>
+
+</header>
+
+
+
 
     </div>
 

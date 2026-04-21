@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-10 px-4">
+
+<div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8">
+
+<a href="{% url 'core:dashboard' %}" class="back-btn">← Dashboard</a>
+
+<h2 class="title">🎓 Apply for {{ course.title }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<!-- PROGRESS -->
+<div class="progress">
+    <div class="bar"><div id="progressBar"></div></div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="step1">
+
+<h3>🎯 Select Role</h3>
+
+<div class="role-grid">
+    <div onclick="selectRole('STUDENT')" id="studentCard" class="role-card">
+        🎓 <h4>Student</h4><p>Apply for yourself</p>
+    </div>
+
+    <div onclick="selectRole('PARENT')" id="parentCard" class="role-card">
+        👨‍👩‍👧 <h4>Parent</h4><p>Apply for child</p>
+    </div>
+</div>
+
+<input type="hidden" name="role_type" id="role_type">
+
+</div>
+
+<!-- STEP 2 -->
+<div class="step hidden" id="step2">
+
+<div class="section-card">
+<h3 class="section-title">👤 Personal Information</h3>
+
+<div class="grid md:grid-cols-2 gap-4">
+
+<div class="field">
+<label>Full Name</label>
+<input value="{{ request.user.get_full_name }}" class="input bg-gray-100" readonly>
+</div>
+
+<div class="field">
+<label>Email</label>
+<input value="{{ request.user.email }}" class="input bg-gray-100" readonly>
+</div>
+
+</div>
+</div>
+
+<div class="section-card">
+<h3 class="section-title">📞 Contact</h3>
+
+<div class="grid md:grid-cols-2 gap-4">
+
+<div class="field">
+<label>Mobile *</label>
+<input name="phone" class="input">
+</div>
+
+<div class="field">
+<label>Home Phone</label>
+<input name="home_phone" class="input">
+</div>
+
+</div>
+</div>
+
+<div class="section-card">
+<h3 class="section-title">🏠 Address</h3>
+
+<div class="field">
+<label>Current Address *</label>
+<input name="current_address" class="input">
+</div>
+
+<div class="field">
+<label>Permanent Address</label>
+<input name="permanent_address" class="input">
+</div>
+
+<div class="field">
+<label>Birthdate *</label>
+<input type="date" name="birthdate" class="input" required>
+</div>
+
+</div>
+
+<div class="section-card">
+<h3 class="section-title">🪪 NIC</h3>
+
+<div class="field">
+<label>NIC Number</label>
+<input name="nic_number" id="nic_number" class="input">
+<p id="nicError" class="error hidden">Invalid NIC</p>
+</div>
+
+<div class="field">
+<label>NIC Copy</label>
+<input type="file" name="nic_copy" id="nicInput" class="input">
+</div>
+
+<img id="nicPreview" class="preview-img hidden mt-3">
+</div>
+
+<!-- PARENT SECTION -->
+<div id="parentSection" class="section-card hidden">
+
+<h3 class="section-title">👨‍👩‍👧 Parent Details</h3>
+
+<div class="grid md:grid-cols-2 gap-4">
+
+<input id="parent_name" name="parent_name" placeholder="Parent Name" class="input">
+<input id="parent_email" name="parent_email" placeholder="Parent Email" class="input">
+
+<input name="student_name" placeholder="Student Name" class="input">
+
+<input type="date" name="child_birthdate" class="input">
+
+<input name="relationship" placeholder="Relationship" class="input md:col-span-2">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- STEP 3 -->
+<div class="step hidden" id="step3">
+
+<h3>📘 O/L Results</h3>
+<table id="olTable" class="table">
+<tr><th>Subject</th><th>Grade</th><th></th></tr>
+</table>
+<button type="button" onclick="addOL()">+ Add</button>
+
+<h3 class="mt-4">📕 A/L Results</h3>
+<table id="alTable" class="table">
+<tr><th>Subject</th><th>Grade</th><th></th></tr>
+</table>
+<button type="button" onclick="addAL()">+ Add</button>
+
+<textarea name="notes" placeholder="Notes" class="input mt-4"></textarea>
+
+</div>
+
+<!-- NAV -->
+<div class="nav">
+<button type="button" onclick="prevStep()">← Back</button>
+<button type="button" id="nextBtn" onclick="nextStep()">Next →</button>
+<button type="submit" id="submitBtn" class="hidden">Submit 🚀</button>
+</div>
+
+</form>
+</div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+
+let step = 1;
+
+const role_type = document.getElementById("role_type");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+
+function showStep(s){
+    document.querySelectorAll(".step").forEach(e=>e.classList.add("hidden"));
+    document.getElementById("step"+s).classList.remove("hidden");
+
+    document.getElementById("progressBar").style.width = (s*33)+"%";
+
+    nextBtn.classList.toggle("hidden", s===3);
+    submitBtn.classList.toggle("hidden", s!==3);
+}
+
+function nextStep(){
+    if(!validateStep()) return;
+    step++;
+    showStep(step);
+}
+
+function prevStep(){
+    if(step > 1){
+        step--;
+        showStep(step);
+    }
+}
+
+// ROLE
+function selectRole(r){
+    role_type.value = r;
+
+    document.getElementById("studentCard").classList.remove("active");
+    document.getElementById("parentCard").classList.remove("active");
+
+    if(r === "PARENT"){
+        document.getElementById("parentCard").classList.add("active");
+        document.getElementById("parentSection").classList.remove("hidden");
+
+        document.getElementById("parent_name").value = "{{ request.user.get_full_name|escapejs }}";
+        document.getElementById("parent_email").value = "{{ request.user.email|escapejs }}";
+
+    } else {
+        document.getElementById("studentCard").classList.add("active");
+        document.getElementById("parentSection").classList.add("hidden");
+    }
+}
+
+// VALIDATION
+function validateStep(){
+
+    let valid = true;
+
+    if(step === 1){
+        if(!role_type.value){
+            alert("Select role");
+            return false;
+        }
+    }
+
+    if(step === 2){
+
+        const phone = document.querySelector("[name='phone']");
+        const address = document.querySelector("[name='current_address']");
+
+        if(!/^0\d{9}$/.test(phone.value)){
+            alert("Invalid phone");
+            valid = false;
+        }
+
+        if(!address.value){
+            alert("Address required");
+            valid = false;
+        }
+    }
+
+    if(step === 3){
+        if(document.querySelectorAll("#olTable tr").length <=1 &&
+           document.querySelectorAll("#alTable tr").length <=1){
+            alert("Add results");
+            valid = false;
+        }
+    }
+
+    return valid;
+}
+
+// TABLES
+function addOL(){
+    let r = olTable.insertRow();
+    r.innerHTML = `
+    <td><input name="ol_subject[]" class="input"></td>
+    <td>
+        <select name="ol_grade[]" class="input">
+        <option>A</option><option>B</option><option>C</option>
+        <option>S</option><option>F</option>
+        </select>
+    </td>
+    <td><button onclick="this.closest('tr').remove()">❌</button></td>`;
+}
+
+function addAL(){
+    let r = alTable.insertRow();
+    r.innerHTML = `
+    <td><input name="al_subject[]" class="input"></td>
+    <td>
+        <select name="al_grade[]" class="input">
+        <option>A</option><option>B</option><option>C</option>
+        <option>S</option><option>F</option>
+        </select>
+    </td>
+    <td><button onclick="this.closest('tr').remove()">❌</button></td>`;
+}
+
+// NIC validation + preview
+const nicInput = document.getElementById("nicInput");
+const preview = document.getElementById("nicPreview");
+
+nicInput.addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    if(!["image/jpeg","image/png"].includes(file.type)){
+        alert("Only JPG/PNG");
+        this.value="";
+        return;
+    }
+
+    if(file.size > 2*1024*1024){
+        alert("Max 2MB");
+        this.value="";
+        return;
+    }
+
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+});
+
+showStep(1);
+
+</script>
+
+<!-- ================= STYLE ================= -->
+<style>
+
+.title { text-align:center; font-size:24px; margin-bottom:20px; }
+
+.role-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.role-card {
+    border:2px solid #ddd;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.role-card.active {
+    border-color:#2563eb;
+    background:#eff6ff;
+}
+
+.input {
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    margin-top:5px;
+}
+
+.section-card {
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    margin-top:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.table { width:100%; margin-top:10px; }
+
+.nav {
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+}
+
+.hidden { display:none; }
+
+.preview-img {
+    max-width:200px;
+    border-radius:10px;
+}
+
+.error { color:red; font-size:12px; }
+
+.progress .bar {
+    width:100%;
+    height:6px;
+    background:#ddd;
+    border-radius:10px;
+}
+
+#progressBar {
+    height:6px;
+    background:#2563eb;
+    width:33%;
+    border-radius:10px;
+}
+
+</style>
+
+{% endblock %}

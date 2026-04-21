@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📈 Progress</h1>
+        <p class="text-gray-500">Track your learning progress across courses</p>
+    </div>
+
+    <!-- 📊 OVERALL PROGRESS -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-lg font-semibold mb-3">Overall Progress</h2>
+
+        <div class="w-full bg-gray-200 rounded-full h-5">
+            <div class="bg-blue-600 h-5 rounded-full"
+                 style="width: {{ overall_progress }}%">
+            </div>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-2">
+            {{ overall_progress }}% completed
+        </p>
+
+    </div>
+
+    <!-- 📚 COURSE PROGRESS -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Course Progress</h2>
+
+        {% if course_progress %}
+
+        <div class="space-y-5">
+
+            {% for c in course_progress %}
+            <div class="border rounded-xl p-4">
+
+                <!-- COURSE TITLE -->
+                <div class="flex justify-between mb-2">
+                    <h3 class="font-semibold text-blue-600">
+                        {{ c.course }}
+                    </h3>
+
+                    <span class="text-sm font-medium">
+                        {{ c.progress }}%
+                    </span>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div class="h-4 rounded-full
+                        {% if c.progress >= 75 %}
+                            bg-green-500
+                        {% elif c.progress >= 50 %}
+                            bg-yellow-500
+                        {% else %}
+                            bg-red-500
+                        {% endif %}
+                    "
+                    style="width: {{ c.progress }}%">
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <p class="text-xs mt-2
+                    {% if c.progress >= 75 %}
+                        text-green-600
+                    {% elif c.progress >= 50 %}
+                        text-yellow-600
+                    {% else %}
+                        text-red-600
+                    {% endif %}
+                ">
+                    {% if c.progress >= 75 %}
+                        ✔ On Track
+                    {% elif c.progress >= 50 %}
+                        ⚠ Needs Attention
+                    {% else %}
+                        🚨 Behind Schedule
+                    {% endif %}
+                </p>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+        <div class="text-center py-10 text-gray-500">
+            📭 No progress data available
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

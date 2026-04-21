@@ -5,33 +5,30 @@ from django.views.generic import View, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.db import IntegrityError
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import JsonResponse
 
 from apps.courses.models import Course
-from .models import EnrollmentInquiry
-from .services import enroll_student
-
-
-# ================================
-# 🎓 ENROLL TO BATCH
-# ================================
-@login_required
-def enroll_view(request, batch_id):
-    enroll_student(request.user, batch_id)
-    return redirect("core:dashboard")
+from apps.batch.models import Batch
+from apps.accounts.models import Student, Parent
+from .models import EnrollmentInquiry, Enrollment
 
 
 # ================================
 # 🔐 ADMIN CHECK
 # ================================
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-
     def test_func(self):
         user = self.request.user
         return hasattr(user, 'profile') and user.profile.role in ['ADMIN', 'STAFF']
 
 
 # ================================
-# 📋 APPLICATION LIST
+# 📋 APPLICATION LIST (ADMIN)
 # ================================
 class ApplicationListView(AdminRequiredMixin, ListView):
     model = EnrollmentInquiry
@@ -44,97 +41,226 @@ class ApplicationListView(AdminRequiredMixin, ListView):
 
 
 # ================================
-# ✅ APPROVE (POST)
+# 📝 APPLY (UNIFIED)
 # ================================
-from django.views import View
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.models import User
+class ApplyView(LoginRequiredMixin, View):
 
-from apps.accounts.models import Student, Parent
-from .models import EnrollmentInquiry
+    template_name = "enrollment/apply.html"
+
+    def get(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+
+        application = EnrollmentInquiry.objects.filter(
+            user=request.user,
+            course=course
+        ).first()
+
+        return render(request, self.template_name, {
+            "course": course,
+            "application": application,
+        })
+
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        user = request.user
+
+        role_type = request.POST.get("role_type")
+
+        application = EnrollmentInquiry.objects.filter(
+            user=user,
+            course=course
+        ).first()
+
+        # 🚫 BLOCK if active
+        if application and application.status in ['PENDING', 'APPROVED']:
+            messages.warning(request, "You already have an active application.")
+            return redirect('core:dashboard')
+
+        data = {
+            "phone": request.POST.get("phone"),
+            "home_phone": request.POST.get("home_phone"),
+            "current_address": request.POST.get("current_address"),
+            "permanent_address": request.POST.get("permanent_address"),
+            "qualification": request.POST.get("qualification"),
+            "nic_number": request.POST.get("nic_number"),
+            "nic_copy": request.FILES.get("nic_copy"),
+            "notes": request.POST.get("notes"),
+        }
+
+        if role_type == "PARENT":
+            data.update({
+                "parent_name": request.POST.get("parent_name"),
+                "parent_email": request.POST.get("parent_email"),
+                "student_name": request.POST.get("student_name"),
+                "student_age": request.POST.get("student_age") or None,
+                "relationship": request.POST.get("relationship"),
+            })
+
+        # 🔁 REAPPLY
+        if application and application.status == 'REJECTED':
+            for k, v in data.items():
+                if v:
+                    setattr(application, k, v)
+
+            application.role_type = role_type
+            application.status = 'PENDING'
+            application.current_stage = 'SUBMITTED'
+            application.rejection_reason = None
+            application.is_nic_verified = False
+
+            application.save()
+
+            messages.success(request, "Application resubmitted.")
+            return redirect('core:dashboard')
+
+        # 🆕 CREATE
+        EnrollmentInquiry.objects.create(
+            user=user,
+            course=course,
+            role_type=role_type,
+            full_name=user.get_full_name(),
+            email=user.email,
+            current_stage='SUBMITTED',
+            **data
+        )
+
+        messages.success(request, "Application submitted successfully.")
+        return redirect('core:dashboard')
 
 
+# ================================
+# ✅ APPROVE APPLICATION
+# ================================
 class ApproveApplicationView(AdminRequiredMixin, View):
 
     def post(self, request, pk):
         app = get_object_or_404(EnrollmentInquiry, id=pk)
 
-        # 🚫 prevent re-processing
         if app.status != 'PENDING':
-            messages.warning(request, "This application has already been processed.")
+            messages.warning(request, "Already processed.")
             return redirect('enrollment:application_list')
 
         user = app.user
         profile = user.profile
 
-        # ============================
-        # 🔥 UPDATE ROLE
-        # ============================
+        # 📊 Move stage
+        app.current_stage = 'FINAL'
+
+        # 🎓 assign role
         profile.role = app.role_type
         profile.save()
 
-        # ============================
-        # 🎓 STUDENT APPLICATION
-        # ============================
+        student = None
+
+        # ====================
+        # STUDENT FLOW
+        # ====================
         if app.role_type == 'STUDENT':
-            # nothing extra needed (signals handle student creation)
-            pass
+            student = user.student
 
-        # ============================
-        # 👨‍🏫 TEACHER APPLICATION
-        # ============================
-        elif app.role_type == 'TEACHER':
-            # handled by signals
-            pass
-
-        # ============================
-        # 👨‍👩‍👧 PARENT APPLICATION
-        # ============================
+        # ====================
+        # PARENT FLOW
+        # ====================
         elif app.role_type == 'PARENT':
 
-            # 🔥 SAFE USERNAME GENERATION
-            base_username = app.student_name.lower().replace(" ", "")
-            username = base_username
-            counter = 1
-
+            username = app.student_name.lower().replace(" ", "")
             while User.objects.filter(username=username).exists():
-                username = f"{base_username}{counter}"
-                counter += 1
+                username += "1"
 
-            # 🔥 CREATE STUDENT USER
-            student_user = User.objects.create(
-                username=username,
-                is_active=True
-            )
-            student_user.set_password("12345678")  # ⚠️ change later
+            password = User.objects.make_random_password()
+
+            student_user = User.objects.create(username=username)
+            student_user.set_password(password)
             student_user.save()
 
-            # 🔥 CREATE STUDENT PROFILE
             student = Student.objects.create(
                 user=student_user,
                 full_name=app.student_name
             )
 
-            # 🔥 ENSURE PARENT EXISTS
             parent, _ = Parent.objects.get_or_create(user=user)
-
-            # 🔥 LINK MANY-TO-MANY
             student.parents.add(parent)
 
-            print(f"✅ Linked {student.full_name} → {parent.user.username}")
+            app.parent_user = user
 
-        # ============================
-        # ✅ FINALIZE APPLICATION
-        # ============================
+            # 📧 send credentials
+            send_mail(
+                "Student Account Created",
+                f"Username: {username}\nPassword: {password}",
+                settings.DEFAULT_FROM_EMAIL,
+                [app.parent_email or app.email],
+                fail_silently=True,
+            )
+
+        # ====================
+        # ENROLL TO BATCH
+        # ====================
+        batch_id = request.POST.get('batch_id')
+        if batch_id:
+            batch = get_object_or_404(Batch, id=batch_id)
+
+            if batch.course != app.course:
+                messages.error(request, "Invalid batch.")
+                return redirect('enrollment:application_list')
+
+            try:
+                Enrollment.objects.create(student=student, batch=batch)
+            except IntegrityError:
+                messages.warning(request, "Already enrolled.")
+
+        # ====================
+        # FINALIZE
+        # ====================
         app.status = 'APPROVED'
         app.save()
 
-        messages.success(request, "Application approved successfully.")
+        # 📧 notify
+        send_mail(
+            "Application Approved",
+            f"Dear {app.full_name}, your application is approved.",
+            settings.DEFAULT_FROM_EMAIL,
+            [app.email],
+            fail_silently=True,
+        )
+
+        messages.success(request, "Application approved.")
         return redirect('enrollment:application_list')
 
-from django.contrib.auth.hashers import make_password
 
+# ================================
+# ❌ REJECT APPLICATION
+# ================================
+class RejectApplicationView(AdminRequiredMixin, View):
+
+    def post(self, request, pk):
+        app = get_object_or_404(EnrollmentInquiry, id=pk)
+
+        reason = request.POST.get("reason")
+
+        if not reason:
+            messages.error(request, "Reason required.")
+            return redirect('enrollment:application_list')
+
+        app.status = 'REJECTED'
+        app.current_stage = 'FINAL'
+        app.rejection_reason = reason
+        app.save()
+
+        send_mail(
+            "Application Rejected",
+            f"Dear {app.full_name},\n\nReason:\n{reason}",
+            settings.DEFAULT_FROM_EMAIL,
+            [app.email],
+            fail_silently=True,
+        )
+
+        messages.error(request, "Application rejected.")
+        return redirect('enrollment:application_list')
+
+
+# ================================
+# 🔐 CHANGE STUDENT PASSWORD
+# ================================
 class ChangeStudentPasswordView(LoginRequiredMixin, View):
 
     def post(self, request):
@@ -146,161 +272,25 @@ class ChangeStudentPasswordView(LoginRequiredMixin, View):
         student_user.password = make_password(new_password)
         student_user.save()
 
-        messages.success(request, "Student password updated")
+        messages.success(request, "Student password updated.")
         return redirect('core:parent_dashboard')
 
-# ================================
-# ❌ REJECT (POST)
-# ================================
-from django.core.mail import send_mail
-from django.conf import settings
-
-class RejectApplicationView(AdminRequiredMixin, View):
-
-    def post(self, request, pk):
-        app = get_object_or_404(EnrollmentInquiry, id=pk)
-
-        if app.status != 'PENDING':
-            messages.warning(request, "Already processed")
-            return redirect('enrollment:application_list')
-
-        reason = request.POST.get("reason")
-
-        if not reason:
-            messages.error(request, "Rejection reason is required.")
-            return redirect('enrollment:application_list')
-
-        # 🔴 Update status
-        app.status = 'REJECTED'
-        app.rejection_reason = reason
-        app.save()
-
-        # 📧 SEND EMAIL
-        send_mail(
-            subject="Application Rejected",
-            message=f"""
-Dear {app.full_name},
-
-Your application for "{app.course.title}" has been rejected.
-
-Reason:
-{reason}
-
-Please contact us for more information.
-
-Thank you.
-""",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[app.email],
-            fail_silently=True,
-        )
-
-        messages.error(request, "Application rejected and email sent.")
-        return redirect('enrollment:application_list')
-# ================================
-# 🎓 APPLY STUDENT
-# ================================
-class ApplyStudentView(LoginRequiredMixin, View):
-
-    template_name = "enrollment/apply_student.html"
-
-    def get(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        user = request.user
-
-        application = EnrollmentInquiry.objects.filter(
-            user=user,
-            course=course
-        ).order_by('-created_at').first()
-
-        return render(request, self.template_name, {
-            "course": course,
-            "application": application
-        })
-
-    def post(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        user = request.user
-
-        # 🚫 BLOCK ANY existing application (IMPORTANT CHANGE)
-        if EnrollmentInquiry.objects.filter(user=user, course=course).exists():
-            messages.warning(request, "You have already applied for this course.")
-            return redirect('core:dashboard')
-
-        # 🆕 New application only
-        EnrollmentInquiry.objects.create(
-            user=user,
-            course=course,
-            role_type='STUDENT',
-            full_name=user.get_full_name(),
-            email=user.email,
-            phone=request.POST.get("phone"),
-            address=request.POST.get("address"),
-            qualification=request.POST.get("qualification"),
-        )
-
-        messages.success(request, "Application submitted successfully!")
-        return redirect('core:dashboard')
-
 
 # ================================
-# 👨‍👩‍👧 APPLY PARENT (placeholder)
+# 🔔 LIVE NOTIFICATIONS API
 # ================================
-from django.views import View
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
+@login_required
+def notification_api(request):
+    apps = EnrollmentInquiry.objects.filter(user=request.user)
 
-from apps.courses.models import Course
-from .models import EnrollmentInquiry
+    data = [
+        {
+            "course": a.course.title,
+            "status": a.status,
+            "stage": a.current_stage,
+            "date": a.created_at.strftime("%Y-%m-%d"),
+        }
+        for a in apps
+    ]
 
-
-class ApplyParentView(LoginRequiredMixin, View):
-
-    template_name = "enrollment/apply_parent.html"
-
-    def get(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-
-        application = EnrollmentInquiry.objects.filter(
-            user=request.user,
-            course=course
-        ).order_by('-created_at').first()
-
-        return render(request, self.template_name, {
-            "course": course,
-            "application": application
-        })
-
-    def post(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        user = request.user
-
-        # 🚫 STRICT: block if already applied
-        if EnrollmentInquiry.objects.filter(user=user, course=course).exists():
-            messages.warning(request, "You have already applied for this course.")
-            return redirect('core:dashboard')
-
-        # 🆕 Create parent application
-        EnrollmentInquiry.objects.create(
-            user=user,
-            course=course,
-            role_type='PARENT',
-
-            full_name=user.get_full_name(),
-            email=user.email,
-
-            phone=request.POST.get("phone"),
-            address=request.POST.get("address"),
-
-            # 👨‍👩‍👧 Parent-specific fields
-            student_name=request.POST.get("student_name"),
-            student_age=request.POST.get("student_age"),
-            relationship=request.POST.get("relationship"),
-
-            # optional
-            notes=request.POST.get("notes"),
-        )
-
-        messages.success(request, "Parent application submitted successfully!")
-        return redirect('core:dashboard')
+    return JsonResponse({"notifications": data})

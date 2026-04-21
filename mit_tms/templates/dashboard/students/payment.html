@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">💳 My Payments</h1>
+        <p class="text-gray-500">Track your payments, dues, and history</p>
+    </div>
+
+    <!-- 📊 SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Total Paid</h3>
+            <p class="text-3xl font-bold text-green-600">
+                Rs. {{ total_paid }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Pending Amount</h3>
+            <p class="text-3xl font-bold text-red-600">
+                Rs. {{ pending_amount }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Total Fees</h3>
+            <p class="text-3xl font-bold text-blue-600">
+                Rs. {{ total_fees }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Payment Status</h3>
+            <p class="text-xl font-bold
+                {% if pending_amount == 0 %}
+                    text-green-600
+                {% else %}
+                    text-red-600
+                {% endif %}
+            ">
+                {% if pending_amount == 0 %}
+                    ✔ Completed
+                {% else %}
+                    Pending
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- 🚨 ALERT -->
+    {% if pending_amount > 0 %}
+    <div class="bg-red-100 text-red-800 p-4 rounded-xl mb-6">
+        ⚠ You have pending payments. Please complete them to avoid service interruptions.
+    </div>
+    {% endif %}
+
+    <!-- 📋 PAYMENT HISTORY -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+
+        <h2 class="text-xl font-semibold mb-4">Payment History</h2>
+
+        {% if payments %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left border">
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr>
+                        <th class="p-3 border">Date</th>
+                        <th class="p-3 border">Course</th>
+                        <th class="p-3 border">Amount</th>
+                        <th class="p-3 border">Method</th>
+                        <th class="p-3 border">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for p in payments %}
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="p-3 border">{{ p.date }}</td>
+
+                        <td class="p-3 border">
+                            {{ p.course.title }}
+                        </td>
+
+                        <td class="p-3 border font-medium">
+                            Rs. {{ p.amount }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ p.method|default:"-" }}
+                        </td>
+
+                        <td class="p-3 border">
+                            <span class="px-2 py-1 text-xs rounded
+                                {% if p.status == 'PAID' %}
+                                    bg-green-100 text-green-700
+                                {% elif p.status == 'PENDING' %}
+                                    bg-yellow-100 text-yellow-700
+                                {% else %}
+                                    bg-red-100 text-red-700
+                                {% endif %}
+                            ">
+                                {{ p.status }}
+                            </span>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-10 text-gray-500">
+            📭 No payment records available
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- 💰 ACTION SECTION -->
+    {% if pending_amount > 0 %}
+    <div class="bg-white p-6 rounded-2xl shadow text-center">
+
+        <h2 class="text-lg font-semibold mb-2">Complete Your Payment</h2>
+        <p class="text-gray-500 mb-4">
+            You have an outstanding balance of <strong>Rs. {{ pending_amount }}</strong>
+        </p>
+
+        <a href="#"
+           class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            Pay Now →
+        </a>
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

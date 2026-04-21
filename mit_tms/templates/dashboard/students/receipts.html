@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">🧾 Receipts</h1>
+        <p class="text-gray-500">View and download your payment receipts</p>
+    </div>
+
+    {% if receipts %}
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Payment Receipts</h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border">
+
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr>
+                        <th class="p-3 border">Receipt No</th>
+                        <th class="p-3 border">Date</th>
+                        <th class="p-3 border">Course</th>
+                        <th class="p-3 border">Amount</th>
+                        <th class="p-3 border">Method</th>
+                        <th class="p-3 border">Status</th>
+                        <th class="p-3 border">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for r in receipts %}
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="p-3 border font-medium">
+                            {{ r.receipt_no }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ r.date }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ r.course }}
+                        </td>
+
+                        <td class="p-3 border font-semibold">
+                            Rs. {{ r.amount }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ r.method }}
+                        </td>
+
+                        <td class="p-3 border">
+                            <span class="text-xs px-2 py-1 rounded
+                                {% if r.status == 'PAID' %}
+                                    bg-green-100 text-green-700
+                                {% else %}
+                                    bg-yellow-100 text-yellow-700
+                                {% endif %}
+                            ">
+                                {{ r.status }}
+                            </span>
+                        </td>
+
+                        <td class="p-3 border text-center">
+                            {% if r.status == 'PAID' %}
+                            <a href="{{ r.file_url }}"
+                               target="_blank"
+                               class="text-blue-600 hover:underline text-sm">
+                                Download
+                            </a>
+                            {% else %}
+                            <span class="text-gray-400 text-sm">N/A</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <!-- EMPTY STATE -->
+    <div class="bg-white p-10 rounded-2xl shadow text-center">
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">
+            📭 No Receipts Available
+        </h2>
+        <p class="text-gray-500">
+            Your payment receipts will appear here after successful payments.
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

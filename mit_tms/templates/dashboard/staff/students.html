@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">👨‍🎓 Students</h1>
+            <p class="text-gray-500">Manage and monitor student records</p>
+        </div>
+
+        <!-- ADD BUTTON -->
+        <a href="#"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            + Add Student
+        </a>
+    </div>
+
+    <!-- 📊 SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Total Students</h3>
+            <p class="text-3xl font-bold text-blue-600">
+                {{ total_students }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Active</h3>
+            <p class="text-3xl font-bold text-green-600">
+                {{ active_students }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">Inactive</h3>
+            <p class="text-3xl font-bold text-red-600">
+                {{ inactive_students }}
+            </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h3 class="text-gray-500 text-sm">New This Month</h3>
+            <p class="text-3xl font-bold text-purple-600">
+                {{ new_students }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- 📋 STUDENT TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Student List</h2>
+
+        {% if students %}
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border">
+
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr>
+                        <th class="p-3 border">Name</th>
+                        <th class="p-3 border">Email</th>
+                        <th class="p-3 border">Course</th>
+                        <th class="p-3 border">Status</th>
+                        <th class="p-3 border">Joined</th>
+                        <th class="p-3 border">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for s in students %}
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="p-3 border font-medium">
+                            {{ s.name }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ s.email }}
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ s.course|default:"-" }}
+                        </td>
+
+                        <td class="p-3 border">
+                            <span class="text-xs px-2 py-1 rounded
+                                {% if s.status == 'ACTIVE' %}
+                                    bg-green-100 text-green-700
+                                {% else %}
+                                    bg-red-100 text-red-700
+                                {% endif %}
+                            ">
+                                {{ s.status }}
+                            </span>
+                        </td>
+
+                        <td class="p-3 border">
+                            {{ s.joined_date }}
+                        </td>
+
+                        <td class="p-3 border text-center space-x-2">
+
+                            <a href="#"
+                               class="text-blue-600 hover:underline text-sm">
+                                View
+                            </a>
+
+                            <a href="#"
+                               class="text-green-600 hover:underline text-sm">
+                                Edit
+                            </a>
+
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY -->
+        <div class="text-center py-10 text-gray-500">
+            📭 No students found
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

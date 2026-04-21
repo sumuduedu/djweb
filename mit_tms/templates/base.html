@@ -2,78 +2,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block page_title %}MIT TMS{% endblock %}</title>
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<script src="https://unpkg.com/alpinejs" defer></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/chat.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800 antialiased">
 
-<div class="flex min-h-screen">
+<div x-data="layout()" class="flex h-screen overflow-hidden">
 
-    <!-- 🔷 SIDEBAR -->
-    {% include "partials/sidebar.html" %}
+    <aside
+        :class="{
+            'sidebar-collapsed md:w-20': collapsed,
+            'md:w-64': !collapsed,
+            'translate-x-0': mobileOpen,
+            '-translate-x-full': !mobileOpen
+        }"
+        class="sidebar fixed md:static z-50 h-full bg-gray-900 text-gray-200 border-r border-gray-800
+               transform md:translate-x-0 transition-[width,transform] duration-300 ease-in-out flex flex-col overflow-hidden"
+    >
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <h2 class="menu-text text-lg font-bold" x-show="!collapsed">MIT TMS</h2>
+            <h2 class="menu-text text-lg font-bold" x-show="collapsed">M</h2>
+        </div>
 
-    <!-- 🔷 MAIN -->
+        <nav class="flex-1 px-2 py-4 space-y-2 text-sm overflow-y-auto">
+            {% include "partials/sidebar/index.html" %}
+        </nav>
+    </aside>
+
+    <div x-show="mobileOpen"
+         x-transition.opacity
+         @click="mobileOpen = false"
+         class="fixed inset-0 bg-black/40 md:hidden z-40">
+    </div>
+
     <div class="flex-1 flex flex-col">
 
-        <!-- 🔷 TOPBAR -->
         {% include "partials/topbar.html" %}
 
-        <!-- 🔷 CONTENT -->
-        <main class="p-6">
-
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                        {{ message }}
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-init="setTimeout(() => show = false, 4000)"
+                         x-transition
+                         class="flex justify-between items-center p-3 rounded bg-green-50 text-green-700 border border-green-200">
+                        <span>{{ message }}</span>
+                        <button @click="show = false" class="ml-4">✕</button>
                     </div>
                 {% endfor %}
             {% endif %}
 
             {% block content %}
             {% endblock %}
-
         </main>
-
     </div>
-
 </div>
 
-<!-- 🔷 GLOBAL SCRIPT -->
 <script>
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
+function layout() {
+    return {
+        collapsed: false,
+        mobileOpen: false,
 
-    sidebar.classList.toggle('w-20');
-    sidebar.classList.toggle('w-64');
+        init() {
+            // Check screen size on load
+            if (window.innerWidth < 768) {
+                this.collapsed = true;
+            }
 
-    document.querySelectorAll('.menu-text').forEach(el => {
-        el.classList.toggle('hidden');
-    });
+            // Load saved preference
+            const saved = localStorage.getItem('sidebarCollapsed');
+            if (saved !== null) {
+                this.collapsed = (saved === 'true');
+            }
+        },
 
-    document.querySelectorAll('.section-title').forEach(el => {
-        el.classList.toggle('hidden');
-    });
-
-    document.querySelectorAll('.nav-link').forEach(el => {
-        el.classList.toggle('justify-center');
-    });
-}
-
-function toggleUserMenu() {
-    document.getElementById('userMenu').classList.toggle('hidden');
-}
-
-document.addEventListener('click', function(e) {
-    const menu = document.getElementById('userMenu');
-    if (!e.target.closest('#userMenu') && !e.target.closest('button')) {
-        menu.classList.add('hidden');
+        toggleCollapse() {
+            this.collapsed = !this.collapsed;
+            localStorage.setItem('sidebarCollapsed', this.collapsed);
+        }
     }
-});
+}
 </script>
 
 </body>

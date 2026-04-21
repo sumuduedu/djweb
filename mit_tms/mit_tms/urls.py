@@ -11,6 +11,8 @@ urlpatterns = [
 
     # ================= PUBLIC WEBSITE =================
     path('', include('apps.website.urls')),
+    path("careers/", include("apps.careers.urls")),
+
 
     # ================= ACCOUNTS (AUTH + PROFILE) =================
     path('accounts/', include('apps.accounts.urls')),
@@ -18,12 +20,18 @@ urlpatterns = [
     # ================= APPLICATION =================
     path('app/', include('apps.core.urls')),
     path('app/courses/', include('apps.courses.urls')),
+
     path('app/batches/', include('apps.batch.urls')),
     path('app/enrollment/', include('apps.enrollment.urls')),
     path('app/schedule/', include('apps.scheduling.urls')),
+    # mit_tms/urls.py
+    path("app/lessons/", include("apps.lessonplan.urls", namespace="lessonplan")),
+
+
 
     # ================= OPTIONAL =================
     path('auth/', include('allauth.urls')),  # only if used
+
 ]
 
 

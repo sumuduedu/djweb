@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+ <div class="flex-1 flex flex-col">
+
+        <!-- 🔷 TOPBAR -->
+        {% include "partials/topbar.html" %}
+
+        <!-- 🔷 CONTENT -->
+        <main class="p-6">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+
+        </main>
+
+    </div>
+<div class="flex min-h-screen">
+
+    <!-- 🔷 SIDEBAR -->
+    <aside class="w-64 bg-gray-900 text-white p-5 space-y-4">
+
+        <h2 class="text-xl font-bold">MIT TMS</h2>
+
+        <nav class="space-y-2">
+
+            <a href="/dashboard/"
+               class="block p-2 rounded hover:bg-gray-700">
+               🏠 Dashboard
+            </a>
+
+            <a href="{% url 'course_list' %}"
+               class="block p-2 rounded hover:bg-gray-700">
+               📚 Courses
+            </a>
+
+            <a href="{% url 'user_blog_list' %}"
+               class="block p-2 rounded hover:bg-gray-700">
+               📝 Blog Admin
+            </a>
+
+        </nav>
+
+        <!-- 🔴 Logout -->
+
+
+    </aside>
+
+    <!-- 🔷 CONTENT -->
+    <main class="flex-1 p-6">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+</body>
+</html>

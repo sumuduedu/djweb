@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <h1 class="text-3xl font-bold mb-6">💡 Recommendations</h1>
+
+    <!-- SUMMARY -->
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+        <h2 class="text-lg font-semibold mb-3">Your Current Status</h2>
+
+        <p>📊 Attendance: {{ attendance }}%</p>
+        <p>📈 Progress: {{ progress }}%</p>
+        <p>📝 Pending Tasks: {{ pending_tasks }}</p>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        <h2 class="text-xl font-semibold mb-4">Suggested Actions</h2>
+
+        <ul class="space-y-3">
+            {% for rec in recommendations %}
+            <li class="p-3 bg-blue-50 rounded-lg">
+                ✔ {{ rec }}
+            </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">📊 Results</h1>
+        <p class="text-gray-500">View your child's academic performance</p>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="grid md:grid-cols-3 gap-6 mb-6">
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Total Subjects</h3>
+            <p class="text-2xl font-bold">{{ results|length }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Average Score</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ avg_score }}%</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="text-sm text-gray-500">Failed Subjects</h3>
+            <p class="text-2xl font-bold text-red-600">{{ failed }}</p>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+
+        {% if results %}
+
+        <table class="w-full text-sm border">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 border">Student</th>
+                    <th class="p-3 border">Course</th>
+                    <th class="p-3 border">Score</th>
+                    <th class="p-3 border">Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in results %}
+                <tr>
+                    <td class="p-3 border">{{ r.student }}</td>
+                    <td class="p-3 border">{{ r.course }}</td>
+                    <td class="p-3 border">{{ r.score }}%</td>
+                    <td class="p-3 border">
+                        <span class="text-xs px-2 py-1 rounded
+                            {% if r.status == 'PASS' %}
+                                bg-green-100 text-green-700
+                            {% else %}
+                                bg-red-100 text-red-700
+                            {% endif %}
+                        ">
+                            {{ r.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        {% else %}
+            <p class="text-center text-gray-500 py-6">
+                No results available
+            </p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

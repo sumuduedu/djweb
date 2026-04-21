@@ -9,7 +9,6 @@ from django.http import JsonResponse
 from django.views.generic import DetailView
 from apps.website.models import ContactMessage, MessageReply, SentMessage
 from apps.courses.models import Course
-
 import json
 from openai import OpenAI
 
@@ -33,7 +32,7 @@ class HomeView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            return redirect('core:dashboard')
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -261,6 +260,96 @@ from django.views.generic import ListView, DetailView
 from django.db.models import F
 from .models import Post
 
+class BlogListView(LoginRequiredMixin,ListView):
+    model = Post
+    template_name = 'blog/blog_list.html'
+    context_object_name = 'posts'
+    paginate_by = 6  # optional (adds pagination)
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True).order_by('-created_at')
+
+
+
+class BlogDetailView(DetailView):
+    model = Post
+    template_name = 'blog/blog_detail.html'
+    context_object_name = 'post'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        # 🔥 Efficient view count increment (no race condition)
+        Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+
+        # refresh object
+        obj.refresh_from_db()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['related_posts'] = Post.objects.filter(
+            category=self.object.category,
+            is_published=True
+        ).exclude(id=self.object.id)[:3]
+
+        return context
+
+
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .models import Post
+
+class BlogCreateView(CreateView):
+    model = Post
+    template_name = 'blog/blog_form.html'
+    fields = ['title', 'slug', 'content', 'category', 'is_published']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('user_blog_detail', kwargs={'slug': self.object.slug})
+
+from django.views.generic import UpdateView
+
+class BlogUpdateView(UpdateView):
+    model = Post
+    template_name = 'blog/blog_form.html'
+    fields = ['title', 'slug', 'content', 'category', 'is_published']
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_success_url(self):
+        return reverse_lazy('user_blog_detail', kwargs={'slug': self.object.slug})
+
+from django.views.generic import DeleteView
+
+class BlogDeleteView(DeleteView):
+    model = Post
+    template_name = 'blog/blog_confirm_delete.html'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    success_url = reverse_lazy('user_blog_list')
+
+
+
+
+
+
+
+
+
+
+
+from .models import Category
 
 class PublicBlogListView(ListView):
     model = Post
@@ -268,8 +357,14 @@ class PublicBlogListView(ListView):
     context_object_name = 'posts'
     paginate_by = 6  # optional (adds pagination)
 
-    def get_queryset(self):
-        return Post.objects.filter(is_published=True).order_by('-created_at')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['recent_posts'] = Post.objects.filter(is_published=True).order_by('-created_at')[:5]
+
+        context['categories'] = Category.objects.all()
+
+        return context
 
 
 class PublicBlogDetailView(DetailView):

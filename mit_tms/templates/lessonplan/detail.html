@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto p-6 bg-white shadow text-sm">
+
+    <!-- 🔷 HEADER -->
+    <h1 class="text-2xl font-bold text-center mb-6">
+        LESSON PLAN
+    </h1>
+
+    <!-- 🔷 BASIC INFO -->
+    <table class="w-full border border-gray-400 mb-6">
+        <tr class="border">
+            <td class="p-2 font-semibold w-1/3">Training Programme</td>
+            <td class="p-2">{{ lesson.task.module.course.title }}</td>
+        </tr>
+        <tr class="border">
+            <td class="p-2 font-semibold">Module Title</td>
+            <td class="p-2">{{ lesson.task.module.title }}</td>
+        </tr>
+        <tr class="border">
+            <td class="p-2 font-semibold">Task / Topic</td>
+            <td class="p-2">{{ lesson.task.title }}</td>
+        </tr>
+        <tr class="border">
+            <td class="p-2 font-semibold">Date</td>
+            <td class="p-2">{{ lesson.date|default:"-" }}</td>
+        </tr>
+        <tr class="border">
+            <td class="p-2 font-semibold">Duration</td>
+            <td class="p-2">{{ lesson.duration_minutes }} minutes</td>
+        </tr>
+    </table>
+
+    <!-- 🎯 OBJECTIVE -->
+    <div class="mb-6">
+        <h2 class="font-bold mb-2">Objective of the Lesson</h2>
+        <p class="border p-3">
+            {{ lesson.competency|default:"Not specified" }}
+        </p>
+    </div>
+
+    <!-- 🔥 MAIN TABLE -->
+    <table class="w-full border border-gray-400 text-xs">
+
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="border p-2">No</th>
+                <th class="border p-2">Teaching & Learning Activities</th>
+                <th class="border p-2">Trainer Time</th>
+                <th class="border p-2">Learner Time</th>
+                <th class="border p-2">Method</th>
+                <th class="border p-2">Resources</th>
+                <th class="border p-2">Total Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for activity in lesson.activities.all %}
+            <tr class="border">
+                <td class="border p-2 text-center">{{ forloop.counter }}</td>
+
+                <td class="border p-2">
+                    {{ activity.description }}
+                </td>
+
+                <td class="border p-2 text-center">
+                    {{ activity.duration_minutes }} min
+                </td>
+
+                <td class="border p-2 text-center">
+                    {{ activity.duration_minutes }} min
+                </td>
+
+                <td class="border p-2 text-center">
+                    {{ activity.get_activity_type_display }}
+                </td>
+
+                <td class="border p-2">
+                    {{ lesson.materials|default:"-" }}
+                </td>
+
+                <td class="border p-2 text-center">
+                    {{ activity.duration_minutes }} min
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center p-4 text-gray-500">
+                    No activities defined
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <!-- 🎯 OUTCOMES -->
+    <div class="mt-6">
+        <h2 class="font-bold mb-2">Learning Outcomes</h2>
+
+        <ul class="list-disc pl-6">
+            {% for outcome in lesson.outcomes.all %}
+            <li>{{ outcome.description }}</li>
+            {% empty %}
+            <li>No outcomes defined</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+{% endblock %}
