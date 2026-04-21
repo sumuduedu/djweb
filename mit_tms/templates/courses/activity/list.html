@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-5xl mx-auto p-6">
+
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">
+            Activities - {{ task.title }}
+        </h2>
+
+        <a href="{% url 'courses:activity_create' task.id %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded">
+            + Add Activity
+        </a>
+    </div>
+
+    <div class="space-y-3">
+
+        {% for activity in activities %}
+        <div class="bg-white border rounded p-4">
+
+            <div class="flex justify-between">
+                <strong>{{ activity.title }}</strong>
+
+                <div class="text-sm space-x-3">
+                    <a href="{% url 'courses:activity_update' activity.id %}" class="text-yellow-600">Edit</a>
+                    <a href="{% url 'courses:activity_delete' activity.id %}" class="text-red-600">Delete</a>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mt-1">
+                {{ activity.description }}
+            </p>
+
+            <div class="text-sm text-gray-500 mt-2">
+                {{ activity.get_type_display }} |
+                ⏱ {{ activity.duration_minutes }} mins
+            </div>
+
+        </div>
+        {% empty %}
+        <p class="text-gray-400">No activities added.</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

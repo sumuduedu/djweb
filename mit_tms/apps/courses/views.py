@@ -335,3 +335,90 @@ def get_module_details(request):
         data = {}
 
     return JsonResponse(data)
+
+from .models import Activity
+class ActivityCreateView(LoginRequiredMixin, CreateView):
+    model = Activity
+    fields = ['title', 'description', 'duration_minutes', 'type', 'order']
+    template_name = "courses/activity/form.html"
+
+    def form_valid(self, form):
+        form.instance.task_id = self.kwargs.get("task_id")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("courses:activity_list", kwargs={
+            "task_id": self.kwargs.get("task_id")
+        })
+
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .models import Activity, Task
+from .forms import ActivityForm
+
+
+# ================================
+# 📋 LIST
+# ================================
+class ActivityListView(LoginRequiredMixin, ListView):
+    model = Activity
+    template_name = "courses/activity/list.html"
+    context_object_name = "activities"
+
+    def get_queryset(self):
+        return Activity.objects.filter(
+            task_id=self.kwargs.get("task_id")
+        ).order_by("order")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["task"] = get_object_or_404(Task, id=self.kwargs.get("task_id"))
+        return context
+
+
+# ================================
+# ➕ CREATE
+# ================================
+class ActivityCreateView(LoginRequiredMixin, CreateView):
+    model = Activity
+    form_class = ActivityForm
+    template_name = "courses/activity/form.html"
+
+    def form_valid(self, form):
+        form.instance.task_id = self.kwargs.get("task_id")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("courses:activity_list", kwargs={
+            "task_id": self.kwargs.get("task_id")
+        })
+
+
+# ================================
+# ✏️ UPDATE
+# ================================
+class ActivityUpdateView(LoginRequiredMixin, UpdateView):
+    model = Activity
+    form_class = ActivityForm
+    template_name = "courses/activity/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("courses:activity_list", kwargs={
+            "task_id": self.object.task.id
+        })
+
+
+# ================================
+# 🗑 DELETE
+# ================================
+class ActivityDeleteView(LoginRequiredMixin, DeleteView):
+    model = Activity
+    template_name = "courses/activity/delete.html"
+
+    def get_success_url(self):
+        return reverse_lazy("courses:activity_list", kwargs={
+            "task_id": self.object.task.id
+        })

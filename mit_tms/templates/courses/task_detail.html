@@ -14,12 +14,12 @@
         </div>
 
         <div class="space-x-2">
-            <a href="{% url 'task_update' task.pk %}"
+            <a href="{% url 'courses:task_update' task.pk %}"
                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
                 ✏️ Edit
             </a>
 
-            <a href="{% url 'task_delete' task.pk %}"
+            <a href="{% url 'courses:task_delete' task.pk %}"
                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                 🗑 Delete
             </a>
@@ -66,11 +66,10 @@
 
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold">Activities</h3>
-
-            <a href="#"
-               class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
-               + Add Activity
-            </a>
+<a href="{% url 'courses:activity_create' task.id %}"
+   class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+   + Add Activity
+</a>
         </div>
 
         {% if task.activities.all %}
@@ -91,7 +90,7 @@
 
     <!-- 🔙 Back -->
     <div>
-        <a href="{% url 'module_detail' task.module.pk %}"
+        <a href="{% url 'courses:module_detail' task.module.pk %}"
            class="text-blue-600 hover:underline">
             ⬅ Back to Module
         </a>

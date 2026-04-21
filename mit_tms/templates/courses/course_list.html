@@ -18,7 +18,7 @@
 <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold text-gray-800">Courses</h2>
 
-    <a href="{% url 'course_create' %}"
+    <a href="{% url 'courses:course_create' %}"
        class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
         + Add Course
     </a>
@@ -111,17 +111,17 @@
                 <!-- Actions -->
                 <td class="p-4 text-right space-x-2 whitespace-nowrap">
 
-                    <a href="{% url 'course_detail' course.pk %}"
+                    <a href="{% url 'courses:course_detail' course.pk %}"
                        class="text-blue-600 hover:text-blue-800 font-medium">
                         View
                     </a>
 
-                    <a href="{% url 'course_update' course.pk %}"
+                    <a href="{% url 'courses:course_update' course.pk %}"
                        class="text-yellow-600 hover:text-yellow-800 font-medium">
                         Edit
                     </a>
 
-                    <a href="{% url 'course_delete' course.pk %}"
+                    <a href="{% url 'courses:course_delete' course.pk %}"
                        class="text-red-600 hover:text-red-800 font-medium">
                         Delete
                     </a>

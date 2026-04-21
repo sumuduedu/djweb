@@ -305,14 +305,21 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
+from django.db import models
+from apps.courses.models import Task
+
 
 class Activity(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='activities')
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="activities"
+    )
 
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
-    duration_minutes = models.IntegerField()
+    duration_minutes = models.PositiveIntegerField(default=0)
 
     ACTIVITY_TYPE = [
         ('EXERCISE', 'Exercise'),
@@ -322,14 +329,19 @@ class Activity(models.Model):
         ('DISCUSSION', 'Discussion'),
     ]
 
-    type = models.CharField(max_length=20, choices=ACTIVITY_TYPE)
-    order = models.IntegerField(default=0)
+    type = models.CharField(
+        max_length=20,
+        choices=ACTIVITY_TYPE,
+        default='EXERCISE'
+    )
+
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['order']
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.task.title})"
 
 
 class StudentTask(models.Model):
@@ -371,3 +383,4 @@ class TaskStandard(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='standards')
 
     description = models.TextField()
+

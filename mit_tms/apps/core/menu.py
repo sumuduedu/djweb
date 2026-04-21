@@ -9,7 +9,7 @@ ADMIN_MENU = [
     {
         "section": "Academic",
         "items": [
-            {"name": "Courses", "url": "course_list", "icon": "📚"},
+            {"name": "Courses", "url": "courses:course_list", "icon": "📚"},
             {"name": "Batches", "url": "batch:batch_list", "icon": "📦"},
             {"name": "Timetable", "url": "schedule:timetable_list", "icon": "🗓"},
             {"name": "Calendar", "url": "schedule:calendar", "icon": "📅"},
@@ -126,7 +126,7 @@ TEACHER_MENU = [
     {
         "section": "Teaching",
         "items": [
-            {"name": "Courses", "icon": "📘", "url": "course_list"},
+            {"name": "Courses", "icon": "📘", "url": "courses:course_list"},
             {"name": "Batches", "icon": "📦", "url": "batch:batch_list"},
             {"name": "Timetable", "icon": "🗓️", "url": "schedule:timetable_list"},
             {"name": "Materials", "icon": "📂", "url": "core:teacher_materials"},

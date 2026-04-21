@@ -12,12 +12,12 @@
         </div>
 
         <div class="space-x-2">
-            <a href="{% url 'course_update' object.pk %}"
+            <a href="{% url 'courses:course_update' object.pk %}"
                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
                 ✏️ Edit
             </a>
 
-            <a href="{% url 'course_delete' object.pk %}"
+            <a href="{% url 'courses:course_delete' object.pk %}"
                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
                 🗑 Delete
             </a>
@@ -183,7 +183,7 @@
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-semibold text-gray-800">Modules</h3>
 
-            <a href="{% url 'module_create' object.pk %}"
+            <a href="{% url 'courses:module_create' object.pk %}"
                class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">
                + Add Module
             </a>
@@ -195,17 +195,17 @@
                 <div class="flex justify-between items-center border-b pb-2 mb-3">
 
                     <h4 class="text-lg font-semibold">
-                        <a href="{% url 'module_detail' module.pk %}"
+                        <a href="{% url 'courses:module_detail' module.pk %}"
                            class="text-blue-600 hover:underline">
                             {{ module.code }} - {{ module.title }}
                         </a>
                     </h4>
 
                     <div class="space-x-2 text-sm">
-                        <a href="{% url 'module_update' module.pk %}"
+                        <a href="{% url 'courses:module_update' module.pk %}"
                            class="text-yellow-600 hover:underline">Edit</a>
 
-                        <a href="{% url 'module_delete' module.pk %}"
+                        <a href="{% url 'courses:module_delete' module.pk %}"
                            class="text-red-600 hover:underline">Delete</a>
                     </div>
 
@@ -241,7 +241,7 @@
 
     <!-- 🔙 BACK -->
     <div>
-        <a href="{% url 'course_list' %}" class="text-blue-600 hover:underline">
+        <a href="{% url 'courses:course_list' %}" class="text-blue-600 hover:underline">
             ⬅ Back to Courses
         </a>
     </div>

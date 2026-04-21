@@ -246,3 +246,21 @@ CriteriaFormSet = inlineformset_factory(
     can_delete=True
 )
 
+from django import forms
+from .models import Activity
+
+
+class ActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = [
+            'title',
+            'description',
+            'duration_minutes',
+            'type',
+            'order',
+        ]
+
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }

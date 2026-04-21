@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import *
 
+
+app_name = "courses"
+
 urlpatterns = [
 
     # 🔷 Course CRUD
@@ -33,4 +36,9 @@ path('units/<int:pk>/edit/', UnitUpdateView.as_view(), name='unit_update'),
 path('units/<int:pk>/delete/', UnitDeleteView.as_view(), name='unit_delete'),
 path('units/<int:pk>/', UnitDetailView.as_view(), name='unit_detail'),
 path('courses/<int:pk>/ncs/', CourseNCSView.as_view(), name='course_ncs'),
+
+path("task/<int:task_id>/activities/", ActivityListView.as_view(), name="activity_list"),
+path("task/<int:task_id>/activities/add/", ActivityCreateView.as_view(), name="activity_create"),
+path("activity/<int:pk>/edit/", ActivityUpdateView.as_view(), name="activity_update"),
+path("activity/<int:pk>/delete/", ActivityDeleteView.as_view(), name="activity_delete"),
 ]
