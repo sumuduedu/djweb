@@ -3,7 +3,7 @@ from django import forms
 from django.forms import inlineformset_factory
 
 from .models import Course, Module, Task, Unit, Element, PerformanceCriteria
-
+from .models import Course, LearningResource
 # =========================================================
 # 🔷 COURSE FORM
 # =========================================================
@@ -29,7 +29,7 @@ class CourseForm(forms.ModelForm):
             'curriculum_category': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'curriculum_availability': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'equivalent_course': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'industry_sector': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
+            'industry': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
 
             # DELIVERY
             'delivery_mode': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
@@ -264,3 +264,14 @@ class ActivityForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
+
+from django.forms import inlineformset_factory
+
+
+ResourceFormSet = inlineformset_factory(
+    Course,
+    LearningResource,
+    fields=['name', 'type', 'file', 'url', 'description'],  # ✅ removed 'order'
+    extra=1,
+    can_delete=True
+)

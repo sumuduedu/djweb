@@ -65,7 +65,7 @@
         <div class="flex justify-between pt-4">
 
             <a href="{% if object %}
-                        {% url 'course_detail' object.course.pk %}
+                        {% url 'course_list' %}
                      {% else %}
                         {% url 'course_detail' view.kwargs.course_id %}
                      {% endif %}"

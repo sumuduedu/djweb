@@ -4,6 +4,14 @@ from .base import BaseView
 class TeacherDashboardView(BaseView):
     allowed_roles = ['TEACHER']
     template_name = "dashboard/teacher.html"
+from apps.courses.models import Course
+
+from apps.courses.models import Course
+
+from apps.courses.models import Course
+
+from apps.accounts.models import Teacher
+from apps.courses.models import Course
 
 class TeacherCoursesView(BaseView):
     allowed_roles = ['TEACHER']
@@ -12,14 +20,21 @@ class TeacherCoursesView(BaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # 🔥 TEMP DATA
-        courses = [
-            {"title": "Python Programming", "batches": 2},
-            {"title": "Web Design", "batches": 1},
-        ]
+        user = self.request.user
+
+        # 🔥 Get Teacher instance
+        teacher = Teacher.objects.filter(user=user).first()
+
+        if teacher:
+            courses = Course.objects.filter(
+                batches__teacher=teacher
+            ).distinct().prefetch_related("units", "modules")
+        else:
+            courses = Course.objects.none()
 
         context["courses"] = courses
         return context
+
 class TeacherAssignmentsView(BaseView):
     allowed_roles = ['TEACHER']
     template_name = "dashboard/teachers/assignments.html"

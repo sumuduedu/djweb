@@ -16,9 +16,9 @@
         <div class="flex justify-between">
 
             <a href="{% if object %}
-                        {% url 'module_detail' object.module.pk %}
+                        {% url 'courses:module_detail' object.course.pk %}
                      {% else %}
-                        {% url 'module_detail' view.kwargs.module_id %}
+                        {% url 'courses:module_detail' view.kwargs.module_id %}
                      {% endif %}"
                class="text-gray-600 hover:underline">
                Cancel

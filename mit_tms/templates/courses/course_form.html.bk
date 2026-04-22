@@ -84,9 +84,8 @@
                 </div>
 
                 <div>
-
                     <label>Industry Sector</label>
-                   {{ form.industry }}
+                    {{ form.industry_sector }}
                 </div>
             </div>
         </div>
@@ -197,11 +196,7 @@
         <!-- ========================= -->
         <div class="border-b pb-4">
             <h3 class="font-semibold mb-3">Resources</h3>
-<div class="border-b pb-4">
-    <h3 class="font-semibold mb-3">Physical Resources</h3>
 
-    {{ form.physical_resources }}
-</div>
             <div>
                 <label>Tools Available</label>
                 {{ form.tools_available }}
@@ -218,22 +213,6 @@
             </div>
         </div>
 
-        <div class="border-b pb-4">
-    <h3 class="font-semibold mb-3">Learning Resources</h3>
-
-    {{ resource_formset.management_form }}
-
-    {% for form in resource_formset %}
-        <div class="border p-3 rounded mb-2">
-            {{ form.name }}
-            {{ form.type }}
-            {{ form.file }}
-            {{ form.url }}
-            {{ form.description }}
-            {{ form.DELETE }}
-        </div>
-    {% endfor %}
-</div>
         <!-- ========================= -->
         <!-- 🔷 NVQ -->
         <!-- ========================= -->
@@ -274,7 +253,7 @@
         <!-- 🔷 ACTIONS -->
         <!-- ========================= -->
         <div class="flex justify-between pt-4">
-            <a href="{% url 'courses:course_list' %}" class="text-gray-600">
+            <a href="{% url 'course_list' %}" class="text-gray-600">
                 Cancel
             </a>
 

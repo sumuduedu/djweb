@@ -123,24 +123,56 @@ TEACHER_MENU = [
             {"name": "Dashboard", "icon": "🏠", "url": "core:teacher_dashboard"},
         ]
     },
-    {
-        "section": "Teaching",
+ {
+        "section": "Communication",
         "items": [
-            {"name": "Courses", "icon": "📘", "url": "courses:course_list"},
-            {"name": "Batches", "icon": "📦", "url": "batch:batch_list"},
-            {"name": "Timetable", "icon": "🗓️", "url": "schedule:timetable_list"},
-            {"name": "Materials", "icon": "📂", "url": "core:teacher_materials"},
-            {"name": "Lesson Plan", "icon": "📂", "url": "lessonplan:list"},
-
+            {
+                "name": "Notifications",
+                "icon": "🔔",
+                "url": "core:teacher_notifications",
+                "badge": "notifications"
+            },
+            {"name": "Messages", "icon": "💬", "url": "core:teacher_messages"},
+            {"name": "Announcements", "icon": "📢", "url": "core:teacher_announcements"},
         ]
     },
+  {
+    "section": "Teaching & Delivery",
+    "items": [
+        {
+            "name": "My Courses",
+            "icon": "📘",
+            "url": "core:teacher_courses"
+        },
+        {
+            "name": "My Batches",
+            "icon": "📦",
+            "url": "batch:batch_list"
+        },
+        {
+            "name": "Learning Materials",
+            "icon": "📂",
+            "url": "core:teacher_materials"
+        },
+    ]
+},
     {
-        "section": "Academic",
+        "section": "Assesments & Evaluation",
         "items": [
             {"name": "Assignments", "icon": "📝", "url": "core:teacher_assignments"},
             {"name": "Submissions", "icon": "📥", "url": "core:teacher_submissions"},
             {"name": "Attendance", "icon": "📊", "url": "core:teacher_attendance"},
             {"name": "Grading", "icon": "🏆", "url": "core:teacher_results"},
+        ]
+    },
+
+     {
+        "section": "Lesson Planing & Schduling ",
+        "items": [
+            {"name": "Timetable", "icon": "🗓️", "url": "schedule:timetable_list"},
+            {"name": "Lesson Plan", "icon": "📂", "url": "lessonplan:list"},
+
+
         ]
     },
     {
@@ -162,19 +194,7 @@ TEACHER_MENU = [
             {"name": "Analytics", "icon": "🧠", "url": "core:teacher_analytics"},
         ]
     },
-    {
-        "section": "Communication",
-        "items": [
-            {
-                "name": "Notifications",
-                "icon": "🔔",
-                "url": "core:teacher_notifications",
-                "badge": "notifications"
-            },
-            {"name": "Messages", "icon": "💬", "url": "core:teacher_messages"},
-            {"name": "Announcements", "icon": "📢", "url": "core:teacher_announcements"},
-        ]
-    },
+
     {
         "section": "Account",
         "items": [

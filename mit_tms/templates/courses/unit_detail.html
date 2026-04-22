@@ -1,105 +1,105 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <div class="max-w-6xl mx-auto space-y-8">
 
-    <!-- 🔷 HEADER -->
-    <div class="flex justify-between items-center">
+    <!-- ================= HEADER ================= -->
+    <div class="flex justify-between items-start bg-white p-6 rounded-xl shadow border">
 
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">
-                {{ unit.code }} - {{ unit.title }}
-            </h2>
-            <p class="text-sm text-gray-500">
-                Level: {{ unit.level|default:"-" }}
-            </p>
+            <h1 class="text-2xl font-semibold text-gray-800">
+                {{ unit.code }} — {{ unit.title }}
+            </h1>
+
+            <div class="mt-2 flex gap-3 text-sm text-gray-500">
+                <span>Level: {{ unit.level|default:"-" }}</span>
+                <span>•</span>
+                <span>{{ unit.total_hours }} hrs</span>
+            </div>
         </div>
 
-        <div class="space-x-2">
-            <a href="{% url 'unit_update' unit.pk %}"
-               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
-                ✏️ Edit
+        <!-- Actions -->
+        <div class="flex gap-2">
+            <a href="{% url 'courses:unit_update' unit.pk %}"
+               class="px-4 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                Edit
             </a>
 
-            <a href="{% url 'unit_delete' unit.pk %}"
-               class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-                🗑 Delete
+            <a href="{% url 'courses:unit_delete' unit.pk %}"
+               class="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                Delete
             </a>
         </div>
 
     </div>
 
 
-    <!-- 📄 DESCRIPTION -->
-    <div class="bg-white shadow rounded-xl p-6">
-        <p class="text-gray-700 leading-relaxed">
-            {{ unit.description|default:"No description available" }}
+    <!-- ================= DESCRIPTION ================= -->
+    <div class="bg-white p-6 rounded-xl shadow border">
+        <h3 class="text-lg font-medium text-gray-800 mb-2">Description</h3>
+        <p class="text-gray-600 leading-relaxed">
+            {{ unit.description|default:"No description available." }}
         </p>
     </div>
 
 
-<!-- 🔥 ELEMENTS & PERFORMANCE CRITERIA -->
-<div>
+    <!-- ================= ELEMENTS ================= -->
+    <div class="bg-white p-6 rounded-xl shadow border">
 
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">
-        Elements & Performance Criteria
-    </h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-800">
+                Elements & Performance Criteria
+            </h3>
 
-    {% for element in unit.elements.all %}
-        <div class="bg-white shadow rounded-xl p-5 mb-4">
-
-            <!-- ✅ Element Title (shown ONCE) -->
-            <p class="font-semibold text-gray-800 mb-2">
-                {{ element.title }}
-            </p>
-
-            <!-- ✅ Criteria List -->
-            {% if element.criteria.all %}
-                <ul class="ml-4 space-y-1 text-sm text-gray-600">
-                    {% for pc in element.criteria.all %}
-                        <li class="flex items-start gap-2">
-                            <span class="text-gray-400">•</span>
-                            <span>{{ pc.description }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-gray-400 text-sm ml-4">
-                    No performance criteria defined
-                </p>
-            {% endif %}
-
+            <a href="{% url 'courses:element_create' unit.pk %}"
+               class="text-sm text-green-600 hover:underline">
+                + Add Element
+            </a>
         </div>
-    {% empty %}
-        <div class="text-gray-500 text-center p-6 bg-white rounded shadow">
-            No elements available
-        </div>
-    {% endfor %}
 
-</div>
+        {% for element in unit.elements.all %}
+            <div class="border rounded-lg p-4 mb-3">
 
-
-    <!-- 🔥 RELATED TASKS -->
-    <div>
-
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">
-            Related Tasks
-        </h3>
-
-        {% for task in unit.task_set.all %}
-            <div class="bg-white shadow rounded-xl p-4 mb-3 flex justify-between items-center">
-
-                <div>
-                    <p class="font-medium text-gray-800">
-                        {{ task.title }}
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        {{ task.duration_hours }} hrs
+                <div class="flex justify-between items-center mb-2">
+                    <p class="font-semibold text-gray-800">
+                        {{ element.title }}
                     </p>
                 </div>
 
-                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                {% if element.criteria.all %}
+                    <ul class="ml-4 space-y-1 text-sm text-gray-600">
+                        {% for pc in element.criteria.all %}
+                            <li>• {{ pc.description }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-400 text-sm ml-4">
+                        No criteria added
+                    </p>
+                {% endif %}
+
+            </div>
+        {% empty %}
+            <p class="text-gray-400 text-sm">No elements available</p>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- ================= TASKS ================= -->
+    <div class="bg-white p-6 rounded-xl shadow border">
+
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Related Tasks</h3>
+
+        {% for task in unit.task_set.all %}
+            <div class="flex justify-between items-center border-b py-3">
+
+                <div>
+                    <p class="font-medium text-gray-800">{{ task.title }}</p>
+                    <p class="text-sm text-gray-500">{{ task.duration_hours }} hrs</p>
+                </div>
+
+                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                     Task
                 </span>
 
@@ -111,24 +111,17 @@
     </div>
 
 
-    <!-- 🔥 ASSESSMENTS -->
-    <div>
+    <!-- ================= ASSESSMENTS ================= -->
+    <div class="bg-white p-6 rounded-xl shadow border">
 
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">
-            Assessments
-        </h3>
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Assessments</h3>
 
-        {% for assessment in unit.course.assessment_set.all %}
-            <div class="bg-white shadow rounded-xl p-4 mb-3">
-
-                <p class="font-medium text-gray-800">
-                    {{ assessment.title }}
-                </p>
-
+        {% for a in unit.course.assessment_set.all %}
+            <div class="border-b py-3">
+                <p class="font-medium text-gray-800">{{ a.title }}</p>
                 <p class="text-sm text-gray-500">
-                    {{ assessment.type }} | {{ assessment.max_marks }} Marks
+                    {{ a.type }} • {{ a.max_marks }} marks
                 </p>
-
             </div>
         {% empty %}
             <p class="text-gray-400 text-sm">No assessments available</p>
@@ -137,24 +130,15 @@
     </div>
 
 
-    <!-- 🔥 RESOURCES -->
-    <div>
+    <!-- ================= RESOURCES ================= -->
+    <div class="bg-white p-6 rounded-xl shadow border">
 
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">
-            Resources
-        </h3>
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Resources</h3>
 
-        {% for resource in unit.course.resource_set.all %}
-            <div class="bg-white shadow rounded-xl p-4 mb-3">
-
-                <p class="font-medium text-gray-800">
-                    {{ resource.name }}
-                </p>
-
-                <p class="text-sm text-gray-500">
-                    {{ resource.type }}
-                </p>
-
+        {% for r in unit.course.resource_set.all %}
+            <div class="border-b py-3">
+                <p class="font-medium text-gray-800">{{ r.name }}</p>
+                <p class="text-sm text-gray-500">{{ r.type }}</p>
             </div>
         {% empty %}
             <p class="text-gray-400 text-sm">No resources available</p>
@@ -163,11 +147,11 @@
     </div>
 
 
-    <!-- 🔙 BACK -->
+    <!-- ================= BACK ================= -->
     <div>
-        <a href="{% url 'course_detail' unit.course.pk %}"
-           class="text-blue-600 hover:underline">
-            ⬅ Back to Course
+        <a href="{% url 'courses:course_detail' unit.course.pk %}"
+           class="text-blue-600 hover:underline text-sm">
+            ← Back to Course
         </a>
     </div>
 
