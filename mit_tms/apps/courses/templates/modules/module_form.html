@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
+
+    <h2 class="text-xl font-bold mb-4">
+        {% if object %}Edit Module{% else %}Add Module{% endif %}
+    </h2>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="flex justify-between">
+
+            <!-- ✅ FIXED CANCEL BUTTON -->
+            <a href="{% if object %}
+                        {% url 'course_detail' object.course.pk %}
+                     {% else %}
+                        {% url 'course_detail' view.kwargs.course_id %}
+                     {% endif %}"
+               class="text-gray-600 hover:underline">
+               Cancel
+            </a>
+
+            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Save
+            </button>
+        </div>
+    </form>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const codeField = document.getElementById("id_code");
+    const url = "{% url 'courses:get_module_details' %}";
+
+    if (codeField) {
+        codeField.addEventListener("change", function() {
+
+            let code = this.value;
+
+            fetch(url + "?code=" + code)
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.title) {
+
+                        document.getElementById("id_title").value = data.title || "";
+                        document.getElementById("id_description").value = data.description || "";
+                        document.getElementById("id_module_type").value = data.module_type || "";
+
+                        document.getElementById("id_total_hours").value = data.total_hours || "";
+                        document.getElementById("id_theory_hours").value = data.theory_hours || "";
+                        document.getElementById("id_practical_hours").value = data.practical_hours || "";
+
+                        document.getElementById("id_learning_outcomes").value = data.learning_outcomes || "";
+                        document.getElementById("id_theory_content").value = data.theory_content || "";
+                        document.getElementById("id_practical_content").value = data.practical_content || "";
+
+                        document.getElementById("id_teaching_methods").value = data.teaching_methods || "";
+                        document.getElementById("id_assessment_methods").value = data.assessment_methods || "";
+
+                        document.getElementById("id_order").value = data.order || "";
+
+                    }
+
+                })
+                .catch(error => console.error("Error:", error));
+
+        });
+    }
+
+});
+</script>
+{% endblock %}

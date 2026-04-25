@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="p-6 max-w-3xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            Create NCS
+        </h1>
+        <p class="text-gray-500">
+            Fill in the details to create a new NCS record
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow p-6">
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <!-- Errors -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-100 text-red-700 p-3 rounded">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                </label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+
+            <!-- Code -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Code
+                </label>
+                {{ form.code }}
+                {{ form.code.errors }}
+            </div>
+
+            <!-- Level -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Level
+                </label>
+                {{ form.level }}
+                {{ form.level.errors }}
+            </div>
+
+            <!-- Sector -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Sector
+                </label>
+                {{ form.sector }}
+                {{ form.sector.errors }}
+            </div>
+
+            <!-- Version -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Version
+                </label>
+                {{ form.version }}
+                {{ form.version.errors }}
+            </div>
+
+            <!-- Active -->
+            <div class="flex items-center space-x-2">
+                {{ form.is_active }}
+                <label class="text-sm text-gray-700">
+                    Active
+                </label>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-4">
+
+                <a href="{% url 'courses:ncs_list' %}"
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Save NCS
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

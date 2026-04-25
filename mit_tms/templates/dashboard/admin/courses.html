@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <p class="text-gray-500">Course & NCS Management</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex gap-6 border-b mb-6">
+
+        <button class="tab-btn active-tab"
+                data-tab="courses">
+            📚 Courses
+        </button>
+
+        <button class="tab-btn"
+                data-tab="ncs">
+            🧩 NCS Structure
+        </button>
+
+    </div>
+
+    <!-- COURSES TAB -->
+    <div id="courses" class="tab-panel">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+            <div class="card">Total: {{ total_courses }}</div>
+            <div class="card">2026: {{ current_year_courses }}</div>
+            <div class="card">Students: {{ total_students_enrolled }}</div>
+            <div class="card">Active: {{ active_courses }}</div>
+
+        </div>
+
+        <a href="{% url 'courses:course_list' %}"
+           class="btn-blue">
+            Manage Courses
+        </a>
+
+    </div>
+
+    <!-- NCS TAB -->
+    <div id="ncs" class="tab-panel hidden">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+            <div class="card">Units: {{ total_units }}</div>
+            <div class="card">Elements: {{ total_elements }}</div>
+            <div class="card">Activities: {{ total_activities }}</div>
+            <div class="card">Hours: {{ total_hours }}</div>
+
+        </div>
+
+        <div class="card mb-4">
+            <h3 class="font-semibold">NCS Versions</h3>
+            <p>Current: {{ current_ncs_version }}</p>
+            <p>Old: {{ old_ncs_count }}</p>
+        </div>
+
+        <a href="{% url 'courses:ncs_list' %}"
+           class="btn-purple">
+            Open NCS Management
+        </a>
+
+    </div>
+
+</div>
+
+<!-- STYLES -->
+<style>
+.tab-btn {
+    padding: 8px 16px;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+}
+.active-tab {
+    color: #2563eb;
+    border-color: #2563eb;
+}
+.tab-panel {
+    display: block;
+}
+.hidden {
+    display: none;
+}
+.card {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.btn-blue {
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+.btn-purple {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+</style>
+
+<!-- JS -->
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+
+        // remove active
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active-tab"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+
+        // activate
+        this.classList.add("active-tab");
+        document.getElementById(this.dataset.tab).classList.remove("hidden");
+
+    });
+});
+</script>
+
+{% endblock %}

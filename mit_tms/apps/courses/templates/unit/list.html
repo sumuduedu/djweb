@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800">
+                Units - {{ course.title }}
+            </h2>
+            <p class="text-sm text-gray-500">Manage Units & Elements</p>
+        </div>
+
+        <a href="{% url 'courses:unit_create' ncs_id %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
+            + Add Unit
+        </a>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow border overflow-hidden">
+
+        <table class="w-full text-sm">
+
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                <tr>
+                    <th class="p-4 text-left">Unit Title</th>
+                    <th class="p-4">Code</th>
+                    <th class="p-4">Level</th>
+                    <th class="p-4">Elements</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for u in units %}
+                <tr class="border-b hover:bg-gray-50">
+
+                    <td class="p-4 font-medium">{{ u.title }}</td>
+                    <td class="p-4">{{ u.code }}</td>
+                    <td class="p-4">{{ u.level }}</td>
+                    <td class="p-4">{{ u.elements.count }}</td>
+
+                    <td class="p-4 text-right space-x-2">
+                        <a href="{% url 'courses:unit_detail' u.pk %}" class="text-blue-600">View</a>
+                        <a href="{% url 'courses:unit_update' u.pk %}" class="text-yellow-600">Edit</a>
+                        <a href="{% url 'courses:unit_delete' u.pk %}" class="text-red-600">Delete</a>
+                    </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="p-6 text-center text-gray-400">
+                        No units available.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

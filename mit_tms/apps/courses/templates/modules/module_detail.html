@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto">
+
+    <!-- 🔷 Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">{{ module.title }}</h2>
+            <p class="text-sm text-gray-500">{{ module.code }}</p>
+        </div>
+
+        <div class="space-x-2">
+            <a href="{% url 'courses:module_update' module.pk %}"
+               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
+                ✏️ Edit
+            </a>
+
+            <a href="{% url 'courses:module_delete' module.pk %}"
+               class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                🗑 Delete
+            </a>
+        </div>
+    </div>
+
+
+    <!-- 📦 Module Info -->
+    <div class="bg-white shadow rounded-xl p-6 mb-8 space-y-4">
+
+        <div>
+            <p class="text-sm text-gray-500">Description</p>
+            <p class="text-gray-700">{{ module.description|default:"-" }}</p>
+        </div>
+
+        <div>
+            <p class="text-sm text-gray-500">Order</p>
+            <p class="font-medium">{{ module.order }}</p>
+        </div>
+
+    </div>
+
+
+    <!-- 🔥 Tasks Section -->
+    <div>
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Tasks</h3>
+
+            <!-- ✅ FIXED LINK -->
+            <a href="{% url 'courses:task_create' module.pk %}"
+               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+               + Add Task
+            </a>
+        </div>
+
+
+        {% for task in module.tasks.all %}
+            <div class="bg-white shadow rounded-lg p-4 mb-3 flex justify-between items-center">
+
+                <!-- Task Info -->
+                <div>
+                    <p class="font-medium text-gray-800">{{ task.title }}</p>
+                    <p class="text-sm text-gray-500">
+                        {{ task.duration_hours }} hrs
+                    </p>
+                </div>
+
+                <!-- ✅ Task Actions -->
+                <div class="space-x-3 text-sm">
+                        <a href="{% url 'courses:task_detail' task.pk %}"
+                        class="font-medium text-blue-600 hover:underline">
+                        {{ task.title }}
+                        </a>
+                        <a href="{% url 'courses:task_update' task.pk %}"
+                        class="text-yellow-600 hover:underline">Edit</a>
+                        <a href="{% url 'courses:task_delete' task.pk %}"
+                       class="text-red-600 hover:underline">Delete</a>
+                </div>
+
+            </div>
+
+        {% empty %}
+            <!-- ✅ Empty State -->
+            <div class="bg-white p-6 text-center text-gray-500 rounded shadow">
+                No tasks available.
+                <div class="mt-2">
+                    <a href="{% url 'courses:task_create' module.pk %}"
+                       class="text-blue-600 underline">
+                        Add your first task
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔙 Back -->
+    <div class="mt-6">
+        <a href="{% url 'courses:course_detail' module.course.pk %}"
+           class="text-blue-600 hover:underline">
+            ⬅ Back to Course
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

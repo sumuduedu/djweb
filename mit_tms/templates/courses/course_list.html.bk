@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 🔔 Messages -->
+{% if messages %}
+<div class="mb-6 space-y-2">
+    {% for message in messages %}
+        <div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 shadow-sm">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+<!-- ============================= -->
+<!-- 📘 COURSES SECTION -->
+<!-- ============================= -->
+
+<div class="mb-10">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800">Courses</h2>
+            <p class="text-sm text-gray-500">Manage all available courses</p>
+        </div>
+
+        <a href="{% url 'courses:course_create' %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            + Add Course
+        </a>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <table class="w-full text-sm">
+
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs border-b">
+                <tr>
+                    <th class="p-4 text-left">Title</th>
+                    <th class="p-4">Code</th>
+                    <th class="p-4">Level</th>
+                    <th class="p-4">NVQ</th>
+                    <th class="p-4">Duration</th>
+                    <th class="p-4">Hours</th>
+                    <th class="p-4">Fees</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for course in courses %}
+                <tr class="border-b hover:bg-gray-50 transition">
+
+                    <td class="p-4 font-medium text-gray-800">
+                        {{ course.title }}
+                    </td>
+
+                    <td class="p-4 text-gray-600">{{ course.code }}</td>
+
+                    <td class="p-4">
+                        <span class="badge-blue">{{ course.level }}</span>
+                    </td>
+
+                    <td class="p-4">
+                        {% if course.nvq_level %}
+                            NVQ {{ course.nvq_level }}
+                        {% else %}
+                            <span class="text-gray-400">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4">{{ course.duration_months }} mo</td>
+                    <td class="p-4">{{ course.total_hours }} hrs</td>
+
+                    <td class="p-4">
+                        {% if course.course_fee %}
+                            Rs. {{ course.course_fee }}
+                        {% else %}
+                            <span class="text-green-600 font-medium">Free</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4">
+                        {% if course.active %}
+                            <span class="badge-green">Active</span>
+                        {% else %}
+                            <span class="badge-red">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4 text-right space-x-3">
+                        <a href="{% url 'courses:course_detail' course.pk %}" class="action-blue">View</a>
+                        <a href="{% url 'courses:course_update' course.pk %}" class="action-yellow">Edit</a>
+                        <a href="{% url 'courses:course_delete' course.pk %}" class="action-red">Delete</a>
+                    </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="p-6 text-center text-gray-500">
+                        No courses available.
+                        <a href="{% url 'courses:course_create' %}" class="text-blue-600 underline ml-1">
+                            Create one
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- 🧠 NCS / UNITS SECTION -->
+<!-- ============================= -->
+
+<div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800">NCS / Units</h2>
+            <p class="text-sm text-gray-500">Manage competency standards</p>
+        </div>
+
+        <!-- ⚠️ MUST PASS course_id -->
+        {% if courses %}
+        <a href="{% url 'courses:unit_create' courses.0.pk %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition">
+            + Add Unit
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <table class="w-full text-sm">
+
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs border-b">
+                <tr>
+                    <th class="p-4 text-left">Unit Title</th>
+                    <th class="p-4">Code</th>
+                    <th class="p-4">Level</th>
+                    <th class="p-4">Hours</th>
+                    <th class="p-4">Elements</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for unit in units %}
+                <tr class="border-b hover:bg-gray-50 transition">
+
+                    <td class="p-4 font-medium text-gray-800">{{ unit.title }}</td>
+                    <td class="p-4">{{ unit.code }}</td>
+
+                    <td class="p-4">
+                        <span class="badge-blue">{{ unit.level }}</span>
+                    </td>
+
+                    <td class="p-4">{{ unit.total_hours }} hrs</td>
+                    <td class="p-4">{{ unit.elements.count }}</td>
+
+                    <td class="p-4 text-right space-x-3">
+                        <a href="{% url 'courses:unit_detail' unit.pk %}" class="action-blue">View</a>
+                        <a href="{% url 'courses:element_create' unit.pk %}" class="action-green">+ Element</a>
+                        <a href="{% url 'courses:unit_update' unit.pk %}" class="action-yellow">Edit</a>
+                        <a href="{% url 'courses:unit_delete' unit.pk %}" class="action-red">Delete</a>
+                    </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="p-6 text-center text-gray-500">
+                        No units available.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<style>
+.badge-blue { @apply px-2 py-1 text-xs rounded bg-blue-100 text-blue-700; }
+.badge-green { @apply px-2 py-1 text-xs rounded bg-green-100 text-green-700; }
+.badge-red { @apply px-2 py-1 text-xs rounded bg-red-100 text-red-600; }
+
+.action-blue { @apply text-blue-600 hover:text-blue-800 font-medium; }
+.action-yellow { @apply text-yellow-600 hover:text-yellow-800 font-medium; }
+.action-red { @apply text-red-600 hover:text-red-800 font-medium; }
+.action-green { @apply text-green-600 hover:text-green-800 font-medium; }
+</style>
+{% endblock %}
