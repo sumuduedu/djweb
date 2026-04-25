@@ -20,6 +20,8 @@
 
 <div class="mb-10">
 
+
+
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
         <div>
@@ -31,6 +33,19 @@
            class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
             + Add Course
         </a>
+
+<a href="{% url 'core:dynamic_list' 'unit' %}"
+   class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+    + Add Unit
+</a>
+<a href="{% url 'core:dynamic_list' 'ncs' %}"
+   class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+    + Add ncs
+</a>
+<a href="{% url 'core:dynamic_list' 'package' %}"
+   class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+    + Add package
+</a>
     </div>
 
     <!-- Table -->

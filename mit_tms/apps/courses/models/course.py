@@ -77,7 +77,7 @@ class Course(BaseModel):
     description = models.TextField(blank=True)
 
 
-    active = models.BooleanField(default=True)
+
 
     # =====================================================
     # 🔷 ACADEMIC STRUCTURE

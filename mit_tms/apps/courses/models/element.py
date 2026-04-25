@@ -1,10 +1,11 @@
 from django.db import models
 from .base import BaseModel
+from .unit import Unit
 
 
 class Element(BaseModel):
     unit = models.ForeignKey(
-        'courses.Unit',
+        Unit,
         on_delete=models.CASCADE,
         related_name="elements"
     )

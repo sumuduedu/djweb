@@ -9,7 +9,7 @@ ADMIN_MENU = [
     {
         "section": "Academic",
         "items": [
-            {"name": "Courses", "url": "courses:course_list", "icon": "📚"},
+            {"name": "Courses", "url": "core:admin_courses", "icon": "📚"},
             {"name": "Batches", "url": "batch:batch_list", "icon": "📦"},
             {"name": "Timetable", "url": "schedule:timetable_list", "icon": "🗓"},
             {"name": "Calendar", "url": "schedule:calendar", "icon": "📅"},

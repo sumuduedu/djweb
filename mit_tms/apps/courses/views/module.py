@@ -8,7 +8,8 @@ from .base import (
 )
 
 from ..models import Module
-from ..forms import ModuleForm
+from apps.courses.forms.module import ModuleForm
+
 
 class ModuleCreateView(BaseChildCreateView):
     model = Module

@@ -1,5 +1,6 @@
 from django.urls import path
-
+from django.urls import path
+from apps.core.views.crud import *
 from .views import (
     # Home
     HomeView,
@@ -13,6 +14,10 @@ from .views import (
     ParentDashboardView,
     GuestDashboardView,
     AlumniDashboardView,
+
+    # Admin Views
+    AdminCourseView,
+
 
     # Student Views
     StudentCoursesView,
@@ -69,8 +74,11 @@ from .views import (
     ParentNotificationsView,
 
     # Alumni Views
-    # AlumniJobsView,
-    # AlumniEventsView,
+     AlumniJobsView,
+     AlumniEventsView,
+     AlumniEventsView,
+     AlumniNetworkView,
+     AlumniCertificatesView,
 )
 
 app_name = "core"
@@ -83,6 +91,7 @@ urlpatterns = [
     # ================= REDIRECT =================
     path('dashboard/', dashboard_redirect, name='dashboard'),
 
+
     # ================= DASHBOARDS =================
     path('dashboard/admin/', AdminDashboardView.as_view(), name='admin_dashboard'),
     path('dashboard/staff/', StaffDashboardView.as_view(), name='staff_dashboard'),
@@ -91,6 +100,12 @@ urlpatterns = [
     path('dashboard/parent/', ParentDashboardView.as_view(), name='parent_dashboard'),
     path('dashboard/guest/', GuestDashboardView.as_view(), name='guest_dashboard'),
     path('dashboard/alumni/', AlumniDashboardView.as_view(), name='alumni_dashboard'),
+
+
+    # ==================Admin Dashboards =====================
+    path('dashboard/courses/', AdminCourseView.as_view(), name='admin_courses'),
+
+
 
     # =====================================================
     # 🎓 STUDENT MODULE
@@ -156,8 +171,20 @@ urlpatterns = [
     # =====================================================
     # 🎓 ALUMNI MODULE
     # =====================================================
-    # path('alumni/jobs/', AlumniJobsView.as_view(), name='alumni_jobs'),
-    # path('alumni/events/', AlumniEventsView.as_view(), name='alumni_events'),
-    # path('alumni/network/', AlumniNetworkView.as_view(), name='alumni_network'),
-    # path('alumni/certificates/', AlumniCertificatesView.as_view(), name='alumni_certificates'),
+     path('alumni/jobs/', AlumniJobsView.as_view(), name='alumni_jobs'),
+     path('alumni/events/', AlumniEventsView.as_view(), name='alumni_events'),
+     path('alumni/network/', AlumniNetworkView.as_view(), name='alumni_network'),
+     path('alumni/certificates/', AlumniCertificatesView.as_view(), name='alumni_certificates'),
+    #=====================================================
+    #🔥 DYNAMIC CRUD SYSTEM (SAFE ZONE)
+    #=====================================================
+    path('manage/<str:entity>/', DynamicListView.as_view(), name='dynamic_list'),
+    path('manage/<str:entity>/add/', DynamicCreateView.as_view(), name='dynamic_create'),
+    path('manage/<str:entity>/<int:pk>/edit/', DynamicUpdateView.as_view(), name='dynamic_update'),
+    path('manage/<str:entity>/<int:pk>/delete/', DynamicDeleteView.as_view(), name='dynamic_delete'),
+
 ]
+
+
+
+

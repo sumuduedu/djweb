@@ -8,7 +8,7 @@ from .views.activity import *
 from .views.ajax import *
 from .views.task import *
 from .views.assessment import *
-
+from .views.ncs import *
 app_name = "courses"
 
 urlpatterns = [
@@ -38,8 +38,16 @@ path('tasks/<int:pk>/delete/', TaskDeleteView.as_view(), name='task_delete'),
 path('tasks/<int:pk>/', TaskDetailView.as_view(), name='task_detail'),
 
 
-path('units/add/units/', UnitCreateView.as_view(), name='units_create'),
-path('units/add/<int:course_id>/', UnitCreateView.as_view(), name='unit_create'),
+   path("ncs/", NCSListView.as_view(), name="ncs_list"),
+    path("ncs/add/", NCSCreateView.as_view(), name="ncs_create"),
+    path("ncs/<int:pk>/edit/", NCSUpdateView.as_view(), name="ncs_update"),
+    path("ncs/<int:pk>/delete/", NCSDeleteView.as_view(), name="ncs_delete"),
+path('ncs/<int:ncs_id>/units/', UnitListByNCSView.as_view(), name='unit_list_by_ncs'),
+path('ncs/<int:ncs_id>/packages/add/', PackageCreateView.as_view(), name='package_create'),
+
+path('units/', UnitListView.as_view(), name='unit_list'),
+
+path('units/add/<int:ncs_id>/', UnitCreateView.as_view(), name='unit_create'),
 path('units/<int:pk>/edit/', UnitUpdateView.as_view(), name='unit_update'),
 path('units/<int:pk>/delete/', UnitDeleteView.as_view(), name='unit_delete'),
 path('units/<int:pk>/', UnitDetailView.as_view(), name='unit_detail'),

@@ -15,6 +15,8 @@ class CourseListView(BaseListView):
 
     def get_queryset(self):
         return Course.objects.all().order_by('-created_at')
+
+
 from .base import BaseDetailView
 from ..models import Course
 
@@ -70,10 +72,10 @@ class CourseDetailView(BaseDetailView):
             'prerequisite': course.prerequisite,
             'learning_outcomes': course.learning_outcomes,
 
-            'industry_sector': course.industry_sector,
+            'industry': course.industry,
             'equivalent_course': course.equivalent_course,
 
-            'is_active': course.active,
+
 
             # validation
             'is_matching': (

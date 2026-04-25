@@ -9,7 +9,7 @@ from .base import (
 )
 
 from ..models import Task
-from ..forms import TaskForm
+from apps.courses.forms import TaskForm
 
 from .base import (
     BaseChildCreateView,

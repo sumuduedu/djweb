@@ -21,7 +21,7 @@ from .base import (
 
 
 from ..models import Activity, Task
-from ..forms import ActivityForm
+from apps.courses.forms import ActivityForm
 
 from .base import BaseChildListView
 from ..models import LearningResource, Course
