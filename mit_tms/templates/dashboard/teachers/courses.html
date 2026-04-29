@@ -1,75 +1,182 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1 class="text-2xl font-bold mb-6">📚 Courses & NCS</h1>
+<div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
-{% for c in courses %}
-<div class="bg-white p-5 rounded-xl shadow-sm mb-4 border hover:shadow-md transition">
+    <!-- 🔷 HEADER -->
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900">🎓 My Courses</h1>
+        <p class="text-sm text-gray-500">Smart teaching dashboard</p>
+    </div>
 
-    <!-- Course Header -->
-    <div class="flex justify-between items-center">
-        <div>
-            <h2 class="text-lg font-semibold text-gray-800">
-                {{ c.title }}
+    <!-- ============================= -->
+    <!-- 📘 SELECTED COURSE PANEL -->
+    <!-- ============================= -->
+    {% if selected_course %}
+    <div class="bg-white border rounded-2xl shadow p-6">
+
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">
+                {{ course_detail.course.title }}
             </h2>
-            <p class="text-sm text-gray-500">
-                {{ c.batches.count }} batches • {{ c.total_hours }} hrs
+
+            <div class="flex items-center gap-3">
+
+                <!-- 🔗 FULL PAGE -->
+                <a href="{% url 'core:teacher_course_detail' course_detail.course.id %}"
+                   class="text-sm text-blue-600 hover:underline">
+                   Open Full →
+                </a>
+
+                <!-- ❌ CLOSE -->
+                <a href="?" class="text-sm text-gray-400 hover:text-gray-600">
+                    ✕
+                </a>
+
+            </div>
+        </div>
+
+        <!-- 👥 STUDENTS -->
+        <div class="text-sm text-gray-600 mb-3">
+            👥 {{ course_detail.student_count }} students
+        </div>
+
+        <!-- 📊 PROGRESS -->
+        <div class="mb-4">
+            <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="bg-blue-600 h-3 rounded-full"
+                     style="width: {{ course_detail.progress }}%">
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+                {{ course_detail.progress }}% completed
             </p>
         </div>
 
-        <!-- Actions -->
-        <div class="space-x-3 text-sm">
-            <a href="{% url 'courses:course_detail' c.pk %}" class="text-blue-600 hover:underline">View</a>
-            <a href="{% url 'courses:unit_create' c.pk %}" class="text-green-600 hover:underline">+ NCS</a>
-        </div>
-    </div>
+        <!-- 📅 UPCOMING LESSONS -->
+        <div>
+            <h3 class="text-sm font-semibold text-gray-600 mb-2">
+                Upcoming Lessons
+            </h3>
 
-    <!-- 🔽 NCS / Units -->
-    <div class="mt-4 pl-4 border-l-2 border-gray-100">
-
-        {% if c.units.all %}
-            <p class="text-xs text-gray-400 mb-2">NCS Units</p>
-
-            {% for unit in c.units.all %}
-                <div class="flex justify-between items-center py-2 text-sm hover:bg-gray-50 px-2 rounded">
-
-                    <!-- Unit Info -->
-                    <div>
-                        <span class="font-medium text-gray-700">
-                            {{ unit.title }}
-                        </span>
-                        <span class="text-gray-400 text-xs ml-2">
-                            ({{ unit.total_hours }} hrs)
-                        </span>
-                    </div>
-
-                    <!-- Unit Actions -->
-                    <div class="space-x-2">
-                        <a href="{% url 'courses:unit_detail' unit.pk %}"
-                           class="text-blue-500 hover:underline text-xs">View</a>
-
-                        <a href="{% url 'courses:element_create' unit.pk %}"
-                           class="text-green-500 hover:underline text-xs">+ Element</a>
-
-                        <a href="{% url 'courses:unit_delete' unit.pk %}"
-                           class="text-red-500 hover:underline text-xs">Delete</a>
-                    </div>
-
+            {% for s in course_detail.upcoming_sessions %}
+                <div class="text-sm text-gray-700 mb-1">
+                    {{ s.date }} — {{ s.lesson.title }}
                 </div>
+            {% empty %}
+                <p class="text-sm text-gray-400">
+                    No upcoming lessons
+                </p>
             {% endfor %}
+        </div>
 
-        {% else %}
-            <p class="text-xs text-gray-400">No NCS units added yet</p>
-        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- ============================= -->
+    <!-- 📦 COURSE GRID -->
+    <!-- ============================= -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for c in active_courses %}
+    <div class="bg-white rounded-2xl shadow-sm border p-5 hover:shadow-lg transition flex flex-col justify-between">
+
+        <!-- 🔹 TOP -->
+        <div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        {{ c.title }}
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-1">
+                        {{ c.total_hours }} hrs
+                    </p>
+                </div>
+
+                <span class="badge-green">Active</span>
+            </div>
+
+            <!-- 👥 STUDENTS -->
+            <div class="mt-4 text-sm text-gray-600">
+                👥 {{ c.student_count }} students
+            </div>
+
+            <!-- 📅 NEXT LESSON -->
+            <div class="text-sm text-gray-600 mt-2">
+                📅
+                {% if c.next_lesson %}
+                    Next: {{ c.next_lesson|date:"M d, Y" }}
+                {% else %}
+                    <span class="text-gray-400">No upcoming lesson</span>
+                {% endif %}
+            </div>
+
+            <!-- 📊 PROGRESS -->
+            <div class="mt-4">
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full"
+                         style="width: 60%">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">
+                    In progress
+                </p>
+            </div>
+
+            <!-- 🔔 ALERTS -->
+            <div class="mt-4 space-y-1">
+                {% if c.student_count < 5 %}
+                    <p class="text-xs text-red-500">⚠ Low student enrollment</p>
+                {% endif %}
+
+                {% if not c.next_lesson %}
+                    <p class="text-xs text-yellow-500">⚠ No lesson scheduled</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 🔹 ACTION BUTTONS -->
+        <div class="mt-6 grid grid-cols-2 gap-2">
+
+            <!-- QUICK VIEW -->
+            <a href="?course={{ c.id }}"
+               class="btn-secondary text-center block">
+                Quick View
+            </a>
+
+            <!-- FULL DETAILS -->
+            <a href="{% url 'core:teacher_course_detail' c.id %}"
+               class="btn-primary text-center block">
+                Details →
+            </a>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+        <div class="col-span-full text-center text-gray-400 py-10">
+            No courses assigned yet
+        </div>
+    {% endfor %}
 
     </div>
 
 </div>
 
-{% empty %}
-<div class="text-gray-500 text-center mt-10">
-    No courses available.
-</div>
-{% endfor %}
+<!-- 🎨 STYLES -->
+<style>
+.btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition;
+}
+
+.btn-secondary {
+    @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition;
+}
+
+.badge-green {
+    @apply px-2 py-1 text-xs rounded-full bg-green-100 text-green-700;
+}
+</style>
 
 {% endblock %}

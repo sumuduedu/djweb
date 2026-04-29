@@ -43,6 +43,7 @@ class ActivityListView(BaseChildListView):
         context["task"] = get_object_or_404(Task, id=self.kwargs.get("task_id"))
         return context
 
+
 class ActivityCreateView(BaseChildCreateView):
     model = Activity
     form_class = ActivityForm
@@ -53,10 +54,23 @@ class ActivityCreateView(BaseChildCreateView):
 
     success_message = "Activity created successfully ✅"
 
+    def get_task(self):
+        return get_object_or_404(Task, id=self.kwargs.get("task_id"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["task"] = self.get_task()   # 🔥 FIXED
+        return context
+
+    def form_valid(self, form):
+        form.instance.task = self.get_task()  # 🔥 ensure task is set
+        return super().form_valid(form)
+
     def get_success_url(self):
         return reverse_lazy("courses:activity_list", kwargs={
             "task_id": self.object.task.id
         })
+
 
 class ActivityUpdateView(BaseChildUpdateView):
     model = Activity

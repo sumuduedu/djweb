@@ -53,6 +53,7 @@ from .views import (
     TeacherNotificationsView,
     TeacherMessagesView,
     TeacherAnnouncementsView,
+    TeacherCourseDetailView,
 
     #StaffViews,
     StaffStudentsView,
@@ -133,6 +134,7 @@ urlpatterns = [
     # 👨‍🏫 TEACHER MODULE
     # =====================================================
     path('teacher/courses/', TeacherCoursesView.as_view(), name='teacher_courses'),
+    path('teacher/courses/<int:pk>/', TeacherCourseDetailView.as_view(), name='teacher_course_detail'),
     path('teacher/assignments/', TeacherAssignmentsView.as_view(), name='teacher_assignments'),
     path('teacher/students/', TeacherStudentsView.as_view(), name='teacher_students'),
     path('teacher/attendance/', TeacherAttendanceView.as_view(), name='teacher_attendance'),

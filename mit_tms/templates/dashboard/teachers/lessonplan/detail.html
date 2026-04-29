@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-6 py-8 space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold">{{ lesson.title }}</h1>
+      <p class="text-sm text-gray-500">
+        {{ lesson.subject }} • {{ lesson.duration_minutes }} mins
+      </p>
+    </div>
+
+    <div class="flex gap-2">
+      <a href="{% url 'lessonplan:update' lesson.id %}" class="btn-secondary">Edit</a>
+      <a href="{% url 'lessonplan:builder' lesson.id %}" class="btn-secondary">Reorder</a>
+      <a href="{% url 'lessonplan:print' lesson.id %}" class="btn-primary">Print</a>
+    </div>
+  </div>
+
+  <!-- GENERATE (BASIC / SMART) -->
+  <div class="card">
+    <form method="post" action="{% url 'lessonplan:generate' lesson.task.id %}" class="flex gap-3 items-center">
+      {% csrf_token %}
+
+      <select name="mode" class="input">
+        <option value="basic">Basic</option>
+        <option value="smart">Smart (Bloom)</option>
+      </select>
+
+      <button class="btn-primary">Regenerate</button>
+    </form>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="card">
+    <h3 class="font-semibold mb-2">📊 Teaching Balance</h3>
+
+    <div class="w-full bg-gray-100 h-3 rounded">
+      <div class="bg-blue-500 h-3 rounded"
+           style="width: {{ analytics.trainer_ratio }}%">
+      </div>
+    </div>
+
+    <p class="text-xs mt-1 text-gray-500">
+      Trainer {{ analytics.trainer_ratio }}% • Trainee {{ analytics.trainee_ratio }}%
+    </p>
+  </div>
+
+  <!-- ACTIVITIES -->
+  <div class="card divide-y">
+
+    {% for a in lesson.activities.all %}
+    <div class="p-4 flex justify-between">
+
+      <div>
+        <div class="font-medium">{{ a.order }}. {{ a.title }}</div>
+        <div class="text-sm text-gray-500">{{ a.description }}</div>
+
+        <div class="text-xs mt-1 text-gray-400">
+          {{ a.get_method_display }} • {{ a.total_time }} mins
+        </div>
+      </div>
+
+      <div class="text-xs text-gray-500 text-right">
+        👨‍🏫 {{ a.trainer_time }}m <br>
+        👨‍🎓 {{ a.trainee_time }}m
+      </div>
+
+    </div>
+    {% endfor %}
+
+  </div>
+
+</div>
+
+{% endblock %}

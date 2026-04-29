@@ -1,6 +1,5 @@
-from apps.courses.models import Unit, NCS, Package
-from apps.courses.forms import UnitForm, NCSForm, PackageForm
-
+from apps.courses.models import Unit, NCS, Package,Course
+from apps.courses.forms import UnitForm, NCSForm, PackageForm, CourseForm
 
 CRUD_CONFIG = {
     "unit": {
@@ -20,5 +19,11 @@ CRUD_CONFIG = {
         "form": PackageForm,
     #    "template": "crud/package.html",
         "name": "Package"
+    },
+        "course": {
+        "model": Course,
+        "form": CourseForm,
+       # "template": "course/course_list.html",
+        "name": "Course"
     }
 }

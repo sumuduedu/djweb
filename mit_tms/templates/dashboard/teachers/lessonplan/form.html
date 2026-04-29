@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto px-6 py-8">
+
+  <h2 class="text-xl font-bold mb-4">
+    {% if object %}Edit Lesson{% else %}Create Lesson{% endif %}
+  </h2>
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <h3 class="font-semibold mt-4">Activities</h3>
+
+    {{ activities.management_form }}
+
+    {% for form in activities %}
+      <div class="card p-3">
+        {{ form.as_p }}
+      </div>
+    {% endfor %}
+
+    <button class="btn-primary">Save</button>
+  </form>
+
+</div>
+
+{% endblock %}

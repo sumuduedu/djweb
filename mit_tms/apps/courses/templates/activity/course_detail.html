@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- 🔷 HEADER -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800">{{ object.title }}</h2>
+            <p class="text-sm text-gray-500">{{ object.code }}</p>
+        </div>
+
+        <div class="space-x-2">
+            <a href="{% url 'courses:course_update' object.pk %}"
+               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
+                ✏️ Edit
+            </a>
+
+            <a href="{% url 'courses:course_delete' object.pk %}"
+               class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                🗑 Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- 🔥 VALIDATION STATUS -->
+    <div class="p-4 rounded-lg border flex justify-between items-center
+                {% if is_matching %}
+                    bg-green-50 border-green-200
+                {% else %}
+                    bg-red-50 border-red-200
+                {% endif %}">
+
+        <div>
+            <p class="text-sm text-gray-600">Curriculum Validation</p>
+
+            <p class="font-medium">
+                Modules → T-{{ total_theory }} | P-{{ total_practical }}
+            </p>
+
+            <p class="text-sm text-gray-500">
+                Course → T-{{ course_theory }} | P-{{ course_practical }}
+            </p>
+        </div>
+
+        <div class="text-right">
+            {% if is_matching %}
+                <p class="text-green-600 font-semibold">✔ Perfect Match</p>
+            {% else %}
+                <p class="text-red-600 font-semibold">⚠ Mismatch Detected</p>
+            {% endif %}
+        </div>
+
+    </div>
+<!-- 📊 COURSE SUMMARY -->
+
+    <!-- 📌 COURSE INFORMATION -->
+    <div class="bg-white shadow rounded-xl p-6 space-y-6">
+
+        <h3 class="text-lg font-semibold">Course Information</h3>
+
+        <!-- BASIC -->
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+            <div><p class="text-gray-500">Level</p><p>{{ course_level }}</p></div>
+            <div><p class="text-gray-500">Medium</p><p>{{ course_medium }}</p></div>
+            <div><p class="text-gray-500">Entry Qualification</p><p>{{ entry_qualification }}</p></div>
+
+            <div><p class="text-gray-500">Delivery Mode</p><p>{{ delivery_mode }}</p></div>
+            <div><p class="text-gray-500">Course Mode</p><p>{{ course_mode }}</p></div>
+
+            <div><p class="text-gray-500">NVQ Level</p><p>NVQ {{ nvq_level }}</p></div>
+            <div><p class="text-gray-500">Qualification Code</p><p>{{ qualification_code }}</p></div>
+
+            <div><p class="text-gray-500">Batches / Year</p><p>{{ batches_per_year }}</p></div>
+            <div><p class="text-gray-500">Students / Batch</p><p>{{ students_per_batch }}</p></div>
+
+            <div><p class="text-gray-500">Industry Sector</p><p>{{ industry }}</p></div>
+            <div><p class="text-gray-500">Equivalent Course</p><p>{{ equivalent_course }}</p></div>
+
+            <div><p class="text-gray-500">OJT Months</p><p>{{ object.ojt_months }}</p></div>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div>
+            <p class="text-gray-500 text-sm">Description</p>
+            <p>{{ object.description }}</p>
+        </div>
+
+        <!-- RESOURCES -->
+        <div>
+            <h4 class="font-semibold">Resources</h4>
+            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                <div><p class="text-gray-500">Tools</p><p>{{ tools }}</p></div>
+                <div><p class="text-gray-500">Equipment</p><p>{{ equipment }}</p></div>
+                <div><p class="text-gray-500">Machinery</p><p>{{ machinery }}</p></div>
+            </div>
+        </div>
+
+        <!-- PEDAGOGY -->
+        <div>
+            <h4 class="font-semibold">Pedagogy</h4>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div><p class="text-gray-500">Prerequisite</p><p>{{ prerequisite }}</p></div>
+                <div><p class="text-gray-500">Learning Outcomes</p><p>{{ learning_outcomes }}</p></div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- 📊 CURRICULUM TABLE -->
+    <div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">
+            List of Curriculum Modules
+        </h3>
+
+        <div class="overflow-x-auto bg-white shadow rounded-xl">
+
+            <table class="w-full border-collapse">
+
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="p-3 text-left">Module Code</th>
+                        <th class="p-3 text-left">Module Title</th>
+                        <th class="p-3 text-center">Theory (Hrs)</th>
+                        <th class="p-3 text-center">Practical (Hrs)</th>
+                        <th class="p-3 text-center">Total (Hrs)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for module in object.modules.all %}
+                    <tr class="border-b hover:bg-gray-50">
+
+                        <td class="p-3">{{ module.code }}</td>
+                        <td class="p-3">{{ module.title }}</td>
+
+                        <td class="p-3 text-center">
+                            {{ module.theory_hours }}
+                        </td>
+
+                        <td class="p-3 text-center">
+                            {{ module.practical_hours }}
+                        </td>
+                        <td class="p-3 text-center">
+                            {{ module.theory_hours|add:module.practical_hours }}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    <!-- TOTAL -->
+                    <tr class="bg-gray-100 font-semibold border-t">
+                        <td colspan="2" class="p-3 text-right">Total</td>
+
+
+
+                        <td class="p-3 text-center">
+                            {{ total_theory }}
+                        </td>
+
+                        <td class="p-3 text-center">
+                            {{ total_practical }}
+                        </td>
+                         <td class="p-3 text-center">
+                            {{total_hours_sum }}
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+    <!-- 📚 MODULES -->
+    <div>
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Modules</h3>
+
+            <a href="{% url 'courses:module_create' object.pk %}"
+               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">
+               + Add Module
+            </a>
+        </div>
+
+        {% for module in object.modules.all %}
+            <div class="bg-white rounded-xl shadow p-5 mb-4">
+
+                <div class="flex justify-between items-center border-b pb-2 mb-3">
+
+                    <h4 class="text-lg font-semibold">
+                        <a href="{% url 'courses:module_detail' module.pk %}"
+                           class="text-blue-600 hover:underline">
+                            {{ module.code }} - {{ module.title }}
+                        </a>
+                    </h4>
+
+                    <div class="space-x-2 text-sm">
+                        <a href="{% url 'courses:module_update' module.pk %}"
+                           class="text-yellow-600 hover:underline">Edit</a>
+
+                        <a href="{% url 'courses:module_delete' module.pk %}"
+                           class="text-red-600 hover:underline">Delete</a>
+                    </div>
+
+                </div>
+
+                {% if module.tasks.all %}
+                    <ul class="space-y-2">
+                        {% for task in module.tasks.all %}
+                            <li class="p-3 bg-gray-50 rounded flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ task.title }}</p>
+                                    <p class="text-sm text-gray-500">{{ task.duration_hours }} hrs</p>
+                                </div>
+
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                    Task
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-400 text-sm">No tasks added</p>
+                {% endif %}
+
+            </div>
+        {% empty %}
+            <div class="text-center text-gray-500 p-6 bg-white rounded shadow">
+                No modules available
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 🔙 BACK -->
+    <div>
+        <a href="{% url 'courses:course_list' %}" class="text-blue-600 hover:underline">
+            ⬅ Back to Courses
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

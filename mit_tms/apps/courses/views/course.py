@@ -10,7 +10,7 @@ from ..forms import CourseForm
 
 class CourseListView(BaseListView):
     model = Course
-    template_name = "courses/course_list.html"
+    template_name = "courses/course_lists.html"
     context_object_name = "courses"
 
     def get_queryset(self):

@@ -1,20 +1,172 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="max-w-xl mx-auto p-6 bg-white rounded shadow">
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow space-y-6">
 
-    <h2 class="text-lg font-semibold mb-4">Activity</h2>
+    <!-- 🔷 HEADER -->
+    <div>
+        <h2 class="text-xl font-bold">
+            {% if object %}Edit Activity{% else %}Add Activity{% endif %}
+        </h2>
+        <p class="text-sm text-gray-500">
+            Task: {{ task.title }}
+        </p>
+    </div>
 
-    <form method="post">
+    <form method="post" class="space-y-6">
         {% csrf_token %}
 
-        {{ form.as_p }}
+        <!-- 🔹 BASIC -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="label">Title</label>
+                {{ form.title }}
+            </div>
 
-        <button class="bg-blue-600 text-white px-4 py-2 rounded">
-            Save
-        </button>
+            <div>
+                <label class="label">Code</label>
+                {{ form.code }}
+            </div>
+        </div>
+
+        <div>
+            <label class="label">Description</label>
+            {{ form.description }}
+        </div>
+
+        <!-- 🔹 TYPE + TIME -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="label">Type</label>
+                {{ form.type }}
+            </div>
+
+            <div>
+                <label class="label">Duration</label>
+                {{ form.duration_minutes }}
+            </div>
+        </div>
+
+        <!-- 🔹 LEARNING DESIGN -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="label">Domain</label>
+                {{ form.domain }}
+            </div>
+
+            <div>
+                <label class="label">Bloom Level</label>
+                {{ form.bloom_level }}
+            </div>
+        </div>
+
+        <!-- 🔹 STATUS -->
+        <div class="flex items-center gap-2">
+            {{ form.is_active }}
+            <label class="text-sm text-gray-600">Active</label>
+        </div>
+
+        <!-- 🔷 PREVIEW -->
+        <div class="bg-gray-50 p-4 rounded-lg border">
+            <h3 class="font-semibold mb-2">📘 Preview</h3>
+
+            <p><strong>Type:</strong> <span id="p_type"></span></p>
+            <p><strong>Domain:</strong> <span id="p_domain"></span></p>
+            <p>
+                <strong>Bloom:</strong>
+                <span id="p_bloom" class="px-2 py-1 rounded text-xs"></span>
+            </p>
+        </div>
+
+        <!-- 🔷 ACTIONS -->
+        <div class="flex justify-between">
+
+            <a href="{% url 'courses:activity_list' task.id %}"
+               class="text-gray-600 hover:underline">
+               Cancel
+            </a>
+
+            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Save
+            </button>
+
+        </div>
+
     </form>
 
 </div>
+
+<!-- 🎨 STYLE -->
+<style>
+.label {
+    @apply block text-sm font-medium text-gray-600 mb-1;
+}
+
+input, select, textarea {
+    @apply w-full px-3 py-2 border rounded-lg;
+}
+</style>
+
+<!-- ⚙️ JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const typeField = document.getElementById("id_type");
+    const domainField = document.getElementById("id_domain");
+    const bloomField = document.getElementById("id_bloom_level");
+
+    const bloomColors = {
+        remember: "bg-green-100 text-green-700",
+        understand: "bg-blue-100 text-blue-700",
+        apply: "bg-yellow-100 text-yellow-700",
+        analyze: "bg-orange-100 text-orange-700",
+        evaluate: "bg-red-100 text-red-700",
+        create: "bg-purple-100 text-purple-700"
+    };
+
+    const mapping = {
+        MCQ: { domain: "cognitive", bloom: "remember" },
+        EXERCISE: { domain: "cognitive", bloom: "understand" },
+        ASSIGNMENT: { domain: "psychomotor", bloom: "apply" },
+        PRACTICAL: { domain: "psychomotor", bloom: "apply" },
+        DISCUSSION: { domain: "affective", bloom: "evaluate" }
+    };
+
+    function updatePreview() {
+        const typeText = typeField.options[typeField.selectedIndex].text;
+        const domainText = domainField.options[domainField.selectedIndex].text;
+        const bloomText = bloomField.options[bloomField.selectedIndex].text;
+        const bloomVal = bloomField.value;
+
+        document.getElementById("p_type").innerText = typeText;
+        document.getElementById("p_domain").innerText = domainText;
+
+        const bloomEl = document.getElementById("p_bloom");
+        bloomEl.innerText = bloomText;
+        bloomEl.className = "px-2 py-1 rounded text-xs";
+
+        if (bloomColors[bloomVal]) {
+            bloomEl.classList.add(...bloomColors[bloomVal].split(" "));
+        }
+    }
+
+    typeField.addEventListener("change", function () {
+        const val = this.value;
+
+        if (mapping[val]) {
+            domainField.value = mapping[val].domain;
+            bloomField.value = mapping[val].bloom;
+        }
+
+        updatePreview();
+    });
+
+    domainField.addEventListener("change", updatePreview);
+    bloomField.addEventListener("change", updatePreview);
+
+    updatePreview();
+
+});
+</script>
 
 {% endblock %}

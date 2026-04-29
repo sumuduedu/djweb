@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lesson Plan</title>
+</head>
+<body>
+
+<h1>{{ lesson.title }}</h1>
+<p>{{ lesson.subject }}</p>
+
+<hr>
+
+{% for a in activities %}
+  <p>
+    <strong>{{ a.order }}. {{ a.title }}</strong><br>
+    {{ a.description }}<br>
+    Trainer: {{ a.trainer_time }} min |
+    Trainee: {{ a.trainee_time }} min |
+    Total: {{ a.total_time }} min
+  </p>
+{% endfor %}
+
+</body>
+</html>

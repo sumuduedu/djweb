@@ -4,14 +4,24 @@ from .base import BaseView
 class TeacherDashboardView(BaseView):
     allowed_roles = ['TEACHER']
     template_name = "dashboard/teacher.html"
-from apps.courses.models import Course
 
 from apps.courses.models import Course
 
+from apps.courses.models import Course
+from django.db.models import Count, Min
 from apps.courses.models import Course
 
 from apps.accounts.models import Teacher
 from apps.courses.models import Course
+from django.db.models import Count, Min
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, Min
+from django.db.models import Q
+from django.db.models import Count, Min, Q
+from django.utils.timezone import now
+from django.shortcuts import get_object_or_404
+from apps.enrollment.models import Enrollment
+from apps.lessonplan.models import LessonSession
 
 class TeacherCoursesView(BaseView):
     allowed_roles = ['TEACHER']
@@ -21,19 +31,141 @@ class TeacherCoursesView(BaseView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-
-        # 🔥 Get Teacher instance
         teacher = Teacher.objects.filter(user=user).first()
 
-        if teacher:
-            courses = Course.objects.filter(
-                batches__teacher=teacher
-            ).distinct().prefetch_related("units", "modules")
-        else:
-            courses = Course.objects.none()
+        if not teacher:
+            context["active_courses"] = Course.objects.none()
+            context["past_courses"] = Course.objects.none()
+            context["teacher"] = None
+            return context
 
-        context["courses"] = courses
+        # 🟢 ACTIVE COURSES
+        active_courses = (
+            Course.objects.filter(
+                batches__teacher=teacher,
+                status="ACTIVE"
+            )
+            .distinct()
+            .prefetch_related("units", "modules")
+            .annotate(
+                student_count=Count(
+                    "batches__enrollments__student",
+                    filter=Q(batches__enrollments__status="ACTIVE"),
+                    distinct=True
+                ),
+                next_lesson = Min(   "batches__batch_sessions__date",    filter=Q(batches__batch_sessions__date__gte=now())
+)
+            )
+        )
+
+        # ⚪ PAST COURSES
+        past_courses = (
+            Course.objects.filter(
+                batches__teacher=teacher,
+                status="INACTIVE"
+            )
+            .distinct()
+        )
+
+        # ============================
+        # 🔥 ADD THIS PART (IMPORTANT)
+        # ============================
+        selected_course_id = self.request.GET.get("course")
+
+        selected_course = None
+        course_detail = None
+
+        if selected_course_id:
+            selected_course = get_object_or_404(Course, pk=selected_course_id)
+
+            batches = selected_course.batches.filter(teacher=teacher)
+
+            student_count = Enrollment.objects.filter(
+                batch__in=batches,
+                status="ACTIVE"
+            ).values("student").distinct().count()
+
+            upcoming_sessions = LessonSession.objects.filter(
+                batch__in=batches,
+                date__gte=now()
+            ).order_by("date")[:5]
+
+            total_sessions = LessonSession.objects.filter(batch__in=batches).count()
+            completed_sessions = LessonSession.objects.filter(
+                batch__in=batches,
+                status="completed"
+            ).count()
+
+            progress = 0
+            if total_sessions > 0:
+                progress = int((completed_sessions / total_sessions) * 100)
+
+            course_detail = {
+                "course": selected_course,
+                "student_count": student_count,
+                "upcoming_sessions": upcoming_sessions,
+                "progress": progress,
+            }
+
+        context.update({
+            "teacher": teacher,
+            "active_courses": active_courses,
+            "past_courses": past_courses,
+            "selected_course": selected_course,
+            "course_detail": course_detail,
+        })
+
+        def get_success_url(self):
+            user = self.request.user
+            course_id = self.object.course.pk if self.object else self.kwargs.get('course_id')
+
+            if user.is_superuser:
+                return reverse('courses:admin_course_detail', args=[course_id])
+            else:
+                return reverse('courses:teacher_course_detail', args=[course_id])
+
         return context
+
+from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+from django.utils.timezone import now
+
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
+from apps.enrollment.models import Enrollment
+from apps.lessonplan.models import LessonSession
+from django.shortcuts import get_object_or_404
+from apps.courses.models import Module, Task, Unit, Element
+
+class TeacherCourseDetailView(BaseView):
+    allowed_roles = ['TEACHER']
+    template_name = "dashboard/teachers/course_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        teacher = Teacher.objects.filter(user=self.request.user).first()
+        course = get_object_or_404(Course, pk=kwargs.get("pk"))
+
+        if not course.batches.filter(teacher=teacher).exists():
+            context["error"] = "Not assigned"
+            return context
+
+        batches = course.batches.filter(teacher=teacher)
+
+        # 👇 STRUCTURE DATA
+        modules = course.modules.prefetch_related("tasks__activities")
+        units = course.units.prefetch_related("elements")
+
+        context.update({
+            "course": course,
+            "modules": modules,
+            "units": units,
+            "batches": batches,
+        })
+
+        return context
+
 
 class TeacherAssignmentsView(BaseView):
     allowed_roles = ['TEACHER']

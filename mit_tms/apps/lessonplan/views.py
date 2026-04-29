@@ -1,15 +1,20 @@
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, View
+from django.views.generic import (
+    ListView, CreateView, UpdateView, DeleteView, DetailView, View
+)
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.db import transaction
+import json
 
 from apps.courses.models import Task
-from .models import LessonPlan
+from .models import LessonPlan, LessonActivity
 from .forms import LessonPlanForm, LessonActivityFormSet
-from .services import generate_lesson_plan
+
+# ✅ NEW: smart generator import
+from .services import generate_lesson_plan, generate_smart_lesson_plan
 
 
 # ================================
@@ -39,12 +44,16 @@ class LessonListView(LoginRequiredMixin, ListView):
         user = self.request.user
 
         if user.is_staff:
-            return LessonPlan.objects.select_related("task__module__course").all()
+            return LessonPlan.objects.select_related(
+                "task__module__course"
+            ).prefetch_related("activities")
 
         teacher = getattr(user, "teacher", None)
 
         if teacher:
-            return LessonPlan.objects.filter(instructor=teacher)
+            return LessonPlan.objects.select_related(
+                "task__module__course"
+            ).prefetch_related("activities").filter(instructor=teacher)
 
         return LessonPlan.objects.none()
 
@@ -56,6 +65,23 @@ class LessonDetailView(LoginRequiredMixin, IsOwnerOrAdminMixin, DetailView):
     model = LessonPlan
     template_name = "lessonplan/detail.html"
     context_object_name = "lesson"
+
+    # ✅ NEW: analytics
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        lesson = self.object
+
+        total = sum(a.total_time for a in lesson.activities.all())
+        trainer = sum(a.trainer_time for a in lesson.activities.all())
+        trainee = sum(a.trainee_time for a in lesson.activities.all())
+
+        context["analytics"] = {
+            "trainer_ratio": int((trainer / total) * 100) if total else 0,
+            "trainee_ratio": int((trainee / total) * 100) if total else 0,
+        }
+
+        return context
 
 
 # ================================
@@ -84,18 +110,26 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
 
         teacher = getattr(self.request.user, "teacher", None)
 
-        # ✅ Assign instructor
         if teacher:
             form.instance.instructor = teacher
 
-        # ✅ Auto subject from module
         if form.instance.task:
             form.instance.subject = form.instance.task.module.title
 
+        form.instance.competency_level = "basic"
+        form.instance.status = "draft"
+
         if activities.is_valid():
             self.object = form.save()
-            activities.instance = self.object
-            activities.save()
+
+            for activity_form in activities:
+                data = activity_form.cleaned_data
+
+                if data and not data.get("DELETE", False):
+                    activity = activity_form.save(commit=False)
+                    activity.lesson = self.object
+                    activity.save()
+
             return redirect(self.success_url)
 
         return self.form_invalid(form)
@@ -130,14 +164,29 @@ class LessonUpdateView(LoginRequiredMixin, IsOwnerOrAdminMixin, UpdateView):
         context = self.get_context_data()
         activities = context["activities"]
 
-        # ✅ Auto subject update
         if form.instance.task:
             form.instance.subject = form.instance.task.module.title
 
+        form.instance.competency_level = "basic"
+        form.instance.status = "updated"
+
         if activities.is_valid():
             self.object = form.save()
-            activities.instance = self.object
-            activities.save()
+
+            existing_ids = []
+
+            for activity_form in activities:
+                data = activity_form.cleaned_data
+
+                if data and not data.get("DELETE", False):
+                    activity = activity_form.save(commit=False)
+                    activity.lesson = self.object
+                    activity.save()
+                    existing_ids.append(activity.id)
+
+            # ✅ safer delete
+            self.object.activities.exclude(id__in=existing_ids).delete()
+
             return redirect(self.success_url)
 
         return self.form_invalid(form)
@@ -153,11 +202,12 @@ class LessonDeleteView(LoginRequiredMixin, IsOwnerOrAdminMixin, DeleteView):
 
 
 # ================================
-# ⚡ GENERATE LESSON (AUTO)
+# ⚡ GENERATE LESSON
 # ================================
 class GenerateLessonView(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    # ✅ FIX: POST instead of GET
+    def post(self, request, *args, **kwargs):
 
         teacher = getattr(request.user, "teacher", None)
 
@@ -166,20 +216,27 @@ class GenerateLessonView(LoginRequiredMixin, View):
 
         task = get_object_or_404(Task, id=kwargs.get("task_id"))
 
-        lesson = generate_lesson_plan(task, instructor=teacher)
+        mode = request.POST.get("mode", "basic")
+
+        # ✅ NEW: smart mode
+        if mode == "smart":
+            lesson = generate_smart_lesson_plan(task, instructor=teacher)
+        else:
+            lesson = generate_lesson_plan(task, instructor=teacher)
 
         return redirect("lessonplan:detail", pk=lesson.id)
 
 
 # ================================
-# 🔄 AJAX: LOAD TASKS BY MODULE
+# 🔄 AJAX: LOAD TASKS
 # ================================
 class LoadTasksView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        try:
-            module_id = int(request.GET.get('module_id'))
-        except (TypeError, ValueError):
+
+        module_id = request.GET.get('module_id')
+
+        if not module_id:
             return JsonResponse([], safe=False)
 
         tasks = Task.objects.filter(
@@ -187,3 +244,70 @@ class LoadTasksView(LoginRequiredMixin, View):
         ).order_by('title').values('id', 'title')
 
         return JsonResponse(list(tasks), safe=False)
+
+
+# ================================
+# 🧱 DRAG BUILDER
+# ================================
+class LessonBuilderView(DetailView):
+    model = LessonPlan
+    template_name = "lessonplan/drag_builder.html"
+    context_object_name = "lesson"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # ✅ FIX: removed invalid field "phase"
+        activities = self.object.activities.all().values(
+            "id", "title", "method", "order"
+        )
+
+        context["activities_json"] = json.dumps(list(activities))
+
+        return context
+
+
+# ================================
+# 🔄 UPDATE ORDER (AJAX)
+# ================================
+class UpdateActivityOrderView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+
+        teacher = getattr(request.user, "teacher", None)
+
+        for item in data:
+            activity = LessonActivity.objects.get(id=item["id"])
+
+            # ✅ SECURITY FIX
+            if not (request.user.is_staff or activity.lesson.instructor == teacher):
+                raise PermissionDenied
+
+            activity.order = item["order"]
+            activity.save()
+
+        return JsonResponse({"status": "ok"})
+
+
+# ================================
+# 🖨 PRINT VIEW
+# ================================
+class LessonPrintView(DetailView):
+    model = LessonPlan
+    template_name = "lessonplan/print.html"
+    context_object_name = "lesson"
+
+    def get_queryset(self):
+        return LessonPlan.objects.select_related(
+            "task__module",
+            "instructor"
+        ).prefetch_related(
+            "activities",
+            "outcomes"
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["activities"] = self.object.activities.all().order_by("order")
+        return context

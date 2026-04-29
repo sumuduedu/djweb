@@ -92,25 +92,49 @@ class LearningOutcome(models.Model):
 # ================================
 # 🪜 LESSON ACTIVITY (NVQ STYLE)
 # ================================
+from django.db import models
+from apps.courses.models.resource import LearningResource, PhysicalResource
+
 class LessonActivity(models.Model):
 
     lesson = models.ForeignKey(
-        LessonPlan,
+        "LessonPlan",
         on_delete=models.CASCADE,
         related_name='activities'
     )
 
     title = models.CharField(max_length=255)
-
     description = models.TextField()
 
     # WHO DOES
     trainer_activity = models.BooleanField(default=False)
     trainee_activity = models.BooleanField(default=False)
 
-    # METHOD + RESOURCES
-    method = models.CharField(max_length=255, blank=True)
-    resources = models.TextField(blank=True)
+    # ✅ METHOD (dropdown instead of text)
+    METHOD_CHOICES = [
+        ('LECTURE', 'Lecture'),
+        ('DEMO', 'Demonstration'),
+        ('DISCUSSION', 'Discussion'),
+        ('PRACTICAL', 'Practical'),
+        ('GROUP', 'Group Work'),
+    ]
+
+    method = models.CharField(
+        max_length=20,
+        choices=METHOD_CHOICES,
+        blank=True
+    )
+
+    # ✅ RESOURCES (structured instead of text)
+    learning_resources = models.ManyToManyField(
+        LearningResource,
+        blank=True
+    )
+
+    physical_resources = models.ManyToManyField(
+        PhysicalResource,
+        blank=True
+    )
 
     # TIME
     trainer_time = models.PositiveIntegerField(default=0)
@@ -138,12 +162,13 @@ class LessonSession(models.Model):
     lesson = models.ForeignKey(
         "lessonplan.LessonPlan",
         on_delete=models.CASCADE,
-        related_name="sessions"
+        related_name="lesson_sessions"
     )
 
     batch = models.ForeignKey(
         "batch.Batch",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="batch_sessions"
     )
 
     instructor = models.ForeignKey(

@@ -3,7 +3,7 @@ ADMIN_MENU = [
         "section": "Dashboard",
         "items": [
             {"name": "Overview", "url": "core:admin_dashboard", "icon": "📊"},
-            {"name": "Analytics", "url": "core:staff_reports", "icon": "📈"},
+         #   {"name": "Analytics", "url": "core:staff_reports", "icon": "📈"},
         ]
     },
     {
@@ -26,22 +26,22 @@ ADMIN_MENU = [
             {"name": "Alumni", "url": "core:alumni_dashboard", "icon": "🎓"},
         ]
     },
-    {
-        "section": "AI Insights 🔥",
-        "items": [
-            {"name": "Analytics", "url": "core:teacher_analytics", "icon": "📊"},
-            {"name": "At-Risk Students", "url": "core:teacher_risk_students", "icon": "⚠", "badge": "risk"},
-            {"name": "Student Insights", "url": "core:student_insights", "icon": "🧠"},
-        ]
-    },
-    {
-        "section": "Communication",
-        "items": [
-            {"name": "Notifications", "url": "core:staff_notifications", "icon": "🔔", "badge": "notifications"},
-            {"name": "Messages", "url": "core:teacher_messages", "icon": "💬"},
-            {"name": "Announcements", "url": "core:teacher_announcements", "icon": "📢"},
-        ]
-    },
+    # {
+    #     "section": "AI Insights 🔥",
+    #     "items": [
+    #         {"name": "Analytics", "url": "core:teacher_analytics", "icon": "📊"},
+    #         {"name": "At-Risk Students", "url": "core:teacher_risk_students", "icon": "⚠", "badge": "risk"},
+    #         {"name": "Student Insights", "url": "core:student_insights", "icon": "🧠"},
+    #     ]
+    # },
+    # {
+    #     "section": "Communication",
+    #     "items": [
+    #         {"name": "Notifications", "url": "core:staff_notifications", "icon": "🔔", "badge": "notifications"},
+    #         {"name": "Messages", "url": "core:teacher_messages", "icon": "💬"},
+    #         {"name": "Announcements", "url": "core:teacher_announcements", "icon": "📢"},
+    #     ]
+    # },
 ]
 # ================================
 # 🎓 STUDENT MENU
@@ -123,19 +123,19 @@ TEACHER_MENU = [
             {"name": "Dashboard", "icon": "🏠", "url": "core:teacher_dashboard"},
         ]
     },
- {
-        "section": "Communication",
-        "items": [
-            {
-                "name": "Notifications",
-                "icon": "🔔",
-                "url": "core:teacher_notifications",
-                "badge": "notifications"
-            },
-            {"name": "Messages", "icon": "💬", "url": "core:teacher_messages"},
-            {"name": "Announcements", "icon": "📢", "url": "core:teacher_announcements"},
-        ]
-    },
+ # {
+ #        "section": "Communication",
+ #        "items": [
+ #            {
+ #                "name": "Notifications",
+ #                "icon": "🔔",
+ #                "url": "core:teacher_notifications",
+ #                "badge": "notifications"
+ #            },
+ #            {"name": "Messages", "icon": "💬", "url": "core:teacher_messages"},
+ #            {"name": "Announcements", "icon": "📢", "url": "core:teacher_announcements"},
+ #        ]
+ #    },
   {
     "section": "Teaching & Delivery",
     "items": [
@@ -149,24 +149,10 @@ TEACHER_MENU = [
             "icon": "📦",
             "url": "batch:batch_list"
         },
-        {
-            "name": "Learning Materials",
-            "icon": "📂",
-            "url": "core:teacher_materials"
-        },
+
     ]
 },
-    {
-        "section": "Assesments & Evaluation",
-        "items": [
-            {"name": "Assignments", "icon": "📝", "url": "core:teacher_assignments"},
-            {"name": "Submissions", "icon": "📥", "url": "core:teacher_submissions"},
-            {"name": "Attendance", "icon": "📊", "url": "core:teacher_attendance"},
-            {"name": "Grading", "icon": "🏆", "url": "core:teacher_results"},
-        ]
-    },
-
-     {
+        {
         "section": "Lesson Planing & Schduling ",
         "items": [
             {"name": "Timetable", "icon": "🗓️", "url": "schedule:timetable_list"},
@@ -175,32 +161,47 @@ TEACHER_MENU = [
 
         ]
     },
-    {
-        "section": "Students",
-        "items": [
-            {"name": "My Students", "icon": "👨‍🎓", "url": "core:teacher_students"},
-            {"name": "Performance Tracking", "icon": "📈", "url": "core:teacher_performance"},
-        ]
-    },
-    {
-        "section": "Insights",
-        "items": [
-            {
-                "name": "At-Risk Students",
-                "icon": "⚠️",
-                "url": "core:teacher_risk_students",
-                "badge": "risk"
-            },
-            {"name": "Analytics", "icon": "🧠", "url": "core:teacher_analytics"},
-        ]
-    },
 
-    {
-        "section": "Account",
-        "items": [
-            {"name": "Settings", "icon": "⚙️", "url": "accounts:account_settings"},
-        ]
-    }
+
+    # {
+    #     "section": "Assesments & Evaluation",
+    #     "items": [
+    #         {"name": "Learning Materials", "icon": "📂", "url": "core:teacher_materials" },
+    #         {"name": "Assignments", "icon": "📝", "url": "core:teacher_assignments"},
+    #         {"name": "Submissions", "icon": "📥", "url": "core:teacher_submissions"},
+    #         {"name": "Attendance", "icon": "📊", "url": "core:teacher_attendance"},
+    #         {"name": "Grading", "icon": "🏆", "url": "core:teacher_results"},
+    #
+    #     ]
+    # },
+
+
+    # {
+    #     "section": "Students",
+    #     "items": [
+    #         {"name": "My Students", "icon": "👨‍🎓", "url": "core:teacher_students"},
+    #         {"name": "Performance Tracking", "icon": "📈", "url": "core:teacher_performance"},
+    #     ]
+    # },
+    # {
+    #     "section": "Insights",
+    #     "items": [
+    #         {
+    #             "name": "At-Risk Students",
+    #             "icon": "⚠️",
+    #             "url": "core:teacher_risk_students",
+    #             "badge": "risk"
+    #         },
+    #         {"name": "Analytics", "icon": "🧠", "url": "core:teacher_analytics"},
+    #     ]
+    # },
+
+    # {
+    #     "section": "Account",
+    #     "items": [
+    #         {"name": "Settings", "icon": "⚙️", "url": "accounts:account_settings"},
+    #     ]
+    # }
 ]
 
 # ================================

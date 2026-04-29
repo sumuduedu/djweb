@@ -16,15 +16,9 @@
         <div class="flex justify-between">
 
             <!-- ✅ FIXED CANCEL BUTTON -->
-            <a href="{% if object %}
-                        {% url 'course_detail' object.course.pk %}
-                     {% else %}
-                        {% url 'course_detail' view.kwargs.course_id %}
-                     {% endif %}"
-               class="text-gray-600 hover:underline">
-               Cancel
-            </a>
-
+        <a href="{{ view.get_success_url }}" class="text-gray-600 hover:underline">
+    Cancel
+</a>
             <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Save
             </button>

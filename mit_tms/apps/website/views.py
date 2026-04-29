@@ -71,7 +71,7 @@ class PublicCourseListView(ListView):
     context_object_name = "courses"
 
     def get_queryset(self):
-        return Course.objects.filter(active=True).order_by('-created_at')
+        return Course.objects.filter(status="ACTIVE").order_by('-created_at')
 
 
 class PublicCourseDetailView(DetailView):

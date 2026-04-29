@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Company, Job, Application
-
+from .models import Company, Job, Application, StudentProfile
 
 # =========================
 # 🏢 COMPANY ADMIN
@@ -43,11 +43,19 @@ class JobAdmin(admin.ModelAdmin):
 # =========================
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ("user", "job", "status", "applied_at")
+    list_display = ("user", "job", "status", "applied_at", "company")
     search_fields = ("user__username", "job__title")
-    list_filter = ("status", "applied_at")
+    list_filter = ("status", "applied_at", "job__company")
     ordering = ("-applied_at",)
     list_editable = ("status",)
-
-    # helpful optimization
     autocomplete_fields = ("user", "job")
+
+    def company(self, obj):
+        return obj.job.company
+
+@admin.register(StudentProfile)
+class StudentProfileAdmin(admin.ModelAdmin):
+    list_display = ("full_name", "user", "is_public", "created_at")
+    search_fields = ("full_name", "skills", "user__username")
+    list_filter = ("is_public",)
+    ordering = ("-created_at",)

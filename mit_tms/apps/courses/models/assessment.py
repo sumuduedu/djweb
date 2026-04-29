@@ -31,6 +31,7 @@ class Assessment(BaseModel):
     type = models.CharField(max_length=20, choices=ASSESSMENT_TYPE)
 
     max_marks = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(default=0)   # ✅ ADD THIS
 
     def __str__(self):
         return self.title

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-6 py-8">
+
+  <h2 class="text-xl font-bold mb-4">🧱 Reorder Activities</h2>
+
+  <div id="list" class="space-y-2">
+    {% for a in lesson.activities.all %}
+    <div class="card p-3 cursor-move" data-id="{{ a.id }}">
+      {{ a.order }}. {{ a.title }}
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script>
+Sortable.create(document.getElementById('list'), {
+  animation: 150,
+  onEnd: function () {
+    let order = [];
+    document.querySelectorAll('#list > div').forEach((el, index) => {
+      order.push({ id: el.dataset.id, order: index + 1 });
+    });
+
+    fetch("{% url 'lessonplan:update_order' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify(order)
+    });
+  }
+});
+</script>
+
+{% endblock %}

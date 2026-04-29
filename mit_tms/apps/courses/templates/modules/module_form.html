@@ -17,9 +17,9 @@
 
             <!-- ✅ FIXED CANCEL BUTTON -->
             <a href="{% if object %}
-                        {% url 'course_detail' object.course.pk %}
+                        {% url 'courses:course_detail' object.course.pk %}
                      {% else %}
-                        {% url 'course_detail' view.kwargs.course_id %}
+                        {% url 'courses:course_detail' view.kwargs.course_id %}
                      {% endif %}"
                class="text-gray-600 hover:underline">
                Cancel

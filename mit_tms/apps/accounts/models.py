@@ -3,18 +3,38 @@ from django.contrib.auth.models import User
 
 
 # ================================
+# 🔷 COMMON BASE MODEL (SAFE ADD)
+# ================================
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+# ================================
 # 🔷 PROFILE (ROLE SYSTEM)
 # ================================
-class Profile(models.Model):
+class Profile(TimeStampedModel):
+
+    # ✅ SAFE CONSTANTS (no breaking)
+    ROLE_ADMIN = 'ADMIN'
+    ROLE_STAFF = 'STAFF'
+    ROLE_TEACHER = 'TEACHER'
+    ROLE_STUDENT = 'STUDENT'
+    ROLE_ALUMNI = 'ALUMNI'
+    ROLE_PARENT = 'PARENT'
+    ROLE_GUEST = 'GUEST'
 
     ROLE_CHOICES = (
-        ('ADMIN', 'Admin'),
-        ('STAFF', 'Staff'),
-        ('TEACHER', 'Teacher'),
-        ('STUDENT', 'Student'),
-        ('ALUMNI', 'Alumni'),
-        ('PARENT', 'Parent'),
-        ('GUEST', 'Guest'),
+        (ROLE_ADMIN, 'Admin'),
+        (ROLE_STAFF, 'Staff'),
+        (ROLE_TEACHER, 'Teacher'),
+        (ROLE_STUDENT, 'Student'),
+        (ROLE_ALUMNI, 'Alumni'),
+        (ROLE_PARENT, 'Parent'),
+        (ROLE_GUEST, 'Guest'),
     )
 
     user = models.OneToOneField(
@@ -26,7 +46,7 @@ class Profile(models.Model):
     role = models.CharField(
         max_length=10,
         choices=ROLE_CHOICES,
-        default='GUEST'   # 🔥 DEFAULT ROLE
+        default=ROLE_GUEST
     )
 
     image = models.ImageField(
@@ -40,9 +60,28 @@ class Profile(models.Model):
 
 
 # ================================
+# 🔷 BASE PERSON (SAFE ADD)
+# ================================
+class BasePerson(TimeStampedModel):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    # ✅ SAFE ADD (no break)
+    is_active = models.BooleanField(default=True)
+
+    def get_full_name(self):
+        return self.user.get_full_name() or self.user.username
+
+    class Meta:
+        abstract = True
+
+
+# ================================
 # 🎓 STUDENT MODEL
 # ================================
-class Student(models.Model):
+class Student(BasePerson):
 
     user = models.OneToOneField(
         User,
@@ -50,9 +89,9 @@ class Student(models.Model):
         related_name="student"
     )
 
+    # ❗ KEPT (no breaking)
     full_name = models.CharField(max_length=255)
 
-    # 🔥 MANY PARENTS
     parents = models.ManyToManyField(
         'Parent',
         related_name='students',
@@ -60,13 +99,13 @@ class Student(models.Model):
     )
 
     def __str__(self):
-        return self.full_name
+        return self.full_name or self.get_full_name()
 
 
 # ================================
 # 👨‍🏫 TEACHER MODEL
 # ================================
-class Teacher(models.Model):
+class Teacher(BasePerson):
 
     user = models.OneToOneField(
         User,
@@ -77,13 +116,13 @@ class Teacher(models.Model):
     full_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.full_name
+        return self.full_name or self.get_full_name()
 
 
 # ================================
 # 🧑‍💼 STAFF MODEL
 # ================================
-class Staff(models.Model):
+class Staff(BasePerson):
 
     user = models.OneToOneField(
         User,
@@ -94,13 +133,19 @@ class Staff(models.Model):
     full_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.full_name
+        return self.full_name or self.get_full_name()
 
 
 # ================================
 # 👨‍👩‍👧 PARENT MODEL
 # ================================
-class Parent(models.Model):
+class Parent(BasePerson):
+
+    RELATION_CHOICES = (
+        ('FATHER', 'Father'),
+        ('MOTHER', 'Mother'),
+        ('GUARDIAN', 'Guardian'),
+    )
 
     user = models.OneToOneField(
         User,
@@ -109,14 +154,29 @@ class Parent(models.Model):
     )
 
     relationship = models.CharField(
-        max_length=50,
+        max_length=20,
+        choices=RELATION_CHOICES,
         blank=True,
         null=True
     )
+
     def __str__(self):
         return self.user.username
 
-class Alumni(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    job_title = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
+
+# ================================
+# 🎓 ALUMNI MODEL
+# ================================
+class Alumni(BasePerson):
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="alumni"
+    )
+
+    job_title = models.CharField(max_length=255, blank=True)
+    company = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.get_full_name()

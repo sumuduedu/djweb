@@ -5,7 +5,17 @@ from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 
 from .models import Profile, Student, Teacher, Staff, Parent
+from django.contrib.auth.models import Group
 
+ROLE_GROUP_MAP = {
+    'ADMIN': 'Admin',
+    'STAFF': 'Staff',
+    'TEACHER': 'Teacher',
+    'STUDENT': 'Student',
+    'PARENT': 'Parent',
+    'ALUMNI': 'Alumni',
+    'GUEST': 'Guest',
+}
 
 # ================================
 # 🔷 CREATE PROFILE (DEFAULT = GUEST)

@@ -5,6 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import Profile, Student, Teacher, Staff, Parent
 
 
+
 # ================================
 # 🔷 PROFILE INLINE (inside User)
 # ================================

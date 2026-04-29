@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto p-6 space-y-6">
+
+```
+<!-- HEADER -->
+<div class="flex justify-between items-center">
+    <div>
+        <h2 class="text-3xl font-bold">🎯 Lesson Builder</h2>
+        <p class="text-gray-500 text-sm">Drag & drop to design your lesson</p>
+    </div>
+
+    <button id="saveBtn"
+        class="bg-blue-600 text-white px-5 py-2 rounded-xl">
+        💾 Save Layout
+    </button>
+</div>
+
+<!-- PHASE COLUMNS -->
+<div class="grid md:grid-cols-4 gap-4">
+
+    <div class="phase" id="intro">
+        <h3>🟢 Introduction</h3>
+    </div>
+
+    <div class="phase" id="main">
+        <h3>🔵 Main</h3>
+    </div>
+
+    <div class="phase" id="practice">
+        <h3>🟡 Practice</h3>
+    </div>
+
+    <div class="phase" id="assessment">
+        <h3>🔴 Assessment</h3>
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- TEMPLATE FOR ACTIVITY CARD -->
+
+<template id="activity-template">
+    <div class="activity-card" draggable="true">
+        <div class="font-semibold activity-title">New Activity</div>
+        <div class="text-xs text-gray-500 mt-1">Drag me</div>
+    </div>
+</template>
+
+<!-- SORTABLE -->
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<script>
+const phases = ['intro', 'main', 'practice', 'assessment'];
+
+phases.forEach(phase => {
+    new Sortable(document.getElementById(phase), {
+        group: 'shared',
+        animation: 150
+    });
+});
+</script>
+
+<!-- LOAD DATA FROM DJANGO -->
+
+<script>
+const lessonData = {{ lesson.activities.all|safe }};
+</script>
+
+<!-- RENDER ACTIVITIES -->
+
+<script>
+function createCard(activity) {
+    const el = document.createElement("div");
+    el.className = "activity-card";
+    el.dataset.id = activity.id;
+
+    el.innerHTML = `
+        <div class="font-semibold">${activity.title}</div>
+        <div class="text-xs text-gray-500">${activity.method || ''}</div>
+    `;
+
+    return el;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    lessonData.forEach(act => {
+        const card = createCard(act);
+        const phase = act.phase || "main";
+        document.getElementById(phase).appendChild(card);
+    });
+});
+</script>
+
+<!-- SAVE ORDER -->
+
+<script>
+document.getElementById("saveBtn").addEventListener("click", () => {
+
+    let data = [];
+
+    phases.forEach(phase => {
+        const items = document.getElementById(phase).children;
+
+        [...items].forEach((el, index) => {
+            data.push({
+                id: el.dataset.id,
+                order: index,
+                phase: phase
+            });
+        });
+    });
+
+    fetch("{% url 'lessonplan:update_order' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => alert("Saved!"));
+});
+</script>
+
+<style>
+.phase {
+    min-height: 300px;
+    border: 2px dashed #ddd;
+    padding: 10px;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.activity-card {
+    background: white;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    cursor: grab;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+</style>
+
+{% endblock %}

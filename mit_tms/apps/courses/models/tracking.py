@@ -26,11 +26,3 @@ class StudentTask(BaseModel):
     completed_at = models.DateTimeField(null=True, blank=True,default=now)
 
     attempts = models.PositiveIntegerField(default=1)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['student', 'task'], name='unique_student_task')
-        ]
-
-    def __str__(self):
-        return f"{self.student} - {self.task}"

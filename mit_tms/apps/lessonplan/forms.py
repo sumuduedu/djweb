@@ -24,7 +24,7 @@ class LessonPlanForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['task'].queryset = Task.objects.none()
+        self.fields['task'].queryset = Task.objects.all()
         self.fields['task'].required = True
         self.fields['task'].empty_label = "Select Module First"
 
@@ -61,7 +61,9 @@ LessonActivityFormSet = inlineformset_factory(
         "trainer_activity",
         "trainee_activity",
         "method",
-        "resources",
+        "learning_resources",     # ✅ NEW
+        "physical_resources",     # ✅ NEW
+
         "trainer_time",
         "trainee_time",
         "order"
@@ -69,3 +71,6 @@ LessonActivityFormSet = inlineformset_factory(
     extra=3,
     can_delete=True
 )
+
+
+
