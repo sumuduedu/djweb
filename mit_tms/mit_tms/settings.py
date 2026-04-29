@@ -55,6 +55,7 @@ LOCAL_APPS = [
     'apps.enrollment.apps.EnrollmentConfig',
     'apps.lessonplan.apps.LessonplanConfig',
     'apps.careers.apps.CareersConfig',
+    'apps.dashboard.apps.DashboardConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -168,6 +169,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
 # ===============================
 # AUTH (FINAL CLEAN VERSION)
 # ===============================
@@ -198,7 +200,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 # ===============================
 # GOOGLE LOGIN
 # ===============================
-
+SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 

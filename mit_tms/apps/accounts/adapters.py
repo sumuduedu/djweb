@@ -34,7 +34,7 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         Prevent duplicate accounts
         """
 
-        email = sociallogin.account.extra_data.get('email')
+        email = sociallogin.account.extra_data.get('email') or sociallogin.user.email
 
         if not email:
             return
@@ -48,13 +48,13 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         except User.DoesNotExist:
             pass
 
-# apps/accounts/adapter.py
 
 # apps/accounts/adapter.py
 
 from allauth.account.adapter import DefaultAccountAdapter
 from django.shortcuts import redirect
 from django.contrib import messages
+
 
 class CustomAccountAdapter(DefaultAccountAdapter):
 
@@ -65,4 +65,4 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         )
 
         # 🔥 YOUR CUSTOM REDIRECT HERE
-        return redirect('accounts:login')   # or any page you want
+        return redirect('accounts:login')   # or any page you want this adapter

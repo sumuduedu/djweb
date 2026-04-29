@@ -36,7 +36,6 @@ class AdminDashboardView(BaseView):
 
         return context
 
-
 class AdminCourseView(BaseView):
     template_name = "dashboard/admin/courses.html"
 
@@ -45,16 +44,22 @@ class AdminCourseView(BaseView):
 
         current_year = now().year
 
+        courses = Course.objects.all().order_by("-created_at")
+
+        context["courses"] = courses
+
+        context["total_courses"] = courses.count()
+
         context["current_year_courses"] = Course.objects.filter(
             created_at__year=current_year
         ).count()
 
         context["total_students_enrolled"] = Enrollment.objects.count()
 
-        # if is_active exists
+        # ✅ FIXED
         context["active_courses"] = Course.objects.filter(
-            is_active=True
-        ).count() if hasattr(Course, "is_active") else 0
+            status='ACTIVE'
+        ).count()
 
         context["current_ncs_version"] = NCS.objects.filter(
             is_active=True
