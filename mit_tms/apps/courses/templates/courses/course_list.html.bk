@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- 🔷 HEADER -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Courses</h1>
+            <p class="text-sm text-gray-500 mt-1">
+                Manage and organize your training programs
+            </p>
+        </div>
+
+       {% if request.user.is_superuser or request.user.groups.all.0.name == "Admin" %}
+<a href="{% url 'courses:course_create' %}" class="btn btn-add">
+    + New Course
+</a>
+{% endif %}
+    </div>
+
+    <!-- 🔍 SEARCH (optional but modern) -->
+    <div class="mb-5">
+        <input type="text" placeholder="Search courses..."
+               class="w-full md:w-80 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+    </div>
+
+    <!-- 🔷 TABLE CARD -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <table class="w-full text-sm">
+
+            <!-- HEADER -->
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                <tr>
+                    <th class="p-4 text-left">Course</th>
+                    <th class="p-4 text-center">Level</th>
+                    <th class="p-4 text-center">NVQ</th>
+                    <th class="p-4 text-center">Duration</th>
+                    <th class="p-4 text-center">Hours</th>
+                    <th class="p-4 text-center">Fee</th>
+                    <th class="p-4 text-center">Status</th>
+                    <th class="p-4 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <!-- BODY -->
+            <tbody class="divide-y">
+
+            {% for course in courses %}
+                <tr class="hover:bg-gray-50 transition">
+
+                    <!-- COURSE INFO -->
+                    <td class="p-4">
+                        <div class="font-semibold text-gray-800">
+                            {{ course.title }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ course.code }}
+                        </div>
+                    </td>
+
+                    <!-- LEVEL -->
+                    <td class="p-4 text-center">
+                        <span class="badge-blue">{{ course.level }}</span>
+                    </td>
+
+                    <!-- NVQ -->
+                    <td class="p-4 text-center">
+                        {% if course.nvq_level %}
+                            <span class="badge-purple">NVQ {{ course.nvq_level }}</span>
+                        {% else %}
+                            <span class="text-gray-300">—</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- DURATION -->
+                    <td class="p-4 text-center text-gray-600">
+                        {{ course.duration_months }} mo
+                    </td>
+
+                    <!-- HOURS -->
+                    <td class="p-4 text-center text-gray-600">
+                        {{ course.total_hours }} hrs
+                    </td>
+
+                    <!-- FEE -->
+                    <td class="p-4 text-center">
+                        {% if course.course_fee %}
+                            <span class="font-medium text-gray-800">
+                                Rs. {{ course.course_fee }}
+                            </span>
+                        {% else %}
+                            <span class="text-green-600 font-semibold">
+                                Free
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- STATUS -->
+                    <td class="p-4 text-center">
+                        {% if course.active %}
+                            <span class="badge-green">● Active</span>
+                        {% else %}
+                            <span class="badge-red">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td class="p-4 text-right">
+                        <div class="flex justify-end gap-2">
+
+                            <a href="{% url 'courses:course_detail' course.pk %}"
+                               class="btn-action btn-view">View</a>
+
+                            <a href="{% url 'courses:course_update' course.pk %}"
+                               class="btn-action btn-edit">Edit</a>
+
+                            <a href="{% url 'courses:course_delete' course.pk %}"
+                               class="btn-action btn-delete">Delete</a>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="p-10 text-center text-gray-400">
+                        No courses yet.
+                        <a href="{% url 'courses:course_create' %}" class="text-blue-600 underline">
+                            Create your first course
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- 🎨 STYLE -->
+<style>
+.badge-blue { @apply px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700; }
+.badge-green { @apply px-2 py-1 text-xs rounded-full bg-green-100 text-green-700; }
+.badge-red { @apply px-2 py-1 text-xs rounded-full bg-red-100 text-red-600; }
+.badge-purple { @apply px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700; }
+
+.btn-action {
+    @apply px-3 py-1 text-xs rounded-lg font-medium transition;
+}
+
+.btn-view {
+    @apply bg-blue-50 text-blue-600 hover:bg-blue-100;
+}
+
+.btn-edit {
+    @apply bg-yellow-50 text-yellow-600 hover:bg-yellow-100;
+}
+
+.btn-delete {
+    @apply bg-red-50 text-red-600 hover:bg-red-100;
+}
+</style>
+
+{% endblock %}

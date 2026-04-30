@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h2 class="text-2xl font-semibold text-gray-800">
+            {{ view.kwargs.entity|title }} Form
+        </h2>
+        <p class="text-sm text-gray-500">
+            Add or update {{ view.kwargs.entity|lower }}
+        </p>
+    </div>
+
+    <a href="{% url 'core:dynamic_list' view.kwargs.entity %}"
+       class="text-gray-600 hover:text-gray-800 text-sm">
+        ← Back to List
+    </a>
+</div>
+
+<!-- Card -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+
+        <!-- Fields -->
+        {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <p class="text-xs text-gray-400 mt-1">
+                        {{ field.help_text }}
+                    </p>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-3 pt-4">
+
+            <a href="{% url 'core:dynamic_list' view.kwargs.entity %}"
+               class="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow">
+                Save
+            </button>
+
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -141,7 +141,7 @@ class Course(BaseModel):
     theory_hours = models.FloatField(default=0)
     practical_hours = models.FloatField(default=0)
     assignment_hours = models.FloatField(default=0)
-
+    slug = models.SlugField(unique=True)
     ojt_months = models.FloatField(default=0)  # On Job Training
 
     # =====================================================

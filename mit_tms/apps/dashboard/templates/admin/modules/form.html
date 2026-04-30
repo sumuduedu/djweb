@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load form_tags %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto">
+
+<!-- 🔷 HEADER -->
+<div class="mb-8 p-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg">
+    <h2 class="text-3xl font-bold">
+        {% if object %}✏️ Edit Module{% else %}➕ Add Module{% endif %}
+    </h2>
+    <p class="text-sm opacity-90 mt-1">
+        Manage module structure and content.
+    </p>
+</div>
+
+<!-- 🔴 FORM ERROR -->
+{% if form.errors %}
+<div class="mb-6 p-4 rounded-xl bg-red-100 border border-red-300 text-red-700 text-sm shadow">
+    Please fix the errors below.
+</div>
+{% endif %}
+
+<form method="post" class="space-y-10">
+    {% csrf_token %}
+
+    <!-- 🔷 BASIC INFO -->
+    <section class="bg-white p-6 rounded-2xl shadow space-y-6 border border-gray-100">
+        <h3 class="text-lg font-semibold text-blue-700 border-b pb-2">Basic Information</h3>
+
+        <!-- 🔹 Course (Read Only) -->
+        <div>
+            <label class="block text-sm font-medium text-gray-600">Course</label>
+            <p class="text-gray-800 font-semibold">
+                {{ course.title }}
+            </p>
+        </div>
+
+        <!-- 🔹 Select NCS Unit -->
+        {% render_field form "ncs_unit" %}
+
+        <!-- 🔹 Code + Title -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% render_field form "code" %}
+            {% render_field form "title" %}
+        </div>
+
+        {% render_field form "description" %}
+        {% render_field form "module_type" %}
+    </section>
+
+    <!-- 🔷 HOURS -->
+    <section class="bg-white p-6 rounded-2xl shadow space-y-6 border border-gray-100">
+        <h3 class="text-lg font-semibold text-green-700 border-b pb-2">Hours Allocation</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {% render_field form "total_hours" %}
+            {% render_field form "theory_hours" %}
+            {% render_field form "practical_hours" %}
+        </div>
+
+        {% render_field form "duration_months" %}
+    </section>
+
+    <!-- 🔷 CONTENT -->
+    <section class="bg-white p-6 rounded-2xl shadow space-y-6 border border-gray-100">
+        <h3 class="text-lg font-semibold text-purple-700 border-b pb-2">Content</h3>
+
+        {% render_field form "learning_outcomes" %}
+        {% render_field form "theory_content" %}
+        {% render_field form "practical_content" %}
+    </section>
+
+    <!-- 🔷 TEACHING & ASSESSMENT -->
+    <section class="bg-white p-6 rounded-2xl shadow space-y-6 border border-gray-100">
+        <h3 class="text-lg font-semibold text-indigo-700 border-b pb-2">Teaching & Assessment</h3>
+
+        {% render_field form "teaching_methods" %}
+        {% render_field form "assessment_methods" %}
+    </section>
+
+    <!-- 🔷 ORDER -->
+    <section class="bg-white p-6 rounded-2xl shadow space-y-6 border border-gray-100">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Module Order</h3>
+
+        {% render_field form "order" %}
+    </section>
+
+    <!-- 🔷 ACTIONS -->
+    <div class="flex justify-between items-center pt-6 border-t">
+
+        <a href="
+            {% if object %}
+                {% url 'dashboard:admin_course_detail' object.course.id %}
+            {% elif view.kwargs.course_id %}
+                {% url 'dashboard:admin_course_detail' view.kwargs.course_id %}
+            {% else %}
+                #
+            {% endif %}
+        "
+        class="text-gray-500 hover:text-gray-700 transition">
+            Cancel
+        </a>
+
+        <button type="submit"
+            class="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition transform hover:scale-105">
+            💾 Save Module
+        </button>
+
+    </div>
+
+</form>
+
+</div>
+
+<!-- 🔵 AUTO-FILL FROM NCS UNIT -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const unitField = document.getElementById("id_ncs_unit");
+
+    if (!unitField) return;
+
+    unitField.addEventListener("change", function() {
+
+        let unitId = this.value;
+        if (!unitId) return;
+
+        fetch(`/courses/get-unit-details/?id=${unitId}`)
+            .then(res => res.json())
+            .then(data => {
+
+                if (!data.title) return;
+
+                const mapping = {
+                    title: "title",
+                    description: "description",
+                    total_hours: "total_hours",
+                    theory_hours: "theory_hours",
+                    practical_hours: "practical_hours",
+                    learning_outcomes: "learning_outcomes"
+                };
+
+                Object.keys(mapping).forEach(key => {
+                    let el = document.getElementById("id_" + mapping[key]);
+                    if (el) el.value = data[key] || "";
+                });
+
+            })
+            .catch(() => alert("Error fetching unit data"));
+
+    });
+
+});
+</script>
+
+{% endblock %}

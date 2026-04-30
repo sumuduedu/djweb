@@ -2,28 +2,30 @@ ADMIN_MENU = [
     {
         "section": "Dashboard",
         "items": [
-            {"name": "Overview", "url": "core:admin_dashboard", "icon": "📊"},
+            {"name": "Overview", "url": "dashboard:admin_dashboard", "icon": "📊"},
          #   {"name": "Analytics", "url": "core:staff_reports", "icon": "📈"},
         ]
     },
     {
         "section": "Academic",
         "items": [
-            {"name": "Courses", "url": "core:admin_courses", "icon": "📚"},
+            {"name": "Courses", "url": "dashboard:admin_courses_list", "icon": "📚"},
             {"name": "Batches", "url": "batch:batch_list", "icon": "📦"},
             {"name": "Timetable", "url": "schedule:timetable_list", "icon": "🗓"},
             {"name": "Calendar", "url": "schedule:calendar", "icon": "📅"},
+            {"name": "Student Enroll", "url": "schedule:calendar", "icon": "📅"},
+
         ]
     },
     {
         "section": "User Management",
         "items": [
             {"name": "All Users", "url": "accounts:user_list", "icon": "👥"},
-            {"name": "Staff", "url": "core:staff_dashboard", "icon": "🧑‍💼"},
-            {"name": "Teachers", "url": "core:teacher_students", "icon": "👨‍🏫"},
-            {"name": "Students", "url": "core:staff_students", "icon": "👨‍🎓"},
-            {"name": "Parents", "url": "core:parent_children", "icon": "👨‍👩‍👧"},
-            {"name": "Alumni", "url": "core:alumni_dashboard", "icon": "🎓"},
+            {"name": "Staff", "url": "dashboard:staff_dashboard", "icon": "🧑‍💼"},
+            {"name": "Teachers", "url": "dashboard:teacher_students", "icon": "👨‍🏫"},
+            {"name": "Students", "url": "dashboard:staff_students", "icon": "👨‍🎓"},
+            {"name": "Parents", "url": "dashboard:parent_children", "icon": "👨‍👩‍👧"},
+            {"name": "Alumni", "url": "dashboard:alumni_dashboard", "icon": "🎓"},
         ]
     },
     # {
@@ -51,24 +53,24 @@ STUDENT_MENU = [
     {
         "section": "Student Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:student_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:student_dashboard"},
         ]
     },
     {
         "section": "Learning",
         "items": [
-            {"name": "My Courses", "icon": "📘", "url": "core:student_courses"},
-            {"name": "Assignments", "icon": "📝", "url": "core:student_assignments"},
-            {"name": "Materials", "icon": "📂", "url": "core:student_materials"},
-            {"name": "Attendance", "icon": "🗓️", "url": "core:student_attendance"},
+            {"name": "My Courses", "icon": "📘", "url": "dashboard:student_courses"},
+            {"name": "Assignments", "icon": "📝", "url": "dashboard:student_assignments"},
+            {"name": "Materials", "icon": "📂", "url": "dashboard:student_materials"},
+            {"name": "Attendance", "icon": "🗓️", "url": "dashboard:student_attendance"},
         ]
     },
     {
         "section": "Performance",
         "items": [
-            {"name": "Results", "icon": "🏆", "url": "core:student_results"},
-            {"name": "Progress", "icon": "📈", "url": "core:student_progress"},
-            {"name": "Certificates", "icon": "🎓", "url": "core:student_certificates"},
+            {"name": "Results", "icon": "🏆", "url": "dashboard:student_results"},
+            {"name": "Progress", "icon": "📈", "url": "dashboard:student_progress"},
+            {"name": "Certificates", "icon": "🎓", "url": "dashboard:student_certificates"},
         ]
     },
     {
@@ -77,31 +79,31 @@ STUDENT_MENU = [
             {
                 "name": "Notifications",
                 "icon": "🔔",
-                "url": "core:student_notifications",
+                "url": "dashboard:student_notifications",
                 "badge": "notifications"
             },
-            {"name": "Messages", "icon": "💬", "url": "core:student_messages"},
-            {"name": "Announcements", "icon": "📢", "url": "core:student_announcements"},
+            {"name": "Messages", "icon": "💬", "url": "dashboard:student_messages"},
+            {"name": "Announcements", "icon": "📢", "url": "dashboard:student_announcements"},
         ]
     },
     {
         "section": "Finance",
         "items": [
-            {"name": "Payments", "icon": "💳", "url": "core:student_payment"},
-            {"name": "Receipts", "icon": "🧾", "url": "core:student_receipts"},
+            {"name": "Payments", "icon": "💳", "url": "dashboard:student_payment"},
+            {"name": "Receipts", "icon": "🧾", "url": "dashboard:student_receipts"},
         ]
     },
     {
         "section": "Insights",
         "items": [
-            {"name": "Performance Insights", "icon": "🧠", "url": "core:student_insights"},
+            {"name": "Performance Insights", "icon": "🧠", "url": "dashboard:student_insights"},
             {
                 "name": "Risk Alerts",
                 "icon": "⚠️",
-                "url": "core:student_risk",
+                "url": "dashboard:student_risk",
                 "badge": "risk"
             },
-            {"name": "Recommendations", "icon": "💡", "url": "core:student_recommendations"},
+            {"name": "Recommendations", "icon": "💡", "url": "dashboard:student_recommendations"},
         ]
     },
     {
@@ -120,7 +122,7 @@ TEACHER_MENU = [
     {
         "section": "Teacher Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:teacher_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:teacher_dashboard"},
         ]
     },
  # {
@@ -129,10 +131,10 @@ TEACHER_MENU = [
  #            {
  #                "name": "Notifications",
  #                "icon": "🔔",
- #                "url": "core:teacher_notifications",
+ #                "url": "dashboard:teacher_notifications",
  #                "badge": "notifications"
  #            },
- #            {"name": "Messages", "icon": "💬", "url": "core:teacher_messages"},
+ #            {"name": "Messages", "icon": "💬", "url": "dashboard:teacher_messages"},
  #            {"name": "Announcements", "icon": "📢", "url": "core:teacher_announcements"},
  #        ]
  #    },
@@ -142,7 +144,7 @@ TEACHER_MENU = [
         {
             "name": "My Courses",
             "icon": "📘",
-            "url": "core:teacher_courses"
+            "url": "dashboard:teacher_courses"
         },
         {
             "name": "My Batches",
@@ -166,11 +168,11 @@ TEACHER_MENU = [
     # {
     #     "section": "Assesments & Evaluation",
     #     "items": [
-    #         {"name": "Learning Materials", "icon": "📂", "url": "core:teacher_materials" },
-    #         {"name": "Assignments", "icon": "📝", "url": "core:teacher_assignments"},
-    #         {"name": "Submissions", "icon": "📥", "url": "core:teacher_submissions"},
-    #         {"name": "Attendance", "icon": "📊", "url": "core:teacher_attendance"},
-    #         {"name": "Grading", "icon": "🏆", "url": "core:teacher_results"},
+    #         {"name": "Learning Materials", "icon": "📂", "url": "dashboard:teacher_materials" },
+    #         {"name": "Assignments", "icon": "📝", "url": "dashboard:teacher_assignments"},
+    #         {"name": "Submissions", "icon": "📥", "url": "dashboard:teacher_submissions"},
+    #         {"name": "Attendance", "icon": "📊", "url": "dashboard:teacher_attendance"},
+    #         {"name": "Grading", "icon": "🏆", "url": "dashboard:teacher_results"},
     #
     #     ]
     # },
@@ -179,8 +181,8 @@ TEACHER_MENU = [
     # {
     #     "section": "Students",
     #     "items": [
-    #         {"name": "My Students", "icon": "👨‍🎓", "url": "core:teacher_students"},
-    #         {"name": "Performance Tracking", "icon": "📈", "url": "core:teacher_performance"},
+    #         {"name": "My Students", "icon": "👨‍🎓", "url": "dashboard:teacher_students"},
+    #         {"name": "Performance Tracking", "icon": "📈", "url": "dashboard:teacher_performance"},
     #     ]
     # },
     # {
@@ -189,10 +191,10 @@ TEACHER_MENU = [
     #         {
     #             "name": "At-Risk Students",
     #             "icon": "⚠️",
-    #             "url": "core:teacher_risk_students",
+    #             "url": "dashboard:teacher_risk_students",
     #             "badge": "risk"
     #         },
-    #         {"name": "Analytics", "icon": "🧠", "url": "core:teacher_analytics"},
+    #         {"name": "Analytics", "icon": "🧠", "url": "dashboard:teacher_analytics"},
     #     ]
     # },
 
@@ -212,29 +214,29 @@ STAFF_MENU = [
     {
         "section": "Staff Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:staff_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:staff_dashboard"},
         ]
     },
     {
         "section": "Operations",
         "items": [
-            {"name": "Students", "icon": "👨‍🎓", "url": "core:staff_students"},
-            {"name": "Enrollments", "icon": "📝", "url": "core:staff_enrollments"},
-            {"name": "Batches", "icon": "📦", "url": "core:staff_batches"},
-            {"name": "Attendance", "icon": "📅", "url": "core:staff_attendance"},
+            {"name": "Students", "icon": "👨‍🎓", "url": "dashboard:staff_students"},
+            {"name": "Enrollments", "icon": "📝", "url": "dashboard:staff_enrollments"},
+            {"name": "Batches", "icon": "📦", "url": "dashboard:staff_batches"},
+            {"name": "Attendance", "icon": "📅", "url": "dashboard:staff_attendance"},
         ]
     },
     {
         "section": "Finance",
         "items": [
-            {"name": "Payments", "icon": "💳", "url": "core:staff_payments"},
-            {"name": "Invoices", "icon": "🧾", "url": "core:staff_invoices"},
+            {"name": "Payments", "icon": "💳", "url": "dashboard:staff_payments"},
+            {"name": "Invoices", "icon": "🧾", "url": "dashboard:staff_invoices"},
         ]
     },
     {
         "section": "Reports",
         "items": [
-            {"name": "Reports", "icon": "📊", "url": "core:staff_reports"},
+            {"name": "Reports", "icon": "📊", "url": "dashboard:staff_reports"},
         ]
     },
     {
@@ -243,7 +245,7 @@ STAFF_MENU = [
             {
                 "name": "Notifications",
                 "icon": "🔔",
-                "url": "core:staff_notifications",
+                "url": "dashboard:staff_notifications",
                 "badge": "notifications"
             },
         ]
@@ -264,27 +266,27 @@ ALUMNI_MENU = [
     {
         "section": "Alumni Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:alumni_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:alumni_dashboard"},
         ]
     },
     {
         "section": "Career",
         "items": [
-            {"name": "Job Opportunities", "icon": "💼", "url": "core:alumni_jobs"},
-            {"name": "Networking", "icon": "🤝", "url": "core:alumni_network"},
+            {"name": "Job Opportunities", "icon": "💼", "url": "dashboard:alumni_jobs"},
+            {"name": "Networking", "icon": "🤝", "url": "dashboard:alumni_network"},
         ]
     },
     {
         "section": "Engagement",
         "items": [
-            {"name": "Events", "icon": "📅", "url": "core:alumni_events"},
-            {"name": "Feedback", "icon": "📝", "url": "core:alumni_feedback"},
+            {"name": "Events", "icon": "📅", "url": "dashboard:alumni_events"},
+            {"name": "Feedback", "icon": "📝", "url": "dashboard:alumni_feedback"},
         ]
     },
     {
         "section": "Records",
         "items": [
-            {"name": "Certificates", "icon": "🎓", "url": "core:alumni_certificates"},
+            {"name": "Certificates", "icon": "🎓", "url": "dashboard:alumni_certificates"},
         ]
     },
     {
@@ -303,22 +305,22 @@ PARENT_MENU = [
     {
         "section": "Parent Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:parent_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:parent_dashboard"},
         ]
     },
     {
         "section": "Child",
         "items": [
-            {"name": "My Children", "icon": "👨‍👩‍👧", "url": "core:parent_children"},
-            {"name": "Progress", "icon": "📈", "url": "core:parent_progress"},
-            {"name": "Attendance", "icon": "📅", "url": "core:parent_attendance"},
-            {"name": "Results", "icon": "🏆", "url": "core:parent_results"},
+            {"name": "My Children", "icon": "👨‍👩‍👧", "url": "dashboard:parent_children"},
+            {"name": "Progress", "icon": "📈", "url": "dashboard:parent_progress"},
+            {"name": "Attendance", "icon": "📅", "url": "dashboard:parent_attendance"},
+            {"name": "Results", "icon": "🏆", "url": "dashboard:parent_results"},
         ]
     },
     {
         "section": "Finance",
         "items": [
-            {"name": "Payments", "icon": "💳", "url": "core:parent_payments"},
+            {"name": "Payments", "icon": "💳", "url": "dashboard:parent_payments"},
         ]
     },
     {
@@ -327,10 +329,10 @@ PARENT_MENU = [
             {
                 "name": "Notifications",
                 "icon": "🔔",
-                "url": "core:parent_notifications",
+                "url": "dashboard:parent_notifications",
                 "badge": "notifications"
             },
-            {"name": "Messages", "icon": "💬", "url": "core:parent_messages"},
+            {"name": "Messages", "icon": "💬", "url": "dashboard:parent_messages"},
         ]
     },
     {
@@ -345,7 +347,7 @@ GUEST_MENU = [
     {
         "section": "Guest Panel",
         "items": [
-            {"name": "Dashboard", "icon": "🏠", "url": "core:guest_dashboard"},
+            {"name": "Dashboard", "icon": "🏠", "url": "dashboard:guest_dashboard"},
         ]
     }
 

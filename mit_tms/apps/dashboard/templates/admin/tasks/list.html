@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-100 pb-20">
+
+    <!-- HEADER -->
+    <div class="p-6 flex justify-between items-center">
+
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Courses</h1>
+        <p class="text-gray-500 text-sm">Manage courses</p>
+    </div>
+
+    <!-- ALWAYS VISIBLE BUTTON -->
+    <a href="{% url 'dashboard:admin_course_create' %}"
+       class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+        + Add Course
+    </a>
+
+</div>
+
+    <!-- 🔍 SEARCH + FILTER -->
+    <div class="px-4 mb-4 flex gap-2">
+
+        <input type="text"
+               id="searchInput"
+               placeholder="Search by code..."
+               class="flex-1 p-2 border rounded-lg text-sm">
+
+        <select id="statusFilter"
+                class="p-2 border rounded-lg text-sm">
+            <option value="">All</option>
+            <option value="ACTIVE">Active</option>
+            <option value="DRAFT">Draft</option>
+            <option value="INACTIVE">Inactive</option>
+        </select>
+
+    </div>
+
+    <!-- 📊 STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 mb-6">
+
+        <div class="card text-center">
+            📚 <br>
+            <span class="text-lg font-bold">{{ total_courses }}</span>
+            <div class="text-xs text-gray-500">Courses</div>
+        </div>
+
+        <div class="card text-center">
+            📅 <br>
+            <span class="text-lg font-bold">{{ current_year_courses }}</span>
+            <div class="text-xs text-gray-500">This Year</div>
+        </div>
+
+        <div class="card text-center">
+            👨‍🎓 <br>
+            <span class="text-lg font-bold">{{ total_students_enrolled }}</span>
+            <div class="text-xs text-gray-500">Students</div>
+        </div>
+
+        <div class="card text-center">
+            🟢 <br>
+            <span class="text-lg font-bold">{{ active_courses }}</span>
+            <div class="text-xs text-gray-500">Active</div>
+        </div>
+
+    </div>
+
+    <!-- 💻 DESKTOP TABLE -->
+    <div class="hidden md:block px-4">
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-gray-50 text-xs text-gray-600 uppercase">
+                    <tr>
+                        <th class="p-4 text-left">Code</th>
+                        <th class="p-4">Mode</th>
+                        <th class="p-4">Duration</th>
+                        <th class="p-4">Hours</th>
+                        <th class="p-4">Fee</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="courseTable">
+
+                {% for course in courses %}
+               <tr data-status="{{ course.status }}"
+    onclick="window.location='{% url 'dashboard:admin_course_detail' course.pk %}'"
+    class="border-t hover:bg-gray-50 cursor-pointer">
+
+                    <td class="p-4 font-semibold">{{ course.code }}</td>
+
+                    <td class="p-4 text-center text-gray-600">
+                        {{ course.get_delivery_mode_display }}<br>
+                        <span class="text-xs text-gray-400">
+                            {{ course.get_course_mode_display }}
+                        </span>
+                    </td>
+
+                    <td class="p-4 text-center">{{ course.duration_months }} mo</td>
+
+                    <td class="p-4 text-center">{{ course.total_hours }} hrs</td>
+
+                    <td class="p-4 text-center">
+                        {% if course.is_free %}
+                            🆓
+                        {% else %}
+                            Rs. {{ course.course_fee }}
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4 text-center">
+                        {% if course.status == "ACTIVE" %}
+                            🟢
+                        {% elif course.status == "DRAFT" %}
+                            🟡
+                        {% else %}
+                            🔴
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4 text-right" onclick="event.stopPropagation()">
+
+                        <a href="{% url 'dashboard:admin_course_update' course.pk %}">✏️</a>
+                        <a href="{% url 'dashboard:admin_course_delete' course.pk %}"
+                           onclick="return confirm('Delete?')">🗑</a>
+
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- 📱 MOBILE CARDS -->
+    <div class="md:hidden px-4 space-y-4" id="courseCards">
+
+        {% for course in courses %}
+        <div data-status="{{ course.status }}"
+             onclick="goToDetail({{ course.pk }})"
+             class="bg-white p-4 rounded-xl shadow active:scale-[0.98] transition cursor-pointer">
+
+            <div class="flex justify-between mb-2">
+                <div class="font-bold">📘 {{ course.code }}</div>
+
+                <div>
+                    {% if course.status == "ACTIVE" %}🟢{% elif course.status == "DRAFT" %}🟡{% else %}🔴{% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 text-sm text-gray-600 gap-2">
+                <div>🏫 {{ course.get_delivery_mode_display }}</div>
+                <div>⏱ {{ course.get_course_mode_display }}</div>
+                <div>📆 {{ course.duration_months }} mo</div>
+                <div>⏳ {{ course.total_hours }} hrs</div>
+            </div>
+
+            <div class="mt-2 text-sm">
+                {% if course.is_free %}
+                    🆓 Free
+                {% else %}
+                    💰 Rs. {{ course.course_fee }}
+                {% endif %}
+            </div>
+
+            <div class="flex justify-end gap-4 mt-3" onclick="event.stopPropagation()">
+                <a href="{% url 'dashboard:admin_course_update' course.pk %}">✏️</a>
+                <a href="{% url 'dashboard:admin_course_delete' course.pk %}"
+                   onclick="return confirm('Delete?')">🗑</a>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- ➕ FLOATING BUTTON (MOBILE ONLY) -->
+<a href="{% url 'dashboard:admin_course_create' %}"
+   class="md:hidden fixed bottom-20 right-5 bg-blue-600 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-lg text-2xl">
+    +
+</a>
+
+<!-- 📱 BOTTOM NAV -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 text-sm">
+
+    <a href="#" class="flex flex-col items-center text-blue-600">
+        📚
+        <span>Courses</span>
+    </a>
+
+    <a href="#" class="flex flex-col items-center text-gray-500">
+        👨‍🎓
+        <span>Students</span>
+    </a>
+
+    <a href="#" class="flex flex-col items-center text-gray-500">
+        📊
+        <span>Reports</span>
+    </a>
+
+</div>
+
+<!-- 🎨 STYLES -->
+<style>
+.card {
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+</style>
+
+<!-- ⚡ JS -->
+<script>
+
+function goToDetail(id){
+    window.location = "/app/courses/" + id + "/";
+}
+
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+
+searchInput.addEventListener("keyup", filterCourses);
+statusFilter.addEventListener("change", filterCourses);
+
+function filterCourses(){
+
+    let search = searchInput.value.toLowerCase();
+    let status = statusFilter.value;
+
+    document.querySelectorAll("[data-status]").forEach(el => {
+
+        let text = el.innerText.toLowerCase();
+        let matchText = text.includes(search);
+        let matchStatus = !status || el.dataset.status === status;
+
+        el.style.display = (matchText && matchStatus) ? "" : "none";
+
+    });
+}
+
+</script>
+
+{% endblock %}

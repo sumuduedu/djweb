@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+
+<!-- Title -->
+<div class="flex justify-between items-center mb-4">
+    <div>
+        <h2 class="text-2xl font-semibold text-gray-800">{{ title }}</h2>
+        <p class="text-sm text-gray-500">Manage {{ title|lower }}</p>
+    </div>
+
+    <a href="{% url 'core:dynamic_create' entity %}"
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+        + Add {{ title }}
+    </a>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <table class="w-full text-sm">
+
+<thead class="bg-gray-50 text-gray-500 uppercase text-xs border-b">
+    <tr>
+        {% for field in fields %}
+            <th class="p-4 text-left">
+                {{ field|title }}
+            </th>
+        {% endfor %}
+        <th class="p-4 text-right">Actions</th>
+    </tr>
+</thead>
+
+        <!-- Body -->
+<tbody>
+{% for row in rows %}
+    <tr class="border-b hover:bg-gray-50 transition">
+
+        {% for value in row.values %}
+            <td class="p-4">
+                {{ value }}
+            </td>
+        {% endfor %}
+
+        <td class="p-4 text-right space-x-3">
+            <a href="{% url 'core:dynamic_update' entity row.obj.id %}" class="action-yellow">Edit</a>
+            <a href="{% url 'core:dynamic_delete' entity row.obj.id %}" class="action-red">Delete</a>
+        </td>
+
+    </tr>
+{% empty %}
+    <tr>
+        <td colspan="{{ fields|length|add:1 }}" class="p-6 text-center text-gray-500">
+            No {{ title|lower }} available.
+        </td>
+    </tr>
+{% endfor %}
+</tbody>
+
+    </table>
+</div>
+
+<style>
+.action-yellow { @apply text-yellow-600 hover:text-yellow-800 font-medium; }
+.action-red { @apply text-red-600 hover:text-red-800 font-medium; }
+</style>
+
+{% endblock %}

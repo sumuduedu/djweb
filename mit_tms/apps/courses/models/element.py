@@ -15,6 +15,7 @@ class Element(BaseModel):
 
     order = models.PositiveIntegerField(default=0)
 
+    description = models.TextField(blank=True)   # ✅ ADD THIS
     class Meta:
         ordering = ['order']
         unique_together = ['unit', 'title']

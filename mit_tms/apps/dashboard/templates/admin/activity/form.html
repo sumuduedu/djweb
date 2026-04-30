@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto bg-white p-8 rounded-xl shadow space-y-6">
+
+    <h2 class="text-2xl font-bold">
+        {% if object %}✏️ Edit Course{% else %}➕ Add Course{% endif %}
+    </h2>
+
+    <!-- 🔔 Errors -->
+    {% if form.errors %}
+    <div class="bg-red-100 text-red-700 p-3 rounded">
+        {{ form.errors }}a
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- ========================= -->
+        <!-- 🔷 BASIC INFO -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Basic Information</h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>Title</label>
+                    {{ form.title }}
+                </div>
+                <div>
+                    <label>Code</label>
+                    {{ form.code }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label>Description</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mt-4">
+                <label>Active</label>
+                {{ form.active }}
+            </div>
+        </div>
+        <div class="mt-4">
+    <label>Status</label>
+    {{ form.status }}
+</div>
+        <!-- ========================= -->
+        <!-- 🔷 ACADEMIC -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Academic Details</h3>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label>Level</label>
+                    {{ form.level }}
+                </div>
+
+                <div>
+                    <label>Entry Qualification</label>
+                    {{ form.entry_qualification }}
+                </div>
+
+                <div>
+                    <label>Medium</label>
+                    {{ form.medium }}
+                </div>
+
+                <div>
+                    <label>Curriculum Category</label>
+                    {{ form.curriculum_category }}
+                </div>
+
+                <div>
+                    <label>Availability</label>
+                    {{ form.curriculum_availability }}
+                </div>
+
+                <div>
+                    <label>Equivalent Course</label>
+                    {{ form.equivalent_course }}
+                </div>
+
+                <div>
+
+                    <label>Industry Sector</label>
+                   {{ form.industry }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 DELIVERY -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Delivery</h3>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label>Delivery Mode</label>
+                    {{ form.delivery_mode }}
+                </div>
+
+                <div>
+                    <label>Course Mode</label>
+                    {{ form.course_mode }}
+                </div>
+
+                <div>
+                    <label>Language Medium</label>
+                    {{ form.medium }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 DURATION -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Duration Breakdown</h3>
+
+            <div class="grid grid-cols-4 gap-4">
+                <div>
+                    <label>Months</label>
+                    {{ form.duration_months }}
+                </div>
+
+                <div>
+                    <label>Theory Hours</label>
+                    {{ form.theory_hours }}
+                </div>
+
+                <div>
+                    <label>Practical Hours</label>
+                    {{ form.practical_hours }}
+                </div>
+
+                <div>
+                    <label>Assignment Hours</label>
+                    {{ form.assignment_hours }}
+                </div>
+
+                <div>
+                    <label>OJT Months</label>
+                    {{ form.ojt_months }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 CAPACITY -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Capacity</h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>Batches Per Year</label>
+                    {{ form.batches_per_year }}
+                </div>
+
+                <div>
+                    <label>Students Per Batch</label>
+                    {{ form.students_per_batch }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 FINANCIAL -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Financial</h3>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label>Course Fee</label>
+                    {{ form.course_fee }}
+                </div>
+
+                <div>
+                    <label>Is Free</label>
+                    {{ form.is_free }}
+                </div>
+
+                <div>
+                    <label>Fee Includes</label>
+                    {{ form.fee_includes }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 RESOURCES -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">Resources</h3>
+<div class="border-b pb-4">
+    <h3 class="font-semibold mb-3">Physical Resources</h3>
+
+    {{ form.physical_resources }}
+</div>
+            <div>
+                <label>Tools Available</label>
+                {{ form.tools_available }}
+            </div>
+
+            <div>
+                <label>Equipment Available</label>
+                {{ form.equipment_available }}
+            </div>
+
+            <div>
+                <label>Machinery Available</label>
+                {{ form.machinery_available }}
+            </div>
+        </div>
+
+        <div class="border-b pb-4">
+    <h3 class="font-semibold mb-3">Learning Resources</h3>
+
+    {{ resource_formset.management_form }}
+
+    {% for form in resource_formset %}
+        <div class="border p-3 rounded mb-2">
+            {{ form.name }}
+            {{ form.type }}
+            {{ form.file }}
+            {{ form.url }}
+            {{ form.description }}
+            {{ form.DELETE }}
+        </div>
+    {% endfor %}
+</div>
+        <!-- ========================= -->
+        <!-- 🔷 NVQ -->
+        <!-- ========================= -->
+        <div class="border-b pb-4">
+            <h3 class="font-semibold mb-3">NVQ Details</h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>NVQ Level</label>
+                    {{ form.nvq_level }}
+                </div>
+
+                <div>
+                    <label>Qualification Code</label>
+                    {{ form.qualification_code }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 PEDAGOGY -->
+        <!-- ========================= -->
+        <div>
+            <h3 class="font-semibold mb-3">Pedagogy</h3>
+
+            <div>
+                <label>Prerequisite</label>
+                {{ form.prerequisite }}
+            </div>
+
+            <div>
+                <label>Learning Outcomes</label>
+                {{ form.learning_outcomes }}
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- 🔷 ACTIONS -->
+        <!-- ========================= -->
+        <div class="flex justify-between pt-4">
+            <a href="{% url 'courses:course_list' %}" class="text-gray-600">
+                Cancel
+            </a>
+
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Save Course
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

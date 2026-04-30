@@ -15,20 +15,13 @@ class Module(BaseModel):
         related_name='modules'
     )
 
-     # 🔥 LINK TO NCS UNIT
-    ncs_unit = models.ForeignKey(
-        'courses.Unit',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='modules'
-    )
 
     # 🔷 BASIC INFO
     code = models.CharField(max_length=20)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-
+    is_active = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
     module_type = models.CharField(max_length=20, choices=MODULE_TYPE_CHOICES)
 
     # 🔷 DURATION

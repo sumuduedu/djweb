@@ -19,12 +19,13 @@ urlpatterns = [
 
     # ================= APPLICATION =================
     path('app/', include([
-        path('', include('apps.core.urls')),              # 👉 dashboard should be here
+        path('', include('apps.dashboard.urls')),              # 👉 dashboard should be here
         path('courses/', include('apps.courses.urls')),
         path('batches/', include('apps.batch.urls')),
         path('enrollment/', include('apps.enrollment.urls')),
         path('schedule/', include('apps.scheduling.urls')),
         path('lessons/', include('apps.lessonplan.urls')),
+        path('core/', include('apps.core.urls')),
     ])),
 ]
 

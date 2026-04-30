@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- 🔷 HEADER -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800">
+                {{ object.code }} - {{ object.title }}
+            </h2>
+            <p class="text-sm text-gray-500">
+                Module under {{ object.course.code }}
+            </p>
+        </div>
+
+        <div class="space-x-2">
+            <a href="{% url 'dashboard:admin_module_update' object.pk %}"
+               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
+                ✏️ Edit
+            </a>
+
+            <a href="{% url 'dashboard:admin_module_delete' object.pk %}"
+               class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                🗑 Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 MODULE SUMMARY -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+        <div class="card text-center">
+            📘 <br>
+            <span class="text-lg font-bold">{{ object.tasks.count }}</span>
+            <div class="text-xs text-gray-500">Tasks</div>
+        </div>
+
+        <div class="card text-center">
+            📖 <br>
+            <span class="text-lg font-bold">{{ object.theory_hours }}</span>
+            <div class="text-xs text-gray-500">Theory Hours</div>
+        </div>
+
+        <div class="card text-center">
+            🛠 <br>
+            <span class="text-lg font-bold">{{ object.practical_hours }}</span>
+            <div class="text-xs text-gray-500">Practical Hours</div>
+        </div>
+
+        <div class="card text-center">
+            ⏱ <br>
+            <span class="text-lg font-bold">
+                {{ object.theory_hours|add:object.practical_hours }}
+            </span>
+            <div class="text-xs text-gray-500">Total Hours</div>
+        </div>
+
+    </div>
+
+    <!-- 📌 MODULE INFORMATION -->
+    <div class="bg-white shadow rounded-xl p-6 space-y-4">
+
+        <h3 class="text-lg font-semibold">Module Information</h3>
+
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+
+            <div>
+                <p class="text-gray-500">Course</p>
+                <p>{{ object.course.title }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Module Code</p>
+                <p>{{ object.code }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Title</p>
+                <p>{{ object.title }}</p>
+            </div>
+
+        </div>
+
+        {% if object.description %}
+        <div>
+            <p class="text-gray-500 text-sm">Description</p>
+            <p>{{ object.description }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- 📚 TASKS LIST -->
+    <div>
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Tasks</h3>
+
+<a href="{% url 'dashboard:admin_module_task_create' module_id=object.id %}"
+   class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition text-sm">
+   + Add Task
+</a>
+        </div>
+
+        {% for task in object.tasks.all %}
+            <div class="bg-white rounded-xl shadow p-5 mb-4">
+
+                <div class="flex justify-between items-center border-b pb-2 mb-3">
+
+                    <h4 class="text-lg font-semibold">
+                        <a href="{% url 'dashboard:admin_task_detail' task.pk %}"
+                           class="text-blue-600 hover:underline">
+                            {{ task.title }}
+                        </a>
+                    </h4>
+
+                    <div class="space-x-2 text-sm">
+                        <a href="{% url 'dashboard:admin_task_update' task.pk %}"
+                           class="text-yellow-600 hover:underline">Edit</a>
+
+                        <a href="{% url 'dashboard:admin_task_delete' task.pk %}"
+                           class="text-red-600 hover:underline">Delete</a>
+                    </div>
+
+                </div>
+
+                <!-- TASK INFO -->
+                <div class="text-sm text-gray-600 mb-2">
+                    Duration: {{ task.duration_hours }} hrs
+                </div>
+
+                <!-- ACTIVITIES PREVIEW -->
+                {% if task.activities.all %}
+                    <ul class="space-y-2">
+                        {% for activity in task.activities.all %}
+                            <li class="p-2 bg-gray-50 rounded flex justify-between items-center">
+                                <span>{{ activity.title }}</span>
+                                <span class="text-xs text-gray-400">
+                                    {{ activity.duration_minutes }} mins
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-400 text-sm">No activities added</p>
+                {% endif %}
+
+            </div>
+        {% empty %}
+            <div class="text-center text-gray-500 p-6 bg-white rounded shadow">
+                No tasks available
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 🔙 BACK -->
+    <div>
+        <a href="{% url 'dashboard:admin_courses_list' %}"
+           class="text-blue-600 hover:underline">
+            ⬅ Back to Courses
+        </a>
+    </div>
+
+</div>
+
+<!-- 🎨 CARD STYLE -->
+<style>
+.card {
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+</style>
+
+{% endblock %}
