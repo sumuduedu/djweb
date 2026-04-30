@@ -5,12 +5,19 @@ from apps.courses.models import Course
 from .base import BaseForm
 from apps.courses.models import Course
 from django import forms
+from django import forms
+from apps.courses.models import Course
+from .base import BaseForm
 
 
-class CourseForm(BaseForm):
+class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = '__all__'
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "tools_available": forms.Textarea(attrs={"rows": 3}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -23,8 +30,5 @@ class CourseForm(BaseForm):
             raise forms.ValidationError(
                 "At least one duration value must be provided."
             )
-        widgets = {
-                    "description": forms.Textarea(attrs={"rows": 4}),
-                    "tools_available": forms.Textarea(attrs={"rows": 3}),
-                }
+
         return cleaned_data

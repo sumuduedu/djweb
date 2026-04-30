@@ -7,15 +7,43 @@ from .base import BaseListView, BaseCreateView, BaseUpdateView, BaseDeleteView
 from ..models import Course
 from ..forms import CourseForm
 
+from .base import BaseListView
+from ..services.course_service import CourseService
+from apps.core.permission_engine import PermissionEngine
+from django.http import HttpResponseForbidden
+
+from apps.courses.selectors.course_selector import CourseSelector
 
 class CourseListView(BaseListView):
-    model = Course
     template_name = "courses/course_lists.html"
-    context_object_name = "courses"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not PermissionEngine.can(request.user, "course", "read"):
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Course.objects.all().order_by('-created_at')
+        return CourseSelector.list(self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["table"] = CourseService.get_table(self.request.user)
+
+        # ✅ permissions INSIDE method
+        context["can_create"] = PermissionEngine.can(
+            self.request.user, "course", "create"
+        )
+
+        context["can_update"] = PermissionEngine.can(
+            self.request.user, "course", "update"
+        )
+
+        context["can_delete"] = PermissionEngine.can(
+            self.request.user, "course", "delete"
+        )
+
+        return context
 
 from .base import BaseDetailView
 from ..models import Course

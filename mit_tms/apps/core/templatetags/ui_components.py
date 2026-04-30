@@ -6,22 +6,14 @@ register = template.Library()
 # ================================
 # 🔷 TABLE COMPONENT
 # ================================
-@register.inclusion_tag('components/table.html')
-def render_table(objects, fields, entity=None):
-    rows = []
-
-    for obj in objects:
-        rows.append({
-            "values": [getattr(obj, f) for f in fields],
-            "id": obj.id,
-            "entity": entity
-        })
-
+@register.inclusion_tag('components/table.html', takes_context=True)
+def render_table(context, table):
     return {
-        "columns": fields,
-        "rows": rows,
-        "entity": entity
+        "table": table,
+        "can_update": context.get("can_update", False),
+        "can_delete": context.get("can_delete", False),
     }
+
 
 
 # ================================

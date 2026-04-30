@@ -16,7 +16,7 @@ class PermissionEngine:
         role = PermissionEngine.get_role(user)
         return action in PERMISSIONS.get(entity, {}).get(role, [])
 
-from core.models import PermissionRule
+from apps.core.models import PermissionRule
 
 class PermissionEngine:
 

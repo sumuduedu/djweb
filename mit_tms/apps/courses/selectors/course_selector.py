@@ -1,7 +1,7 @@
-# courses/selectors/course_selector.py
-
 from django.db.models import Count, Q
-from courses.models import Course
+from django.shortcuts import get_object_or_404
+from ..models import Course
+
 
 class CourseSelector:
 
@@ -9,18 +9,21 @@ class CourseSelector:
     def list(user):
         queryset = Course.objects.all()
 
-        # 🔒 Row-level security
-        if user.groups.filter(name="Student").exists():
+        # 🔥 ADD THIS
+        if user.is_superuser:
+            return queryset.order_by("-created_at")
+
+        if user.groups.filter(name__iexact="student").exists() and hasattr(user, "student"):
             queryset = queryset.filter(enrollments__student=user.student)
 
-        elif user.groups.filter(name="Teacher").exists():
+        elif user.groups.filter(name__iexact="teacher").exists() and hasattr(user, "teacher"):
             queryset = queryset.filter(modules__teacher=user.teacher)
 
-        return queryset.distinct()
+        return queryset.distinct().order_by("-created_at")
 
     @staticmethod
     def get_by_id(course_id):
-        return Course.objects.get(id=course_id)
+        return get_object_or_404(Course, id=course_id)
 
     @staticmethod
     def list_with_related(user):
@@ -34,7 +37,9 @@ class CourseSelector:
 
     @staticmethod
     def search(user, query=None, filters=None):
-        queryset = CourseSelector.list(user)
+        filters = filters or {}
+
+        queryset = CourseSelector.list_with_related(user)
 
         if query:
             queryset = queryset.filter(
@@ -42,18 +47,19 @@ class CourseSelector:
                 Q(code__icontains=query)
             )
 
-        if filters:
-            if filters.get("level"):
-                queryset = queryset.filter(level=filters["level"])
+        if filters.get("level"):
+            queryset = queryset.filter(level=filters["level"])
 
-            if filters.get("status"):
-                queryset = queryset.filter(status=filters["status"])
+        if filters.get("status"):
+            queryset = queryset.filter(status=filters["status"])
 
         return queryset
 
     @staticmethod
-    def stats():
-        return Course.objects.aggregate(
+    def stats(user):
+        queryset = CourseSelector.list(user)
+
+        return queryset.aggregate(
             total_courses=Count("id"),
             active_courses=Count("id", filter=Q(status="ACTIVE"))
         )

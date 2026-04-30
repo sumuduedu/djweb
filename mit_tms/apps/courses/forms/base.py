@@ -1,27 +1,24 @@
 from django import forms
 
-
-from django import forms
-
 class BaseForm(forms.ModelForm):
-    """
-    Apply consistent Tailwind styling to all fields
-    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
 
-            # Checkboxes (special styling)
-            if isinstance(field.widget, forms.CheckboxInput):
+            if isinstance(field.widget, forms.Select):
                 field.widget.attrs.update({
-                    "class": "mr-2"
-                })
-            else:
-                field.widget.attrs.update({
-                    "class": "w-full border rounded px-3 py-2"
+                    "class": "w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
                 })
 
-            # Optional: auto placeholder
-            field.widget.attrs.setdefault("placeholder", field.label)
+            elif isinstance(field.widget, forms.Textarea):
+                field.widget.attrs.update({
+                    "class": "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500",
+                    "rows": 3
+                })
+
+            else:
+                field.widget.attrs.update({
+                    "class": "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                })

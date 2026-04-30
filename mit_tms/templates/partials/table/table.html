@@ -1,0 +1,107 @@
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <table class="w-full text-sm">
+
+        <!-- HEADER -->
+        <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+            <tr>
+                {% for col in table.columns %}
+                    <th class="p-4 text-left">{{ col.label }}</th>
+                {% endfor %}
+                <th class="p-4 text-right">Actions</th>
+            </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody class="divide-y">
+
+        {% for row in table.rows %}
+            <tr class="hover:bg-gray-50 transition">
+
+                {% for col in table.columns %}
+                    <td class="p-4">
+
+                        <!-- COURSE -->
+                        {% if col.field == "course" %}
+                            <div class="font-semibold text-gray-800">
+                                {{ row.course.title }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {{ row.course.code }}
+                            </div>
+
+                        <!-- LEVEL -->
+                        {% elif col.field == "level" %}
+                            <span class="badge-blue">{{ row.level }}</span>
+
+                        <!-- NVQ -->
+                        {% elif col.field == "nvq" %}
+                            {% if row.nvq %}
+                                <span class="badge-purple">NVQ {{ row.nvq }}</span>
+                            {% else %}
+                                <span class="text-gray-300">—</span>
+                            {% endif %}
+
+                        <!-- DURATION -->
+                        {% elif col.field == "duration" %}
+                            {{ row.duration }}
+
+                        <!-- HOURS -->
+                        {% elif col.field == "hours" %}
+                            {{ row.hours }}
+
+                        <!-- FEE -->
+                        {% elif col.field == "fee" %}
+                            {% if row.fee %}
+                                Rs. {{ row.fee }}
+                            {% else %}
+                                <span class="text-green-600 font-semibold">Free</span>
+                            {% endif %}
+
+                        <!-- 🔥 STATUS (FIXED HERE) -->
+                        {% elif col.field == "status" %}
+                            <span class="badge-{{ row.status.color }}">
+                                ● {{ row.status.label }}
+                            </span>
+
+                        {% else %}
+                            {{ row[col.field] }}
+                        {% endif %}
+
+                    </td>
+                {% endfor %}
+
+                <!-- ACTIONS -->
+                <td class="p-4 text-right">
+                    <div class="flex justify-end gap-2">
+
+                        <a href="{% url 'courses:course_detail' row.id %}"
+                           class="btn-action btn-view">View</a>
+
+                        {% if can_update %}
+                        <a href="{% url 'courses:course_update' row.id %}"
+                           class="btn-action btn-edit">Edit</a>
+                        {% endif %}
+
+                        {% if can_delete %}
+                        <a href="{% url 'courses:course_delete' row.id %}"
+                           class="btn-action btn-delete">Delete</a>
+                        {% endif %}
+
+                    </div>
+                </td>
+
+            </tr>
+
+        {% empty %}
+            <tr>
+                <td colspan="100" class="p-10 text-center text-gray-400">
+                    No data available.
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
