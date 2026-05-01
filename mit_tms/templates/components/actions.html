@@ -1,0 +1,23 @@
+<div class="flex justify-end gap-2">
+
+    {% for action in actions %}
+
+        {% if action.type == "edit" and can_update %}
+            <a href="{{ action.url }}"
+               class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200">
+                ✏️ {{ action.label }}
+            </a>
+        {% endif %}
+
+        {% if action.type == "delete" and can_delete %}
+            <a href="{{ action.url }}"
+               class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200">
+                🗑 {{ action.label }}
+            </a>
+        {% endif %}
+
+    {% empty %}
+        <span class="text-xs text-gray-400">No actions</span>
+    {% endfor %}
+
+</div>
