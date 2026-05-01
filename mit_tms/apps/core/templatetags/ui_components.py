@@ -1,4 +1,5 @@
 from django import template
+from django.urls import reverse
 
 register = template.Library()
 
@@ -12,8 +13,8 @@ def render_table(context, table):
         "table": table,
         "can_update": context.get("can_update", False),
         "can_delete": context.get("can_delete", False),
+        "can_create": context.get("can_create", False),
     }
-
 
 
 # ================================
@@ -28,13 +29,47 @@ def render_model_table(queryset, entity=None):
         rows.append({
             "values": [getattr(obj, f) for f in fields],
             "id": obj.id,
-            "entity": entity
+            "entity": entity,
+            "actions": [
+                {
+                    "label": "Edit",
+                    "url": reverse(f"{entity}:update", args=[obj.id]) if entity else "#"
+                },
+                {
+                    "label": "Delete",
+                    "url": reverse(f"{entity}:delete", args=[obj.id]) if entity else "#"
+                }
+            ]
         })
 
     return {
-        "columns": fields,
+        "columns": [{"label": f.title(), "field": f} for f in fields],
         "rows": rows,
         "entity": entity
+    }
+
+
+# ================================
+# 🔷 CRUD ACTIONS (Edit/Delete/View)
+# ================================
+
+@register.inclusion_tag('components/actions.html', takes_context=True)
+def render_actions(context, row):
+    return {
+        "actions": row.get("actions", []),   # 🔥 THIS IS THE FIX
+        "can_update": context.get("can_update", False),
+        "can_delete": context.get("can_delete", False),
+    }
+
+
+# ================================
+# 🔷 BULK ACTIONS
+# ================================
+@register.inclusion_tag('components/bulk_actions.html', takes_context=True)
+def render_bulk_actions(context, entity):
+    return {
+        "entity": entity,
+        "can_delete": context.get("can_delete", False),
     }
 
 
@@ -42,15 +77,7 @@ def render_model_table(queryset, entity=None):
 # 🔷 CARD COMPONENT (ADVANCED)
 # ================================
 @register.inclusion_tag('components/card.html')
-def render_card(
-    title,
-    value,
-    subtitle=None,
-    icon=None,
-    extra=None,
-    color="default",
-    url=None
-):
+def render_card(title, value, subtitle=None, icon=None, extra=None, color="default", url=None):
 
     COLORS = {
         "default": ("bg-white", "text-gray-500", "text-gray-800"),
@@ -89,13 +116,25 @@ def render_button(url, label, color="bg-blue-600"):
 
 
 # ================================
-# 🔷 FORM
+# 🔷 CREATE BUTTON URL
+# ================================
+@register.simple_tag
+def create_url(entity):
+    try:
+        return reverse(f"{entity}:create")
+    except:
+        return "#"
+
+
+# ================================
+# 🔷 FORM (CRUD READY)
 # ================================
 @register.inclusion_tag('components/form.html')
-def render_form(form, cancel_url):
+def render_form(form, cancel_url, submit_label="Save"):
     return {
         "form": form,
-        "cancel_url": cancel_url
+        "cancel_url": cancel_url,
+        "submit_label": submit_label
     }
 
 
@@ -138,6 +177,7 @@ def render_alert(message, type="success"):
         "classes": COLORS.get(type, COLORS["success"])
     }
 
+
 # ================================
 # 🔷 EMPTY STATE
 # ================================
@@ -161,3 +201,33 @@ def render_chart_card(title, value, labels, data, chart_id, icon=None):
         "chart_id": chart_id,
         "icon": icon
     }
+
+
+# ================================
+# 🔷 FILTER COMPONENT
+# ================================
+@register.inclusion_tag('components/filters.html')
+def render_filters(filters, request_get=None):
+    return {
+        "filters": filters,
+        "request_get": request_get or {}
+    }
+
+
+# ================================
+# 🔷 DELETE CONFIRM BUTTON
+# ================================
+@register.inclusion_tag('components/delete_confirm.html')
+def render_delete_confirm(url):
+    return {
+        "url": url
+    }
+
+
+# ================================
+# 🔷 ROW CLICK (DETAIL URL)
+# ================================
+@register.simple_tag
+def detail_url(row):
+    return row.get("detail_url", "#")
+

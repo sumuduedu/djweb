@@ -28,7 +28,11 @@ class EnrollmentInquiry(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="enrollments"  # 🔥 THIS LINE
+    )
 
     role_type = models.CharField(max_length=10, choices=ROLE_TYPE)
 

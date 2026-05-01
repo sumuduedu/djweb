@@ -1,36 +1,136 @@
-<form method="post" class="bg-white p-6 rounded-2xl shadow space-y-6">
-    {% csrf_token %}
+{% load core_tags %}
 
-    {% for field in form %}
+<!-- ========================= -->
+<!-- 🔷 COURSE FORM -->
+<!-- ========================= -->
+{% for section, fields in form_layout %}
+<div class="border-b pb-4">
+    <h3 class="font-semibold mb-3">{{ section }}</h3>
+
+    <div class="grid grid-cols-2 gap-4">
+
+        {% for field_name in fields %}
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                {{ field.label }}
-            </label>
 
-            {{ field }}
+            {% with field=form|get_field:field_name %}
 
-            {% if field.help_text %}
-                <p class="text-xs text-gray-400 mt-1">
-                    {{ field.help_text }}
-                </p>
-            {% endif %}
+                {% if field %}
 
-            {% if field.errors %}
-                <p class="text-red-500 text-xs mt-1">
-                    {{ field.errors|striptags }}
-                </p>
-            {% endif %}
+                    <label class="text-sm text-gray-600">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p class="text-gray-400 text-xs">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <p class="text-red-500 text-xs">
+                            {{ field.errors|striptags }}
+                        </p>
+                    {% endif %}
+
+                {% else %}
+                    <p class="text-red-500 text-xs">
+                        ⚠️ Field "{{ field_name }}" not found
+                    </p>
+                {% endif %}
+
+            {% endwith %}
+
         </div>
-    {% endfor %}
+        {% endfor %}
 
-    <div class="flex justify-between pt-4 border-t">
-        <a href="{{ cancel_url }}" class="text-gray-500 hover:text-gray-700">
-            Cancel
-        </a>
-
-        <button type="submit"
-                class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
-            Save
-        </button>
     </div>
-</form>
+</div>
+{% endfor %}
+
+
+<!-- ========================= -->
+<!-- 🔷 RELATIONS (SEPARATE) -->
+<!-- ========================= -->
+{% for rel in relation_layout %}
+<div class="border-b pb-4">
+
+    <h3 class="font-semibold mb-3">{{ rel.label }}</h3>
+
+    {% with formset=relation_formsets|get_item:rel.name %}
+
+        {{ formset.management_form }}
+
+        <div id="{{ rel.name }}-container">
+
+            {% for f in formset %}
+            <div class="form-row border p-3 rounded mb-2 grid grid-cols-5 gap-2">
+
+                {% for field_name in rel.fields %}
+                    {% with field=f|get_field:field_name %}
+                        {{ field }}
+                    {% endwith %}
+                {% endfor %}
+
+                {{ f.DELETE }}
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- 🔥 Dynamic Add Button -->
+        <button type="button"
+            onclick="addForm('{{ rel.name }}')"
+            class="mt-3 px-3 py-1 bg-green-100 text-green-700 rounded">
+            + Add {{ rel.label }}
+        </button>
+
+    {% endwith %}
+
+</div>
+{% endfor %}
+<script>
+function addForm(name) {
+
+    const container = document.getElementById(`${name}-container`);
+    const totalFormsInput = document.getElementById(`id_${name}-TOTAL_FORMS`);
+
+    if (!container || !totalFormsInput) {
+        console.error("Formset not found for:", name);
+        return;
+    }
+
+    let formCount = parseInt(totalFormsInput.value);
+
+    const firstRow = container.querySelector(".form-row");
+
+    // 🔥 if no row exists (edge case)
+    if (!firstRow) {
+        console.error("No form row found to clone");
+        return;
+    }
+
+    const newRow = firstRow.cloneNode(true);
+
+    // 🔥 replace index (learning_resources-0- → learning_resources-1-)
+    const regex = new RegExp(`${name}-\\d+-`, 'g');
+    newRow.innerHTML = newRow.innerHTML.replace(regex, `${name}-${formCount}-`);
+
+    // 🔥 clear values
+    newRow.querySelectorAll("input, textarea, select").forEach(el => {
+        if (el.name && el.type !== "hidden") {
+            if (el.type === "checkbox") {
+                el.checked = false;
+            } else {
+                el.value = "";
+            }
+        }
+    });
+
+    container.appendChild(newRow);
+
+    totalFormsInput.value = formCount + 1;
+}
+</script>

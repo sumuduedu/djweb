@@ -1,24 +1,59 @@
 from django import forms
 from apps.courses.models import Course
-
-
-from .base import BaseForm
-from apps.courses.models import Course
-from django import forms
-from django import forms
-from apps.courses.models import Course
 from .base import BaseForm
 
 
-class CourseForm(forms.ModelForm):
+class CourseForm(BaseForm):
+
     class Meta:
         model = Course
-        fields = '__all__'
+
+        # 🔥 Explicit fields (better than '__all__')
+        fields = [
+            "title", "code", "description", "status",
+
+            "level", "entry_qualification", "medium",
+            "curriculum_category", "curriculum_availability",
+            "equivalent_course", "industry",
+
+            "delivery_mode", "course_mode",
+
+            "duration_months", "theory_hours",
+            "practical_hours", "assignment_hours", "ojt_months",
+
+            "batches_per_year", "students_per_batch",
+
+            "course_fee", "is_free", "fee_includes",
+
+            "physical_resources",
+            "tools_available", "equipment_available", "machinery_available",
+
+            "nvq_level", "qualification_code",
+
+            "prerequisite", "learning_outcomes",
+        ]
+
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
             "tools_available": forms.Textarea(attrs={"rows": 3}),
+            "equipment_available": forms.Textarea(attrs={"rows": 3}),
+            "machinery_available": forms.Textarea(attrs={"rows": 3}),
+            "learning_outcomes": forms.Textarea(attrs={"rows": 4}),
+            "prerequisite": forms.Textarea(attrs={"rows": 3}),
         }
 
+        labels = {
+            "course_fee": "Course Fee (LKR)",
+            "ojt_months": "OJT Duration (Months)",
+        }
+
+        help_texts = {
+            "learning_outcomes": "Write outcomes as bullet points",
+        }
+
+    # =========================
+    # 🔍 VALIDATION
+    # =========================
     def clean(self):
         cleaned_data = super().clean()
 
