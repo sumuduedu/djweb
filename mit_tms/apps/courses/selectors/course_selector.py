@@ -33,20 +33,19 @@ class CourseSelector:
         return CourseSelector.base_queryset(user).order_by("-created_at")
 
     # =========================
-    # 🔍 GET BY ID (FOR DETAIL / UPDATE / DELETE)
+    # 🔍 GET BY ID
     # =========================
     @staticmethod
     def get_by_id(course_id, user=None):
         qs = Course.objects.all()
 
-        # Optional: enforce row-level security
         if user:
             qs = CourseSelector.base_queryset(user)
 
         return get_object_or_404(qs, id=course_id)
 
     # =========================
-    # ⚡ LIST WITH RELATED (FOR UI / TABLE)
+    # ⚡ LIST WITH RELATED (SAFE)
     # =========================
     @staticmethod
     def list_with_related(user):
@@ -54,15 +53,12 @@ class CourseSelector:
 
         return qs.select_related("ncs").prefetch_related(
             "modules",
-            "modules__tasks",
-            "resources",
-            "physical_resources"
+            "modules__tasks"
         ).annotate(
             enrolled_count=Count("enrollments", distinct=True),
             module_count=Count("modules", distinct=True),
             task_count=Count("modules__tasks", distinct=True),
         ).order_by("-created_at")
-
     # =========================
     # 🔎 SEARCH + FILTER
     # =========================
@@ -71,7 +67,6 @@ class CourseSelector:
         filters = filters or {}
         qs = CourseSelector.list_with_related(user)
 
-        # 🔍 Search
         if query:
             query = query.strip()
             qs = qs.filter(
@@ -79,7 +74,6 @@ class CourseSelector:
                 Q(code__icontains=query)
             )
 
-        # 🎯 Filters
         if filters.get("level"):
             qs = qs.filter(level=filters["level"])
 
@@ -95,7 +89,7 @@ class CourseSelector:
         return qs
 
     # =========================
-    # 📊 STATS (FOR CARDS)
+    # 📊 STATS
     # =========================
     @staticmethod
     def stats(user):
@@ -109,7 +103,7 @@ class CourseSelector:
         )
 
     # =========================
-    # 📦 SIMPLE LIST (FOR DROPDOWN/API)
+    # 📦 SIMPLE LIST
     # =========================
     @staticmethod
     def simple_list(user=None):

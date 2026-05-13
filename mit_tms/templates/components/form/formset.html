@@ -1,0 +1,70 @@
+<div class="mt-6">
+    <h3 class="text-lg font-semibold mb-3">{{ label }}</h3>
+
+    <!-- 🔥 REQUIRED: management form -->
+    {{ formset.management_form }}
+
+    <!-- 🔷 Existing Forms -->
+    <div id="{{ formset.prefix }}-container">
+
+        {% for form in formset %}
+            <div class="form-row border p-4 mb-3 rounded">
+
+                {{ form.id }}
+
+                {% for field in form.visible_fields %}
+                    <div class="mb-2">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+
+                <!-- hidden delete checkbox -->
+                {{ form.DELETE }}
+
+                <button type="button"
+                        onclick="removeForm(this)"
+                        class="text-red-600 text-sm mt-2">
+                    ❌ Remove
+                </button>
+
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 🔷 Add Button -->
+    <button type="button"
+            onclick="addForm('{{ formset.prefix }}')"
+            class="mt-2 text-blue-600">
+        ➕ Add {{ label }}
+    </button>
+</div>
+
+
+<!-- 🔥 EMPTY TEMPLATE (CRITICAL FOR JS) -->
+<div id="{{ formset.prefix }}-empty" style="display:none;">
+    <div class="form-row border p-4 mb-3 rounded">
+
+        {% with form=formset.empty_form %}
+            {{ form.id }}
+
+            {% for field in form.visible_fields %}
+                <div class="mb-2">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+
+            {{ form.DELETE }}
+        {% endwith %}
+
+        <button type="button"
+                onclick="removeForm(this)"
+                class="text-red-600 text-sm mt-2">
+            ❌ Remove
+        </button>
+
+    </div>
+</div>

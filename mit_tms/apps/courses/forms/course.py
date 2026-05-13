@@ -14,7 +14,7 @@ class CourseForm(BaseForm):
 
             "level", "entry_qualification", "medium",
             "curriculum_category", "curriculum_availability",
-            "equivalent_course", "industry",
+            "equivalent_course",
 
             "delivery_mode", "course_mode",
 
@@ -25,7 +25,8 @@ class CourseForm(BaseForm):
 
             "course_fee", "is_free", "fee_includes",
 
-            "physical_resources",
+
+
             "tools_available", "equipment_available", "machinery_available",
 
             "nvq_level", "qualification_code",

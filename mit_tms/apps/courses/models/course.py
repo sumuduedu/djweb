@@ -1,9 +1,9 @@
 from django.db import models
-from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 from .base import BaseModel
 
-# course.py
-from .resource import PhysicalResource
+
 class Course(BaseModel):
 
     # =====================================================
@@ -49,35 +49,19 @@ class Course(BaseModel):
         ('DEGREE', 'Degree'),
     ]
 
-    INDUSTRY_SECTORS = [
-    ("A", "Agriculture, Hunting and Forestry"),
-    ("B", "Fishing"),
-    ("BCS", "Common"),
-    ("C", "Mining and Quarrying"),
-    ("D", "Manufacturing"),
-    ("E", "Electricity, Gas and Water Supply"),
-    ("F", "Construction"),
-    ("G", "Wholesale and Retail Trade"),
-    ("H", "Hotel and Restaurants"),
-    ("I", "Transport, Storage and Communications"),
-    ("J", "Financial Intermediation"),
-    ("K", "Real Estate, Renting and Business Activities"),
-    ("L", "Public Administration and Defense"),
-    ("M", "Education"),
-    ("N", "Health and Social Work"),
-    ("O", "Other Community, Social and Personal Service Activities"),
-    ("P", "Private Households with Employed Persons"),
-    ("Q", "Extra-Territorial Organizations and Bodies"),
-]
+    STATUS_CHOICES = [
+        ('DRAFT', 'Draft'),
+        ('ACTIVE', 'Active'),
+        ('INACTIVE', 'Inactive'),
+    ]
+
     # =====================================================
     # 🔷 BASIC INFO
     # =====================================================
     title = models.CharField(max_length=255)
-    code = models.CharField(max_length=20, unique=True)
+    code = models.CharField(max_length=20, unique=True,null=True, blank=True)
     description = models.TextField(blank=True)
-
-
-
+    slug = models.SlugField(blank=True, null=True)
 
     # =====================================================
     # 🔷 ACADEMIC STRUCTURE
@@ -104,8 +88,6 @@ class Course(BaseModel):
 
     equivalent_course = models.CharField(max_length=100, blank=True)
 
-    industry = models.CharField( max_length=5, choices=INDUSTRY_SECTORS)
-
     # =====================================================
     # 🔷 DELIVERY
     # =====================================================
@@ -127,22 +109,16 @@ class Course(BaseModel):
         default='SINHALA'
     )
 
-    physical_resources = models.ManyToManyField(
-    'courses.PhysicalResource',
-    blank=True,
-    related_name='courses'
-)
-
     # =====================================================
     # 🔷 DURATION & HOURS
     # =====================================================
     duration_months = models.PositiveIntegerField(default=0)
 
-    theory_hours = models.FloatField(default=0)
-    practical_hours = models.FloatField(default=0)
-    assignment_hours = models.FloatField(default=0)
-    slug = models.SlugField(blank=True, null=True)
-    ojt_months = models.FloatField(default=0)  # On Job Training
+    theory_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    practical_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    assignment_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    ojt_months = models.DecimalField(max_digits=4, decimal_places=1, default=0)
 
     # =====================================================
     # 🔷 CAPACITY
@@ -161,6 +137,7 @@ class Course(BaseModel):
     )
 
     is_free = models.BooleanField(default=False)
+
     fee_includes = models.CharField(
         max_length=255,
         blank=True,
@@ -180,6 +157,14 @@ class Course(BaseModel):
     nvq_level = models.IntegerField(null=True, blank=True)
     qualification_code = models.CharField(max_length=50, blank=True)
 
+    ncs = models.ForeignKey(
+        'courses.NCS',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='courses'
+    )
+
     # =====================================================
     # 🔷 PEDAGOGY
     # =====================================================
@@ -189,16 +174,10 @@ class Course(BaseModel):
     # =====================================================
     # 🔷 SYSTEM
     # =====================================================
-    STATUS_CHOICES = [
-    ('DRAFT', 'Draft'),
-    ('ACTIVE', 'Active'),
-    ('INACTIVE', 'Inactive'),]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='DRAFT')
 
-    ncs = models.ForeignKey('courses.NCS', on_delete=models.SET_NULL, null=True, blank=True, related_name='courses')
-    resources = models.ManyToManyField('courses.LearningResource', blank=True, related_name='courses_linked')
     # =====================================================
-    # 🔥 CALCULATED TOTAL
+    # 🔥 CALCULATED FIELD
     # =====================================================
     @property
     def total_hours(self):
@@ -208,9 +187,20 @@ class Course(BaseModel):
             (self.assignment_hours or 0)
         )
 
+    # =====================================================
+    # 🔷 VALIDATION
+    # =====================================================
     def clean(self):
-        if self.is_free:
-            self.course_fee = 0
+        if self.is_free and self.course_fee:
+            raise ValidationError("Free courses should not have a fee")
+
+    # =====================================================
+    # 🔷 AUTO SLUG
+    # =====================================================
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.code} - {self.title}"

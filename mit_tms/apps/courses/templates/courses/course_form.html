@@ -9,49 +9,29 @@
         {% if object %}✏️ Edit Course{% else %}➕ Add Course{% endif %}
     </h2>
 
-    {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded">
-            {{ form.errors }}
-        </div>
-    {% endif %}
+<div class="bg-red-100 text-red-700 p-3 rounded">
+    {{ form.non_field_errors }}
 
-    <!-- 🔥 IMPORTANT for file upload -->
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div><strong>{{ field.label }}:</strong> {{ error }}</div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- ✅ Dynamic Form -->
-        {% include "components/form.html" with form=form form_layout=form_layout %}
+        <!-- 🔷 FORM -->
+        {% include "components/form/form_layout.html" %}
 
-        <!-- 🔥 RESOURCE FORMSET -->
-        <div class="border-b pb-4">
-            <h3 class="font-semibold mb-3">Learning Resources</h3>
+        <!-- ❌ FORMSETS REMOVED -->
 
-            {{ resource_formset.management_form }}
-
-            {% for f in resource_formset %}
-            <div class="border p-3 rounded mb-2 grid grid-cols-5 gap-2">
-                {{ f.name }}
-                {{ f.type }}
-                {{ f.file }}
-                {{ f.url }}
-                {{ f.description }}
-                {{ f.DELETE }}
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- ACTIONS -->
-        <div class="flex justify-between pt-4">
-            <a href="{% url 'courses:course_list' %}" class="text-gray-600">
-                Cancel
-            </a>
-
-            <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                Save Course
+        <div class="mt-6">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                Save
             </button>
         </div>
-
     </form>
 
 </div>

@@ -92,13 +92,18 @@ def length_safe(value):
 # =========================
 @register.filter(name="get_field")
 def get_field(form, field_name):
-    """
-    Safely get Django form field.
-
-    Usage:
-    {{ form|get_field:"title" }}
-    """
-    try:
-        return form[field_name]   # ✅ THIS is the correct way
-    except Exception:
+    if not form:
         return None
+
+    field = form.fields.get(field_name)
+
+    if not field:
+        return None
+
+    bound_field = form[field_name]
+
+    # 🔥 Inject default styling
+    if "class" not in bound_field.field.widget.attrs:
+        bound_field.field.widget.attrs["class"] = "w-full border rounded p-2"
+
+    return bound_field

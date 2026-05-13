@@ -1,0 +1,7 @@
+<div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <h3 class="font-semibold mb-3">{{ title }}</h3>
+
+    {% for field in fields %}
+        {% include "components/form/field.html" with field=field %}
+    {% endfor %}
+</div>

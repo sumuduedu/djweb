@@ -1,19 +1,24 @@
 from django.urls import reverse_lazy
-from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-from .base import BaseListView, BaseCreateView, BaseUpdateView, BaseDeleteView
-
-from ..models import Course
-from ..forms import CourseForm
-
-from .base import BaseListView
-from ..services.course_service import CourseService
-from apps.core.permission_engine import PermissionEngine
 from django.http import HttpResponseForbidden
+from django.forms import modelformset_factory
+from django.db import transaction
 
+from apps.core.permission_engine import PermissionEngine
+
+from .base import BaseListView, BaseUpdateView, BaseDeleteView
+from apps.courses.views.dynbase import DynamicCreateView
+from .base import BaseDetailView
+
+from ..models import Course, LearningResource
+from ..forms import CourseForm
+from ..services.course_service import CourseService
 from apps.courses.selectors.course_selector import CourseSelector
+from ..config.form_layout import COURSE_FORM_LAYOUT, RELATION_LAYOUT
 
+
+# =========================
+# 🔷 COURSE LIST
+# =========================
 class CourseListView(BaseListView):
     template_name = "courses/course_lists.html"
 
@@ -23,6 +28,7 @@ class CourseListView(BaseListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        # ⚠️ IMPORTANT: do NOT use invalid prefetch like "resources"
         return CourseSelector.list(self.request.user)
 
     def get_context_data(self, **kwargs):
@@ -30,31 +36,24 @@ class CourseListView(BaseListView):
 
         context["table"] = CourseService.get_table(self.request.user)
 
-        # ✅ permissions INSIDE method
-        context["can_create"] = PermissionEngine.can(
-            self.request.user, "course", "create"
-        )
-
-        context["can_update"] = PermissionEngine.can(
-            self.request.user, "course", "update"
-        )
-
-        context["can_delete"] = PermissionEngine.can(
-            self.request.user, "course", "delete"
-        )
+        context["can_create"] = PermissionEngine.can(self.request.user, "course", "create")
+        context["can_update"] = PermissionEngine.can(self.request.user, "course", "update")
+        context["can_delete"] = PermissionEngine.can(self.request.user, "course", "delete")
 
         return context
 
-from .base import BaseDetailView
-from ..models import Course
 
-
+# =========================
+# 🔷 COURSE DETAIL
+# =========================
 class CourseDetailView(BaseDetailView):
     model = Course
     template_name = "courses/course_detail.html"
 
     def get_extra_context(self):
         course = self.object
+
+        # safe related access (requires related_name="modules")
         modules = course.modules.all()
 
         total_theory = sum(m.theory_hours or 0 for m in modules)
@@ -65,88 +64,74 @@ class CourseDetailView(BaseDetailView):
         course_assignment = course.assignment_hours or 0
 
         return {
-            # totals
-            'total_theory': total_theory,
-            'total_practical': total_practical,
-            'total_hours_sum': total_theory + total_practical,
-            'total_months': course.duration_months,
+            "total_theory": total_theory,
+            "total_practical": total_practical,
+            "total_hours_sum": total_theory + total_practical,
+            "total_months": course.duration_months,
 
-            # course values
-            'course_theory': course_theory,
-            'course_practical': course_practical,
-            'course_industry': course_assignment,
+            "course_theory": course_theory,
+            "course_practical": course_practical,
+            "course_assignment": course_assignment,  # ✅ FIXED
 
-            # details
-            'course_level': course.level,
-            'course_medium': course.medium,
-            'delivery_mode': course.delivery_mode,
-            'course_mode': course.course_mode,
-            'entry_qualification': course.entry_qualification,
+            "course_level": course.level,
+            "course_medium": course.medium,
+            "delivery_mode": course.delivery_mode,
+            "course_mode": course.course_mode,
+            "entry_qualification": course.entry_qualification,
 
-            'nvq_level': course.nvq_level,
-            'qualification_code': course.qualification_code,
+            "nvq_level": course.nvq_level,
+            "qualification_code": course.qualification_code,
 
-            'batches_per_year': course.batches_per_year,
-            'students_per_batch': course.students_per_batch,
+            "batches_per_year": course.batches_per_year,
+            "students_per_batch": course.students_per_batch,
 
-            'course_fee': course.course_fee,
-            'is_free': course.is_free,
-            'fee_includes': course.fee_includes,
+            "course_fee": course.course_fee,
+            "is_free": course.is_free,
+            "fee_includes": course.fee_includes,
 
-            'tools': course.tools_available,
-            'equipment': course.equipment_available,
-            'machinery': course.machinery_available,
+            "tools": course.tools_available,
+            "equipment": course.equipment_available,
+            "machinery": course.machinery_available,
 
-            'prerequisite': course.prerequisite,
-            'learning_outcomes': course.learning_outcomes,
+            "prerequisite": course.prerequisite,
+            "learning_outcomes": course.learning_outcomes,
 
-            'industry': course.industry,
-            'equivalent_course': course.equivalent_course,
+            "industry": course.industry,
+            "equivalent_course": course.equivalent_course,
 
-
-
-            # validation
-            'is_matching': (
+            "is_matching": (
                 total_theory == course_theory and
                 total_practical == course_practical
             )
         }
 
-from django.forms import modelformset_factory
-from apps.courses.models.course import Course
 
-
-from django.forms import modelformset_factory
-from django.urls import reverse_lazy
-from apps.courses.models import Course, LearningResource
-from ..config.form_layout import *
-from django.urls import reverse_lazy
-from django.forms import modelformset_factory
-from apps.courses.models import Course, LearningResource
-
-
-
-class CourseCreateView(BaseCreateView):
+# =========================
+# 🔷 COURSE CREATE
+# =========================
+class CourseCreateView(DynamicCreateView):
     model = Course
     form_class = CourseForm
     template_name = "courses/course_form.html"
-    success_url = reverse_lazy('courses:course_list')
-    success_message = "Course created successfully ✅"
+    success_url = reverse_lazy("courses:course_list")
+
+    form_layout = COURSE_FORM_LAYOUT
+    relation_layout = RELATION_LAYOUT
+
+    relation_models = {
+        "learning_resources": LearningResource
+    }
+
+    parent_field = "course"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["form_layout"] = COURSE_FORM_LAYOUT
-        context["relation_layout"] = RELATION_LAYOUT
-
         relation_formsets = {}
 
-        for rel in RELATION_LAYOUT:
-
-            # 🔥 map relation → model
-            if rel["name"] == "learning_resources":
-                model = LearningResource
-            else:
+        for rel in self.relation_layout:
+            model = self.relation_models.get(rel["name"])
+            if not model:
                 continue
 
             FormSet = modelformset_factory(
@@ -156,54 +141,85 @@ class CourseCreateView(BaseCreateView):
                 can_delete=True
             )
 
-            # 🔥 THIS IS THE IMPORTANT LINE
-            prefix = rel["name"]   # ✅ put here
+            prefix = rel["name"]
 
             if self.request.POST:
                 relation_formsets[rel["name"]] = FormSet(
                     self.request.POST,
                     self.request.FILES,
                     queryset=model.objects.none(),
-                    prefix=prefix   # ✅ and here
+                    prefix=prefix
                 )
             else:
                 relation_formsets[rel["name"]] = FormSet(
                     queryset=model.objects.none(),
-                    prefix=prefix   # ✅ and here
+                    prefix=prefix
                 )
 
         context["relation_formsets"] = relation_formsets
 
+        context["relation_items"] = [
+            {
+                "name": rel["name"],
+                "formset": relation_formsets.get(rel["name"]),
+                "label": rel.get("label", rel["name"].title())
+            }
+            for rel in self.relation_layout
+        ]
+
+        context["form_layout"] = self.form_layout
+
         return context
 
-from django.urls import reverse_lazy
-from django.forms import modelformset_factory
-from apps.courses.models import Course, LearningResource
+    @transaction.atomic
+    def form_valid(self, form):
+        context = self.get_context_data()
+        relation_formsets = context.get("relation_formsets", {})
+
+        for formset in relation_formsets.values():
+            if not formset.is_valid():
+                return self.form_invalid(form)
+
+        self.object = form.save()
+
+        for formset in relation_formsets.values():
+            instances = formset.save(commit=False)
+
+            for obj in instances:
+                setattr(obj, self.parent_field, self.object)
+                obj.save()
+
+            for obj in formset.deleted_objects:
+                obj.delete()
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
 
 
+# =========================
+# 🔷 COURSE UPDATE
+# =========================
 class CourseUpdateView(BaseUpdateView):
     model = Course
     form_class = CourseForm
     template_name = "courses/course_form.html"
-    success_url = reverse_lazy('courses:course_list')
+    success_url = reverse_lazy("courses:course_list")
 
     success_message = "Course updated successfully ✏️"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # ✅ layouts
         context["form_layout"] = COURSE_FORM_LAYOUT
         context["relation_layout"] = RELATION_LAYOUT
 
         relation_formsets = {}
 
         for rel in RELATION_LAYOUT:
-
-            if rel["name"] == "learning_resources":
-                model = LearningResource
-            else:
-                continue
+            model = LearningResource
 
             FormSet = modelformset_factory(
                 model,
@@ -232,9 +248,12 @@ class CourseUpdateView(BaseUpdateView):
         return context
 
 
+# =========================
+# 🔷 COURSE DELETE
+# =========================
 class CourseDeleteView(BaseDeleteView):
     model = Course
     template_name = "courses/course_confirm_delete.html"
-    success_url = reverse_lazy('courses:course_list')
+    success_url = reverse_lazy("courses:course_list")
 
     success_message = "Course deleted successfully ❌"

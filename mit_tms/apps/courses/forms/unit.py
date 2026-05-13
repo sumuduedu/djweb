@@ -7,11 +7,10 @@ class UnitForm(BaseForm):
     class Meta:
         model = Unit
         fields = [
-            'ncs',
-            'course',
+            'package',      # ✅ changed (was ncs)
             'code',
             'title',
-            'description',
+            'descriptor',   # ✅ changed (was description)
             'level',
             'order',
         ]
@@ -19,18 +18,18 @@ class UnitForm(BaseForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        ncs = cleaned_data.get('ncs')
+        package = cleaned_data.get('package')
         code = cleaned_data.get('code')
 
-        if ncs and code:
+        if package and code:
             exists = Unit.objects.filter(
-                ncs=ncs,
+                package=package,
                 code=code
             ).exclude(pk=self.instance.pk).exists()
 
             if exists:
                 raise forms.ValidationError(
-                    "Unit code already exists in this NCS."
+                    "Unit code already exists in this Package."
                 )
 
         return cleaned_data
