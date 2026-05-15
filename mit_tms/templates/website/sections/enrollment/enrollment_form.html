@@ -1,0 +1,98 @@
+<section class="py-20 bg-gray-50">
+
+    <div class="max-w-3xl mx-auto px-6">
+
+        <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+
+            <!-- Heading -->
+
+            <div class="mb-8 text-center">
+
+                <h2 class="text-3xl font-bold text-gray-900">
+
+                    🎓 Course Enrollment
+
+                </h2>
+
+                <p class="text-gray-600 mt-3">
+
+                    Register now and begin your journey with
+                    MIT Computer Training Center.
+
+                </p>
+
+            </div>
+
+            <!-- Success Messages -->
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="bg-green-100 text-green-700 p-4 rounded-xl mb-6">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <!-- Enrollment Form -->
+
+            <form method="post" class="space-y-5">
+
+                {% csrf_token %}
+
+                <input type="hidden"
+                       name="course"
+                       value="{{ request.GET.course }}">
+
+                <!-- Name -->
+
+                <input type="text"
+                       name="name"
+                       placeholder="Your Name"
+                       required
+                       class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                <!-- Email -->
+
+                <input type="email"
+                       name="email"
+                       placeholder="Email Address"
+                       required
+                       class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                <!-- Phone -->
+
+                <input type="text"
+                       name="phone"
+                       placeholder="Phone Number"
+                       required
+                       class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                <!-- Message -->
+
+                <textarea name="message"
+                          rows="5"
+                          placeholder="Message (Optional)"
+                          class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+
+                <!-- Submit Button -->
+
+                <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold shadow hover:scale-[1.01] transition duration-300">
+
+                    🚀 Submit Enrollment
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>

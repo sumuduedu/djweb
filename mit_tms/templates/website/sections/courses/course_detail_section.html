@@ -1,0 +1,280 @@
+<section class="bg-gray-100 py-20">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <!-- Main Wrapper -->
+
+        <div class="overflow-hidden rounded-3xl shadow-2xl bg-white border border-gray-200">
+
+            <div class="grid lg:grid-cols-2">
+
+                <!-- LEFT SIDE -->
+
+                <div class="bg-slate-900 p-10 lg:p-16 text-white flex flex-col justify-center">
+
+    <!-- Badge -->
+
+    <div>
+
+        <span class="inline-flex items-center px-4 py-2 rounded-full bg-blue-700 text-sm font-medium">
+
+            🎓 Professional IT Program
+
+        </span>
+
+    </div>
+
+    <!-- Title -->
+
+    <h1 class="text-4xl lg:text-5xl font-black leading-tight mt-8 text-white">
+
+        {{ course.title }}
+
+    </h1>
+
+    <!-- Description -->
+
+    <p class="mt-6 text-gray-300 text-lg leading-relaxed">
+
+        {{ course.description }}
+
+    </p>
+
+    <!-- Meta -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
+
+        <!-- Duration -->
+
+        <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700">
+
+            <p class="text-sm text-gray-400">
+
+                Duration
+
+            </p>
+
+            <p class="font-bold text-xl mt-2 text-white">
+
+                {{ course.duration_months|default:"N/A" }} Months
+
+            </p>
+
+        </div>
+
+        <!-- Level -->
+
+        <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700">
+
+            <p class="text-sm text-gray-400">
+
+                Level
+
+            </p>
+
+            <p class="font-bold text-xl mt-2 text-white">
+
+                {{ course.level|default:"Beginner" }}
+
+            </p>
+
+        </div>
+
+        <!-- Fee -->
+
+        <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700">
+
+            <p class="text-sm text-gray-400">
+
+                Course Fee
+
+            </p>
+
+            <p class="font-bold text-xl mt-2 text-white">
+
+                {% if course.is_free %}
+
+                    🎉 Free
+
+                {% else %}
+
+                    Rs. {{ course.course_fee }}
+
+                {% endif %}
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="flex flex-wrap gap-4 mt-12">
+
+        <a href="{% url 'website:enroll' %}?course={{ course.id }}"
+           class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg transition">
+
+            🚀 Enroll Now
+
+        </a>
+
+        <a href="{% url 'website:contact' %}"
+           class="border border-slate-600 px-8 py-4 rounded-2xl font-semibold hover:bg-slate-800 transition">
+
+            📞 Contact Us
+
+        </a>
+
+    </div>
+
+</div>
+
+                <!-- RIGHT SIDE -->
+
+                <div class="bg-white p-10 lg:p-16">
+
+                    <h2 class="text-4xl font-black text-gray-900 mb-10">
+
+                        🚀 What You Will Learn
+
+                    </h2>
+
+                    <div class="space-y-8">
+
+                        <!-- Item -->
+
+                        <div class="flex gap-5">
+
+                            <div class="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-3xl flex-shrink-0">
+
+                                💻
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-900">
+
+                                    Practical Hands-on Training
+
+                                </h3>
+
+                                <p class="text-gray-600 mt-2 leading-relaxed">
+
+                                    Gain practical experience through real-world activities and exercises.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Item -->
+
+                        <div class="flex gap-5">
+
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-100 flex items-center justify-center text-3xl flex-shrink-0">
+
+                                🛠
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-900">
+
+                                    Industry Projects
+
+                                </h3>
+
+                                <p class="text-gray-600 mt-2 leading-relaxed">
+
+                                    Build portfolio-ready projects and strengthen technical confidence.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Item -->
+
+                        <div class="flex gap-5">
+
+                            <div class="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center text-3xl flex-shrink-0">
+
+                                📈
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-900">
+
+                                    Career Development
+
+                                </h3>
+
+                                <p class="text-gray-600 mt-2 leading-relaxed">
+
+                                    Prepare for future employment opportunities with industry-focused learning.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Item -->
+
+                        <div class="flex gap-5">
+
+                            <div class="w-16 h-16 rounded-2xl bg-pink-100 flex items-center justify-center text-3xl flex-shrink-0">
+
+                                🎯
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-900">
+
+                                    Skill-Based Learning
+
+                                </h3>
+
+                                <p class="text-gray-600 mt-2 leading-relaxed">
+
+                                    Develop competency-focused technical and professional skills.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Back Link -->
+
+        <div class="mt-10">
+
+            <a href="{% url 'website:public_course_list' %}"
+               class="inline-flex items-center text-gray-600 hover:text-blue-600 font-medium transition">
+
+                ← Back to Courses
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>

@@ -1,54 +1,59 @@
-<section class="py-24 bg-gradient-to-r from-indigo-50 to-blue-50 text-center">
+<section class="py-24
+                bg-gradient-to-r
+                from-indigo-50
+                to-blue-50
+                text-center">
 
     <div class="max-w-6xl mx-auto px-6">
 
-        <h2 class="text-3xl font-bold text-gray-800 mb-12 fade-up">
-            Why Choose Us
+        <!-- Title -->
+        <h2 class="text-3xl
+                   font-bold
+                   text-gray-800
+                   mb-12
+                   fade-up">
+
+            {{ home_features.title }}
+
         </h2>
 
-        <div class="grid md:grid-cols-3 gap-10 stagger">
+        <!-- Feature Grid -->
+        <div class="grid
+                    md:grid-cols-3
+                    gap-10
+                    stagger">
 
-            <div class="card bg-white/80 backdrop-blur-md border border-gray-200">
+            {% for item in home_features.items %}
 
-                <div class="text-4xl mb-4">💻</div>
+                <div class="card
+                            bg-white/80
+                            backdrop-blur-md
+                            border
+                            border-gray-200">
 
-                <h3 class="text-xl font-semibold text-gray-800">
-                    Practical Learning
-                </h3>
+                    <div class="text-4xl mb-4">
 
-                <p class="text-gray-600 mt-3">
-                    Hands-on real-world projects.
-                </p>
+                        {{ item.icon }}
 
-            </div>
+                    </div>
 
-            <div class="card bg-white/80 backdrop-blur-md border border-gray-200">
+                    <h3 class="text-xl
+                               font-semibold
+                               text-gray-800">
 
-                <div class="text-4xl mb-4">🎓</div>
+                        {{ item.title }}
 
-                <h3 class="text-xl font-semibold text-gray-800">
-                    Expert Instructor
-                </h3>
+                    </h3>
 
-                <p class="text-gray-600 mt-3">
-                    Guided by experienced teaching.
-                </p>
+                    <p class="text-gray-600 mt-3">
 
-            </div>
+                        {{ item.description }}
 
-            <div class="card bg-white/80 backdrop-blur-md border border-gray-200">
+                    </p>
 
-                <div class="text-4xl mb-4">🚀</div>
+                </div>
 
-                <h3 class="text-xl font-semibold text-gray-800">
-                    Career Focused
-                </h3>
-
-                <p class="text-gray-600 mt-3">
-                    Job-ready skill development.
-                </p>
-
-            </div>
+            {% endfor %}
 
         </div>
 

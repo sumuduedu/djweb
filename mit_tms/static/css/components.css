@@ -113,15 +113,21 @@
     @apply w-9 h-9 flex items-center justify-center rounded-full text-sm transition-all duration-300;
     background: rgba(255,255,255,0.15);
 }
+.social-circle {
+    @apply w-12 h-12
+    flex items-center justify-center
+    rounded-full
+    text-xl
+    transition-all duration-300
+    text-white;
 
-.social-icon:hover {
-    @apply bg-white text-indigo-600;
-    transform: translateY(-3px);
+    background: rgba(255,255,255,0.15);
 }
 
-.social-circle {
-    @apply w-10 h-10 flex items-center justify-center rounded-full text-sm transition-all duration-300 text-white;
-    background: rgba(255,255,255,0.15);
+.social-circle:hover {
+    @apply bg-white text-indigo-600 shadow-lg;
+
+    transform: translateY(-3px) scale(1.05);
 }
 
 .social-circle:hover {

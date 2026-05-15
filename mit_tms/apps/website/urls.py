@@ -14,6 +14,10 @@ from .views import (
     PublicBlogListView,
     PublicBlogDetailView,
 
+    PrivacyPolicyView,
+    TermsOfServiceView,
+    SitemapView,
+
     chat_api,
 )
 
@@ -99,6 +103,28 @@ urlpatterns = [
         "blog/<slug:slug>/",
         PublicBlogDetailView.as_view(),
         name="blog_detail"
+    ),
+
+    # =================================================
+    # LEGAL PAGES
+    # =================================================
+
+    path(
+        "privacy-policy/",
+        PrivacyPolicyView.as_view(),
+        name="privacy_policy"
+    ),
+
+    path(
+        "terms-of-service/",
+        TermsOfServiceView.as_view(),
+        name="terms_of_service"
+    ),
+
+    path(
+        "sitemap/",
+        SitemapView.as_view(),
+        name="sitemap"
     ),
 
     # =================================================

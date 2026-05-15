@@ -34,7 +34,7 @@ from .models import Post, Category
 # 🌐 WEBSITE CONTENT
 # ==========================================
 
-from apps.website.sections.home import HOME_HERO
+from apps.website.sections.home import HOME_HERO,HOME_STATS,HOME_ABOUT,HOME_FEATURES,HOME_COURSES,HOME_TESTIMONIALS
 from apps.website.sections.about import ABOUT_HERO
 from apps.website.sections.contact import CONTACT_HERO
 from apps.website.sections.courses import COURSES_HERO
@@ -60,7 +60,11 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["hero"] = HOME_HERO
-
+        context["home_stats"] = HOME_STATS
+        context["home_about"] = HOME_ABOUT
+        context["home_features"] = HOME_FEATURES
+        context["home_courses"] = HOME_COURSES
+        context["home_testimonials"] = HOME_TESTIMONIALS
         return context
 
 
@@ -132,7 +136,6 @@ class PublicCourseListView(ListView):
 
         return context
 
-
 class PublicCourseDetailView(DetailView):
 
     model = Course
@@ -141,6 +144,23 @@ class PublicCourseDetailView(DetailView):
 
     context_object_name = "course"
 
+    def get_queryset(self):
+
+        return Course.objects.filter(
+            status="ACTIVE"
+        )
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["related_courses"] = Course.objects.filter(
+            status="ACTIVE"
+        ).exclude(
+            id=self.object.id
+        )[:3]
+
+        return context
 
 # ==========================================
 # 📝 PUBLIC BLOG
@@ -229,7 +249,7 @@ class PublicBlogDetailView(DetailView):
 
 class EnrollView(TemplateView):
 
-    template_name = "website/pages/enroll/index.html"
+    template_name = "website/pages/enrollment/index.html"
 
     def post(self, request, *args, **kwargs):
 
@@ -572,3 +592,17 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     slug_url_kwarg = "slug"
 
     success_url = reverse_lazy("user_blog_list")
+
+from django.views.generic import TemplateView
+
+
+class PrivacyPolicyView(TemplateView):
+    template_name = 'website/pages/legal/privacy_policy.html'
+
+
+class TermsOfServiceView(TemplateView):
+    template_name = 'website/pages/legal/terms_of_service.html'
+
+
+class SitemapView(TemplateView):
+    template_name = 'website/pages/legal/sitemap.html'

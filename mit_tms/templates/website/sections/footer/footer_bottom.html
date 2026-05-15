@@ -1,30 +1,67 @@
-<div class="relative border-t border-white/20">
+<div class="relative z-10">
 
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/80">
+    <div class="max-w-7xl
+                mx-auto
+                px-6
+                lg:px-8
+                py-4">
 
-        <!-- Copyright -->
-        <p class="text-center md:text-left">
-            © {% now "Y" %} MIT Computer Training Center.
-            All rights reserved.
-        </p>
+        <div class="flex
+                    flex-col
+                    sm:flex-row
+                    items-center
+                    justify-between
+                    gap-4">
 
-        <!-- Footer Links -->
-        <div class="flex flex-wrap items-center justify-center gap-6">
+            <!-- Left -->
+            <p class="text-sm
+                      text-white/75
+                      tracking-wide">
 
-            <a href="#"
-               class="hover:text-white transition duration-300">
-                Privacy Policy
-            </a>
+                © 2001 - {% now "Y" %}
 
-            <a href="#"
-               class="hover:text-white transition duration-300">
-                Terms of Service
-            </a>
+                <span class="mx-2">•</span>
 
-            <a href="#"
-               class="hover:text-white transition duration-300">
-                Sitemap
-            </a>
+                MIT Computer Training Center
+
+            </p>
+
+            <!-- Right -->
+            <div class="flex
+                        items-center
+                        flex-wrap
+                        gap-6
+                        text-sm
+                        tracking-wide">
+
+                <a href="{% url 'website:privacy_policy' %}"
+                   class="text-white/75
+                          hover:text-white
+                          transition duration-300">
+
+                    Privacy
+
+                </a>
+
+                <a href="{% url 'website:terms_of_service' %}"
+                   class="text-white/75
+                          hover:text-white
+                          transition duration-300">
+
+                    Terms
+
+                </a>
+
+                <a href="{% url 'website:sitemap' %}"
+                   class="text-white/75
+                          hover:text-white
+                          transition duration-300">
+
+                    Sitemap
+
+                </a>
+
+            </div>
 
         </div>
 
