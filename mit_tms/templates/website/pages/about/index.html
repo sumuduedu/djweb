@@ -1,0 +1,25 @@
+{% extends 'website/base/base.html' %}
+{% load static %}
+
+{% block title %}
+About | MIT
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+{% include 'website/sections/shared/hero.html' with hero=hero %}
+<!-- ABOUT SECTIONS -->
+{% include 'website/sections/about/story.html' %}
+
+{% include 'website/sections/about/timeline.html' %}
+
+{% include 'website/sections/about/founder.html' %}
+
+{% include 'website/sections/about/management_team.html' %}
+
+{% include 'website/sections/about/mission_vision.html' %}
+
+{% include 'website/sections/shared/cta.html' %}
+
+{% endblock %}

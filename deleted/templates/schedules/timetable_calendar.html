@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- CALENDAR -->
+    <div class="md:col-span-2 bg-white p-4 rounded shadow">
+        <div id="calendar"></div>
+    </div>
+
+    <!-- QUICK FORM -->
+    <div class="bg-white p-4 rounded shadow space-y-4">
+
+        <h3 class="font-semibold text-lg">Quick Add</h3>
+
+        <input type="date" id="date" class="w-full border p-2 rounded">
+
+        <select id="batch" class="w-full border p-2 rounded">
+            {% for b in batches %}
+                <option value="{{ b.id }}">{{ b.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="module" class="w-full border p-2 rounded"></select>
+
+        <select id="slot" class="w-full border p-2 rounded">
+            {% for s in slots %}
+                <option value="{{ s.id }}">{{ s }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="session_type" class="w-full border p-2 rounded">
+            <option value="THEORY">Theory</option>
+            <option value="PRACTICAL">Practical</option>
+        </select>
+
+        <button onclick="saveEvent()"
+                class="w-full bg-indigo-600 text-white py-2 rounded">
+            Save
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FULLCALENDAR -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const batchSelect = document.getElementById("batch");
+    const moduleSelect = document.getElementById("module");
+
+    // 🔥 LOAD MODULES
+    function loadModules(batchId, selectedModule=null) {
+        fetch(`/app/batches/api/modules/?batch_id=${batchId}`)
+            .then(res => res.json())
+            .then(data => {
+                moduleSelect.innerHTML = "";
+
+                data.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m.id;
+                    opt.textContent = m.title;
+                    moduleSelect.appendChild(opt);
+                });
+
+                if (selectedModule) moduleSelect.value = selectedModule;
+            });
+    }
+
+    batchSelect.addEventListener("change", function () {
+        loadModules(this.value);
+    });
+
+    loadModules(batchSelect.value);
+
+    // 🔥 CALENDAR
+    const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+
+        initialView: 'dayGridMonth',
+        selectable: true,
+        editable: true,
+
+        events: '/app/batches/api/load/',
+
+        eventDidMount: function(info) {
+            info.el.style.backgroundColor =
+                info.event.title.includes("THEORY") ? "#3b82f6" : "#22c55e";
+        },
+
+        // CLICK DATE → LOAD FORM
+        dateClick: function(info) {
+
+            document.getElementById("date").value = info.dateStr;
+
+            fetch(`/app/batches/api/timetable/by-date/?date=${info.dateStr}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    if (!data.exists) return;
+
+                    batchSelect.value = data.batch;
+                    loadModules(data.batch, data.module);
+
+                    document.getElementById("slot").value = data.slot;
+                    document.getElementById("session_type").value = data.session_type;
+
+                });
+        },
+
+        // DRAG MOVE
+        eventDrop: function(info) {
+
+            fetch('/app/batches/api/update/', {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    id: info.event.id,
+                    date: info.event.startStr
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Conflict!");
+                    info.revert();
+                }
+            });
+        },
+
+        // CLICK EVENT DELETE
+        eventClick: function(info) {
+
+            if (!confirm("Delete this session?")) return;
+
+            fetch('/app/batches/api/delete/', {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({id: info.event.id})
+            })
+            .then(() => calendar.refetchEvents());
+        }
+
+    });
+
+    calendar.render();
+
+});
+</script>
+
+<script>
+function saveEvent() {
+
+    const data = {
+        batch: document.getElementById("batch").value,
+        module: document.getElementById("module").value,
+        date: document.getElementById("date").value,
+        slot: document.getElementById("slot").value,
+        session_type: document.getElementById("session_type").value
+    };
+
+    if (!data.date) {
+        alert("Select date");
+        return;
+    }
+
+    fetch('/app/batches/api/create/', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    })
+    .then(() => location.reload());
+}
+</script>
+
+<style>
+.fc-daygrid-day:hover {
+    background: #eef2ff;
+    cursor: pointer;
+}
+</style>
+
+{% endblock %}

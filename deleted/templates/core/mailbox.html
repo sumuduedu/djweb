@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="flex min-h-screen bg-gray-100">
+
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-white border-r p-4">
+
+        <a href="{% url 'compose' %}"
+           class="block bg-blue-600 text-white text-center py-2 rounded-lg mb-6">
+            ✉️ Compose
+        </a>
+
+        <nav class="space-y-2">
+
+            <a href="{% url 'inbox' %}"
+               class="block px-4 py-2 rounded-lg
+               {% if type == 'inbox' %}bg-blue-100 text-blue-600{% endif %}">
+                📥 Inbox
+            </a>
+
+            <a href="{% url 'sent' %}"
+               class="block px-4 py-2 rounded-lg
+               {% if type == 'sent' %}bg-blue-100 text-blue-600{% endif %}">
+                📤 Sent
+            </a>
+
+        </nav>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 p-6">
+
+        <div class="bg-white rounded-2xl shadow overflow-hidden">
+
+            <table class="w-full text-sm">
+
+                <tbody>
+
+                {% for msg in messages %}
+                <tr class="border-b hover:bg-gray-50 cursor-pointer">
+
+                    <td class="px-6 py-4">
+
+                        {% if type == 'inbox' %}
+                            <strong>{{ msg.name }}</strong><br>
+                            <span class="text-xs text-gray-500">{{ msg.email }}</span>
+                        {% else %}
+                            <strong>{{ msg.to_email }}</strong><br>
+                            <span class="text-xs text-gray-400">Sent Mail</span>
+                        {% endif %}
+
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        {% if type == 'sent' %}
+                            <strong>{{ msg.subject }}</strong><br>
+                        {% endif %}
+
+                        {{ msg.message|truncatechars:60 }}
+
+                    </td>
+
+                    <td class="px-6 py-4 text-xs text-gray-400">
+
+                        {% if type == 'inbox' %}
+                            {{ msg.created_at|date:"M d" }}
+                        {% else %}
+                            {{ msg.sent_at|date:"M d" }}
+                        {% endif %}
+
+                    </td>
+
+                    <td class="px-6 py-4">
+                       {% if type == 'inbox' %}
+    <a href="{% url 'message_detail' msg.id %}"> view </a>
+{% else %}
+    <a href="{% url 'sent_detail' msg.id %}"> view </a>
+{% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

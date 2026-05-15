@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow text-center">
+
+    <h2 class="text-xl font-bold mb-4">Delete Task</h2>
+
+    <p class="mb-4">Are you sure?</p>
+    <p class="font-semibold mb-6">{{ object.title }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <button class="bg-red-500 text-white px-4 py-2 rounded">
+            Delete
+        </button>
+
+        <a href="{% url 'module_detail' object.module.pk %}"
+           class="ml-2 text-gray-600">Cancel</a>
+    </form>
+
+</div>
+
+{% endblock %}

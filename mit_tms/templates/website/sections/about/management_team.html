@@ -1,0 +1,23 @@
+<section class="py-20 bg-white">
+
+    <div class="max-w-6xl mx-auto px-6 text-center">
+
+        <h2 class="text-3xl font-bold text-gray-800 mb-12">
+            Management Team
+        </h2>
+
+        <div class="grid md:grid-cols-4 gap-10">
+
+   {% include 'website/components/cards/team_card.html' with image='images/instructor.png' border_class='border-blue-100' role_class='text-blue-600' name='Don Sumudu S. Hettiarachchi' role='Founder & Proprietor' %}
+
+{% include 'website/components/cards/team_card.html' with image='images/team1.jpg' border_class='border-purple-100' role_class='text-purple-600' name='Shanthi Kumar Hettiarachchi' role='Director' %}
+
+{% include 'website/components/cards/team_card.html' with image='images/team2.jpg' border_class='border-green-100' role_class='text-green-600' name='D. D. Prabath' role='Personal Manager' %}
+
+{% include 'website/components/cards/team_card.html' with image='images/team3.jpg' border_class='border-indigo-100' role_class='text-indigo-600' name='D. T. Shiromani' role='Manager' %}
+
+        </div>
+
+    </div>
+
+</section>

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- 🔷 HEADER -->
+    <div class="space-y-3">
+
+        <h1 class="text-3xl font-bold text-gray-800">
+            {{ post.title }}
+        </h1>
+
+        <div class="flex items-center justify-between text-sm text-gray-500">
+
+            <div class="space-x-4">
+                <span>👤 {{ post.author }}</span>
+                <span>📅 {{ post.created_at|date:"F d, Y" }}</span>
+                <span>👁 {{ post.views }} views</span>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="space-x-2">
+                <a href="{% url 'user_blog_update' post.slug %}"
+                   class="text-yellow-600 hover:underline">
+                    ✏️ Edit
+                </a>
+
+                <a href="{% url 'user_blog_delete' post.slug %}"
+                   class="text-red-600 hover:underline">
+                    🗑 Delete
+                </a>
+            </div>
+
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+            <span class="inline-block bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
+                {{ post.category.name }}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- 🖼 FEATURED IMAGE -->
+    {% if post.image %}
+        <img src="{{ post.image.url }}"
+             class="w-full rounded-xl shadow"
+             alt="{{ post.title }}">
+    {% endif %}
+
+    <!-- 📝 CONTENT -->
+    <div class="prose max-w-none">
+        {{ post.content|linebreaks }}
+    </div>
+
+    <!-- 🔗 RELATED POSTS -->
+    {% if related_posts %}
+    <div class="border-t pt-6">
+
+        <h3 class="text-xl font-semibold mb-4">Related Posts</h3>
+
+        <div class="grid md:grid-cols-3 gap-4">
+            {% for item in related_posts %}
+                <a href="{% url 'user_blog_detail' item.slug %}"
+                   class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition">
+
+                    <h4 class="font-semibold text-gray-800">
+                        {{ item.title }}
+                    </h4>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        {{ item.created_at|date:"M d, Y" }}
+                    </p>
+
+                </a>
+            {% endfor %}
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- 🔙 BACK -->
+    <div class="pt-4">
+        <a href="{% url 'user_blog_list' %}" class="text-blue-600 hover:underline">
+            ⬅ Back to Blog
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

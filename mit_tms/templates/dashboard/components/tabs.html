@@ -1,0 +1,10 @@
+<div class="flex space-x-4 border-b">
+
+    {% for tab in tabs %}
+        <a href="{{ tab.url }}"
+           class="pb-2 border-b-2 {% if tab.active %}border-blue-600{% endif %}">
+            {{ tab.name }}
+        </a>
+    {% endfor %}
+
+</div>

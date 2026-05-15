@@ -1,0 +1,84 @@
+{% extends "website/base.html" %}
+{% block title %}My Profile | CareerHub{% endblock %}
+
+{% block content %}
+
+<section class="bg-gray-50 py-10">
+<div class="max-w-4xl mx-auto px-6 space-y-6">
+
+    <!-- PROFILE HEADER -->
+    <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-6">
+
+        <div class="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold">
+            {{ request.user.username|slice:":1"|upper }}
+        </div>
+
+        <div>
+            <h2 class="text-2xl font-bold">
+                {{ form.instance.full_name|default:request.user.username }}
+            </h2>
+
+            <p class="text-gray-500">
+                {{ form.instance.bio|default:"Add your bio..." }}
+            </p>
+
+            {% if form.instance.id %}
+            <a href="{% url 'careers:student_detail' form.instance.id %}"
+               class="text-blue-600 text-sm hover:underline mt-2 inline-block">
+                👁 View Public Profile
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- EDIT FORM -->
+    <div class="bg-white rounded-2xl shadow p-6">
+
+        <h3 class="text-lg font-semibold mb-4">Edit Profile</h3>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label>Full Name</label>
+                {{ form.full_name }}
+            </div>
+
+            <div>
+                <label>Bio</label>
+                {{ form.bio }}
+            </div>
+
+            <div>
+                <label>Skills</label>
+                {{ form.skills }}
+            </div>
+
+            <div>
+                <label>Experience</label>
+                {{ form.experience }}
+            </div>
+
+            <div>
+                <label>Upload CV</label>
+                {{ form.cv }}
+            </div>
+
+            <div class="flex items-center gap-2">
+                {{ form.is_public }}
+                <label>Make profile public</label>
+            </div>
+
+            <button class="bg-blue-600 text-white px-6 py-2 rounded">
+                Save
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+</section>
+
+{% endblock %}

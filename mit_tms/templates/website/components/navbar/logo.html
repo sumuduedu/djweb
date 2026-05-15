@@ -1,0 +1,38 @@
+{% load static %}
+
+<a href="{% url website.logo.url %}"
+   class="flex items-center gap-3 group">
+
+    <img
+        src="{% static website.logo.image %}"
+        alt="MIT Logo"
+        class="w-16 h-16 object-contain"
+    >
+
+    <div>
+
+        <h1 class="text-xl font-bold">
+
+            <span class="text-indigo-600">
+
+                {{ website.logo.title_primary }}
+
+            </span>
+
+            <span class="text-gray-700">
+
+                {{ website.logo.title_secondary }}
+
+            </span>
+
+        </h1>
+
+        <p class="text-xs tracking-wide text-gray-500">
+
+            {{ website.logo.tagline }}
+
+        </p>
+
+    </div>
+
+</a>

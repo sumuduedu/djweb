@@ -1,0 +1,86 @@
+<section class="bg-gradient-to-r
+                from-blue-600
+                via-indigo-600
+                to-purple-600
+                text-white
+                py-24">
+
+    <div class="max-w-6xl mx-auto px-6 text-center">
+
+        <!-- TITLE -->
+        <h1 class="text-4xl md:text-6xl font-bold leading-tight">
+
+            {% if hero.title %}
+
+                {{ hero.title }}
+
+            {% else %}
+
+                {{ hero.title_prefix }}
+
+                <span class="text-yellow-300">
+
+                    {{ hero.title_highlight }}
+
+                </span>
+
+            {% endif %}
+
+        </h1>
+
+        <!-- DESCRIPTION -->
+        {% if hero.description %}
+
+        <p class="mt-6
+                  text-lg md:text-xl
+                  text-blue-100
+                  max-w-3xl mx-auto">
+
+            {{ hero.description }}
+
+        </p>
+
+        {% endif %}
+
+        <!-- BUTTONS -->
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+
+            {% if hero.button_text %}
+
+            <a href="{{ hero.button_link }}"
+               class="bg-white
+                      text-blue-700
+                      font-semibold
+                      px-8 py-3
+                      rounded-xl
+                      shadow
+                      hover:scale-105
+                      transition">
+
+                {{ hero.button_text }}
+
+            </a>
+
+            {% endif %}
+
+            {% if hero.secondary_button_text %}
+
+            <a href="{{ hero.secondary_button_link }}"
+               class="border border-white
+                      px-8 py-3
+                      rounded-xl
+                      hover:bg-white
+                      hover:text-blue-700
+                      transition">
+
+                {{ hero.secondary_button_text }}
+
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>

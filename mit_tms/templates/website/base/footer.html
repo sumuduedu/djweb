@@ -1,0 +1,19 @@
+<footer class="relative text-gray-300 mt-20 overflow-hidden">
+
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500"></div>
+
+    <div class="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-white/20 blur-3xl rounded-full"></div>
+
+    <div class="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-cyan-300/20 blur-3xl rounded-full"></div>
+
+    <div class="relative max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-12">
+
+        {% include 'website/sections/footer/footer_brand.html' %}
+        {% include 'website/sections/footer/social_links.html' %}
+        {% include 'website/sections/footer/footer_contact.html' %}
+
+    </div>
+
+    {% include 'website/sections/footer/footer_bottom.html' %}
+
+</footer>

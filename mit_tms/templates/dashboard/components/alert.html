@@ -1,0 +1,11 @@
+<div x-data="{ show: true }"
+     x-show="show"
+     class="p-3 rounded flex justify-between items-center {{ classes }}">
+
+    <span>{{ message }}</span>
+
+    <button @click="show = false"
+            class="ml-3 text-sm opacity-70 hover:opacity-100">
+        ✖
+    </button>
+</div>

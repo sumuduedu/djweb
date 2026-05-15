@@ -1,0 +1,35 @@
+<header
+    x-data="{ mobileOpen: false }"
+
+    class="bg-white/80 backdrop-blur-md
+           shadow-md sticky top-0 z-50"
+>
+
+    <div
+        class="max-w-7xl mx-auto
+               px-4 lg:px-6 py-4
+               flex items-center justify-between"
+    >
+
+        <!-- LEFT SIDE -->
+        <div class="flex items-center gap-4">
+
+            {% include 'website/components/navbar/mobile_button.html' %}
+
+            {% include 'website/components/navbar/logo.html' %}
+
+        </div>
+
+        <!-- DESKTOP MENU -->
+        <div class="hidden lg:block">
+
+            {% include 'website/components/navbar/desktop_menu.html' %}
+
+        </div>
+
+    </div>
+
+    <!-- MOBILE MENU -->
+    {% include 'website/components/navbar/mobile_menu.html' %}
+
+</header>

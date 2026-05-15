@@ -1,0 +1,14 @@
+<div class="flex items-center gap-4 mt-6">
+
+    {% for social in website.footer.socials %}
+
+        <a href="{{ social.url }}"
+           class="social-circle">
+
+            <i class="{{ social.icon }}"></i>
+
+        </a>
+
+    {% endfor %}
+
+</div>

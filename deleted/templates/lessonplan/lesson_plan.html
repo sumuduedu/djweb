@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- ============================= -->
+    <!-- 🔷 HEADER -->
+    <!-- ============================= -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">
+                📘 Lesson Plan Generator
+            </h1>
+            <p class="text-sm text-gray-500">
+                Generate smart NVQ-based lesson plans
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- ⚙️ GENERATE PANEL -->
+    <!-- ============================= -->
+    <div class="bg-white border rounded-xl p-5 shadow-sm">
+
+        <form method="post" class="flex flex-wrap gap-4 items-end">
+            {% csrf_token %}
+
+            <!-- SESSION DURATION -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">
+                    Session Duration
+                </label>
+                <select name="hours" class="input">
+                    <option value="2">2 Hours</option>
+                    <option value="3">3 Hours</option>
+                </select>
+            </div>
+
+            <!-- GENERATE BUTTON -->
+            <div class="flex gap-2">
+
+                <button name="mode" value="basic"
+                        class="btn-secondary">
+                    Generate Basic
+                </button>
+
+                <button name="mode" value="smart"
+                        class="btn-primary">
+                    🚀 Smart Generate
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- ============================= -->
+    <!-- 📘 LESSON OUTPUT -->
+    <!-- ============================= -->
+    {% if lesson %}
+
+    <div class="bg-white border rounded-xl shadow">
+
+        <!-- HEADER -->
+        <div class="p-5 border-b">
+            <h2 class="text-lg font-semibold text-gray-800">
+                {{ lesson.title }}
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                {{ lesson.subject }} • {{ lesson.duration_minutes }} mins
+            </p>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <div class="divide-y">
+
+            {% for a in lesson.activities.all %}
+            <div class="p-5 flex justify-between items-start">
+
+                <!-- LEFT -->
+                <div class="flex-1">
+
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="badge-order">
+                            {{ a.order }}
+                        </span>
+
+                        <h3 class="font-medium text-gray-800">
+                            {{ a.title }}
+                        </h3>
+                    </div>
+
+                    <p class="text-sm text-gray-600">
+                        {{ a.description }}
+                    </p>
+
+                    <!-- META -->
+                    <div class="mt-2 text-xs text-gray-500 flex flex-wrap gap-3">
+
+                        <span class="badge-method">
+                            {{ a.get_method_display }}
+                        </span>
+
+                        {% if a.trainer_activity %}
+                            <span class="badge-blue">Trainer</span>
+                        {% endif %}
+
+                        {% if a.trainee_activity %}
+                            <span class="badge-green">Trainee</span>
+                        {% endif %}
+
+                        <span>
+                            ⏱ {{ a.total_time }} mins
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- RIGHT TIME SPLIT -->
+                <div class="text-right text-xs text-gray-500 ml-4">
+
+                    <div>
+                        👨‍🏫 {{ a.trainer_time }} min
+                    </div>
+
+                    <div>
+                        👨‍🎓 {{ a.trainee_time }} min
+                    </div>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ============================= -->
+<!-- 🎨 STYLES -->
+<!-- ============================= -->
+<style>
+
+.input {
+    @apply border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition;
+}
+
+.btn-secondary {
+    @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition;
+}
+
+.badge-order {
+    @apply bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded;
+}
+
+.badge-method {
+    @apply bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs;
+}
+
+.badge-blue {
+    @apply bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs;
+}
+
+.badge-green {
+    @apply bg-green-100 text-green-700 px-2 py-1 rounded text-xs;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'website/base/base.html' %}
+
+{% block content %}
+
+   {% include 'website/sections/shared/hero.html' with hero=hero %}
+
+    {% include 'website/sections/home/stats.html' %}
+
+    {% include 'website/sections/home/about.html' %}
+
+    {% include 'website/sections/home/features.html' %}
+
+    {% include 'website/sections/home/courses.html' %}
+
+    {% include 'website/sections/home/testimonials.html' %}
+
+    {% include 'website/sections/shared/cta.html' %}
+
+
+{% endblock %}

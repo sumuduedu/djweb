@@ -1,0 +1,149 @@
+{% extends 'blog/blog_base.html' %}
+
+{% block content %}
+
+<!-- 🔔 Messages -->
+{% if messages %}
+  <div class="mb-6 space-y-2">
+    {% for message in messages %}
+      <div class="p-3 rounded-lg bg-green-100 text-green-700 shadow-sm">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- 🔷 Header -->
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800">Blog Posts</h2>
+
+    <a href="{% url 'user_blog_create' %}"
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+        + Add Post
+    </a>
+</div>
+
+<!-- 📦 Table Container -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+
+    <table class="w-full text-sm text-left">
+
+        <!-- Table Head -->
+        <thead class="bg-gray-50 border-b text-gray-500 uppercase text-xs">
+            <tr>
+                <th class="p-4">Title</th>
+                <th class="p-4">Category</th>
+                <th class="p-4">Author</th>
+                <th class="p-4">Views</th>
+                <th class="p-4">Created</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Actions</th>
+            </tr>
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+        {% for post in posts %}
+            <tr class="border-b hover:bg-gray-50 transition">
+
+                <!-- Title -->
+                <td class="p-4 font-medium text-gray-800">
+                    {{ post.title }}
+                </td>
+
+                <!-- Category -->
+                <td class="p-4 text-gray-600">
+                    {{ post.category.name }}
+                </td>
+
+                <!-- Author -->
+                <td class="p-4 text-gray-600">
+                    {{ post.author }}
+                </td>
+
+                <!-- Views -->
+                <td class="p-4 text-gray-600">
+                    {{ post.views }}
+                </td>
+
+                <!-- Created -->
+                <td class="p-4 text-gray-600">
+                    {{ post.created_at|date:"Y-m-d" }}
+                </td>
+
+                <!-- Status -->
+                <td class="p-4">
+                    {% if post.is_published %}
+                        <span class="px-2 py-1 text-xs rounded-md bg-green-100 text-green-700">
+                            Published
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-1 text-xs rounded-md bg-yellow-100 text-yellow-700">
+                            Draft
+                        </span>
+                    {% endif %}
+                </td>
+
+                <!-- Actions -->
+                <td class="p-4 text-right space-x-2 whitespace-nowrap">
+
+                    <a href="{% url 'user_blog_detail' post.slug %}"
+                       class="text-blue-600 hover:text-blue-800 font-medium">
+                        View
+                    </a>
+
+                    <a href="{% url 'user_blog_update' post.slug %}"
+                       class="text-yellow-600 hover:text-yellow-800 font-medium">
+                        Edit
+                    </a>
+
+                    <a href="{% url 'user_blog_delete' post.slug %}"
+                       class="text-red-600 hover:text-red-800 font-medium">
+                        Delete
+                    </a>
+
+                </td>
+            </tr>
+
+        {% empty %}
+            <!-- 💤 Empty State -->
+            <tr>
+                <td colspan="7" class="p-6 text-center text-gray-500">
+                    No blog posts available.
+                    <a href="{% url 'blog_create' %}" class="text-blue-600 underline ml-1">
+                        Create one
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+<!-- 📄 Pagination -->
+{% if is_paginated %}
+<div class="mt-6 flex justify-center items-center space-x-2">
+
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+           Prev
+        </a>
+    {% endif %}
+
+    <span class="px-4 py-1 bg-blue-100 text-blue-700 rounded">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+           Next
+        </a>
+    {% endif %}
+
+</div>
+{% endif %}
+
+{% endblock %}

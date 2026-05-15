@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- HEADER -->
+<div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold">{{ batch.name }}</h2>
+
+    <div class="flex items-center gap-3">
+        <button onclick="clearAll()" class="px-3 py-1 bg-red-600 text-white rounded">
+            Clear All
+        </button>
+
+        <button onclick="changeWeek(-1)" class="px-3 py-1 bg-gray-200 rounded">⬅</button>
+        <span>Week {{ current_week }}</span>
+        <button onclick="changeWeek(1)" class="px-3 py-1 bg-gray-200 rounded">➡</button>
+    </div>
+</div>
+
+    <!-- THEORY MODULES -->
+    <div class="bg-white shadow rounded-xl p-4">
+        <h3 class="font-semibold mb-3 text-blue-600">📘 Theory Modules</h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {% for module in modules %}
+            <div class="draggable bg-blue-500 text-white p-2 rounded-lg cursor-move shadow hover:shadow-md transition"
+                 draggable="true"
+                 data-id="{{ module.id }}"
+                 data-type="THEORY"
+                 data-hours="{{ module.theory_hours }}">
+
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold truncate">
+                        {{ module.title }}
+                    </span>
+                    <span class="text-[10px] bg-white text-blue-600 px-1.5 py-0.5 rounded">
+                        T
+                    </span>
+                </div>
+
+                <div class="text-[10px] mt-1">
+                    Remaining:
+                    <span class="remain font-semibold">{{ module.theory_hours }}</span> hrs
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- PRACTICAL MODULES -->
+    <div class="bg-white shadow rounded-xl p-4">
+        <h3 class="font-semibold mb-3 text-green-600">🧪 Practical Modules</h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {% for module in modules %}
+            <div class="draggable bg-green-500 text-white p-2 rounded-lg cursor-move shadow hover:shadow-md transition"
+                 draggable="true"
+                 data-id="{{ module.id }}"
+                 data-type="PRACTICAL"
+                 data-hours="{{ module.practical_hours }}">
+
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold truncate">
+                        {{ module.title }}
+                    </span>
+                    <span class="text-[10px] bg-white text-green-600 px-1.5 py-0.5 rounded">
+                        P
+                    </span>
+                </div>
+
+                <div class="text-[10px] mt-1">
+                    Remaining:
+                    <span class="remain font-semibold">{{ module.practical_hours }}</span> hrs
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- TIMETABLE GRID -->
+    <div class="bg-white shadow rounded-xl p-4">
+
+        <div class="grid grid-cols-8 gap-2 text-sm text-center">
+
+            <div></div>
+
+            {% for d in days %}
+                <div class="font-semibold text-xs bg-gray-50 rounded p-1">
+                    {{ d|date:"D" }}<br>
+                    {{ d|date:"Y-m-d" }}
+                </div>
+            {% endfor %}
+
+            {% for slot in slots %}
+            <div class="font-semibold text-xs bg-gray-100 rounded p-1">
+                {{ slot.start_time }} - {{ slot.end_time }}
+            </div>
+
+            {% for d in days %}
+            <div class="drop-zone border h-24 rounded p-1 flex flex-col bg-gray-50 hover:bg-blue-50 transition"
+                 data-day="{{ forloop.counter }}"
+                 data-date="{{ d|date:'Y-m-d' }}"
+                 data-slot="{{ slot.id }}"
+                 data-start="{{ slot.start_time|time:'H:i' }}"
+                 data-end="{{ slot.end_time|time:'H:i' }}">
+            </div>
+            {% endfor %}
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// =========================
+// GLOBAL STATE
+// =========================
+let dragged = null;
+let currentWeek = {{ current_week|default:1 }};
+let moduleState = {};
+
+// =========================
+// INIT MODULES
+// =========================
+document.querySelectorAll('.draggable').forEach(el => {
+
+    const key = el.dataset.id + "_" + el.dataset.type;
+
+    moduleState[key] = {
+        total: parseFloat(el.dataset.hours),
+        remaining: parseFloat(el.dataset.hours),
+        el: el
+    };
+
+    el.addEventListener('dragstart', () => {
+        dragged = el;
+    });
+
+});
+
+// =========================
+// SLOT DURATION
+// =========================
+function getSlotDuration(zone) {
+    let [sh, sm] = zone.dataset.start.split(":").map(Number);
+    let [eh, em] = zone.dataset.end.split(":").map(Number);
+    return (eh + em / 60) - (sh + sm / 60);
+}
+
+// =========================
+// UI UPDATE
+// =========================
+function updateUI(key) {
+    const m = moduleState[key];
+    if (!m) return;
+
+    const remainEl = m.el.querySelector(".remain");
+
+    if (remainEl) {
+        remainEl.innerText = m.remaining.toFixed(1);
+    }
+
+    // Hide when finished
+    if (m.remaining <= 0) {
+        m.el.classList.add("hidden");
+    } else {
+        m.el.classList.remove("hidden");
+    }
+}
+
+// =========================
+// DROP
+// =========================
+document.querySelectorAll('.drop-zone').forEach(zone => {
+
+    zone.addEventListener('dragover', e => e.preventDefault());
+
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+
+        if (!dragged) return;
+
+        const id = dragged.dataset.id;
+        const type = dragged.dataset.type;
+        const key = id + "_" + type;
+
+        if (zone.querySelector('[data-id]')) return;
+
+        let duration = getSlotDuration(zone);
+
+        if (moduleState[key].remaining < duration) {
+            alert("Not enough remaining hours");
+            return;
+        }
+
+        // UPDATE STATE
+        moduleState[key].remaining -= duration;
+        updateUI(key);
+
+        // UI
+        const div = document.createElement("div");
+
+        div.className = `text-xs ${
+            type === "PRACTICAL" ? "bg-green-500" : "bg-blue-500"
+        } text-white px-2 py-1 rounded mt-1`;
+
+        div.dataset.id = id;
+        div.dataset.type = type;
+        div.innerText = dragged.innerText;
+
+        zone.appendChild(div);
+
+        save(zone, id, type);
+    });
+
+    // DELETE
+    zone.addEventListener('dblclick', (e) => {
+
+        const block = e.target.closest('[data-id]');
+        if (!block) return;
+
+        const id = block.dataset.id;
+        const type = block.dataset.type;
+        const key = id + "_" + type;
+
+        let duration = getSlotDuration(zone);
+
+        // RESTORE
+        moduleState[key].remaining += duration;
+        updateUI(key);
+
+        block.remove();
+
+        fetch("{% url 'batch:save_timetable' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRF()
+            },
+            body: JSON.stringify({
+                delete: true,
+                batch: {{ batch.id }},
+                week: currentWeek,
+                day: zone.dataset.day,
+                slot: zone.dataset.slot,
+                module: id
+            })
+        });
+    });
+
+});
+
+// =========================
+// SAVE
+// =========================
+function save(zone, id, type) {
+    fetch("{% url 'batch:save_timetable' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRF()
+        },
+        body: JSON.stringify({
+            module: id,
+            batch: {{ batch.id }},
+            week: currentWeek,
+            day: zone.dataset.day,
+            slot: zone.dataset.slot,
+            session_type: type,
+            start_time: zone.dataset.start,
+            end_time: zone.dataset.end
+        })
+    });
+}
+
+// =========================
+// 🔥 CORRECT LOAD (FINAL)
+// =========================
+function load() {
+
+    // STEP 1: Reset to total
+    for (let key in moduleState) {
+        moduleState[key].remaining = moduleState[key].total;
+    }
+
+    fetch("{% url 'batch:load_timetable' %}?batch={{ batch.id }}")
+    .then(res => res.json())
+    .then(data => {
+
+        // Clear UI
+        document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
+
+        data.forEach(item => {
+
+            const key = item.module + "_" + item.session_type;
+
+            const zone = document.querySelector(
+                `.drop-zone[data-day="${item.day}"][data-slot="${item.slot}"]`
+            );
+
+            if (!zone) return;
+
+            let duration = getSlotDuration(zone);
+
+            // 🔥 GLOBAL REDUCTION (ALL WEEKS)
+            if (moduleState[key]) {
+                moduleState[key].remaining -= duration;
+            }
+
+            // 🔥 RENDER ONLY CURRENT WEEK
+            if (item.week == currentWeek) {
+
+                const div = document.createElement("div");
+
+                div.className = `text-xs ${
+                    item.session_type === "PRACTICAL" ? "bg-green-500" : "bg-blue-500"
+                } text-white px-2 py-1 rounded mt-1`;
+
+                div.dataset.id = item.module;
+                div.dataset.type = item.session_type;
+                div.innerText = item.module_name;
+
+                zone.appendChild(div);
+            }
+        });
+
+        // 🔥 FINAL UI UPDATE
+        for (let key in moduleState) {
+            updateUI(key);
+        }
+
+    });
+}
+
+// =========================
+// WEEK CHANGE
+// =========================
+function changeWeek(v) {
+    currentWeek += v;
+    if (currentWeek < 1) currentWeek = 1;
+
+    window.location.href = "?batch={{ batch.id }}&week=" + currentWeek;
+}
+
+// =========================
+// CSRF
+// =========================
+function getCSRF() {
+    return document.cookie.split('; ')
+        .find(r => r.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+function clearAll() {
+
+    if (!confirm("⚠️ Delete ALL timetable data?")) return;
+
+    fetch("{% url 'batch:clear_timetable' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRF()
+        },
+        body: JSON.stringify({
+            batch: {{ batch.id }}
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+
+            // 🔥 CLEAR UI
+            document.querySelectorAll('.drop-zone').forEach(z => z.innerHTML = '');
+
+            // 🔥 RESET MODULE HOURS
+            for (let key in moduleState) {
+                moduleState[key].remaining = moduleState[key].total;
+                updateUI(key);
+            }
+
+            alert("✅ Timetable cleared!");
+
+        }
+
+    });
+}
+// INIT
+document.addEventListener("DOMContentLoaded", load);
+
+</script>
+{% endblock %}

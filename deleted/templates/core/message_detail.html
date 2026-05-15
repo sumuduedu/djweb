@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <div class="max-w-4xl mx-auto">
+
+        <!-- SUCCESS MESSAGE -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4 shadow">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- MAIN CARD -->
+        <div class="bg-white rounded-2xl shadow p-6">
+
+            <!-- HEADER -->
+            <div class="flex justify-between items-center border-b pb-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        📩 Message Details
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        {{ msg.created_at|date:"M d, Y H:i" }}
+                    </p>
+                </div>
+
+                <!-- ✅ FIXED -->
+                <a href="{% url 'inbox' %}"
+                   class="text-sm text-gray-500 hover:underline">
+                    ← Back to Inbox
+                </a>
+            </div>
+
+            <!-- USER INFO -->
+            <div class="bg-gray-50 p-4 rounded-xl mb-6">
+                <p class="font-semibold text-gray-800">{{ msg.name }}</p>
+                <a href="mailto:{{ msg.email }}" class="text-blue-600 text-sm hover:underline">
+                    {{ msg.email }}
+                </a>
+            </div>
+
+            <!-- ORIGINAL MESSAGE -->
+            <div class="mb-8">
+                <h3 class="text-sm font-semibold text-gray-500 mb-2">
+                    ORIGINAL MESSAGE
+                </h3>
+
+                <div class="bg-gray-100 p-4 rounded-xl">
+                    <p class="text-gray-800 whitespace-pre-line">
+                        {{ msg.message }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- CONVERSATION -->
+            <div class="mb-8">
+                <h3 class="text-sm font-semibold text-gray-500 mb-3">
+                    💬 CONVERSATION
+                </h3>
+
+                <div class="space-y-4">
+
+                    {% for reply in msg.replies.all %}
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold text-blue-600">
+                                You
+                            </span>
+                            <span class="text-xs text-gray-400">
+                                {{ reply.sent_at|date:"M d, H:i" }}
+                            </span>
+                        </div>
+
+                        <p class="text-gray-800 text-sm whitespace-pre-line">
+                            {{ reply.reply_text }}
+                        </p>
+
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-400 text-sm">
+                        No replies yet
+                    </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <!-- REPLY FORM -->
+            <div class="border-t pt-6">
+
+                <h3 class="text-sm font-semibold text-gray-500 mb-3">
+                    ✉️ SEND REPLY
+                </h3>
+
+                <!-- ✅ ONLY ONE FORM -->
+                <form method="post" action="{% url 'reply_message' msg.id %}" class="space-y-4">
+                    {% csrf_token %}
+
+                    <textarea name="reply" rows="5" required
+                        placeholder="Write your reply..."
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></textarea>
+
+                    <!-- ACTIONS -->
+                    <div class="flex justify-between items-center">
+
+                        <a href="mailto:{{ msg.email }}"
+                           class="text-sm text-blue-600 hover:underline">
+                            Open Email App →
+                        </a>
+
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium shadow hover:bg-blue-700 transition">
+                            Send Reply
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <!-- ✅ DELETE SEPARATE -->
+                <div class="mt-4 text-right">
+                    <form method="post" action="{% url 'delete_message' msg.id %}"
+                          onsubmit="return confirm('Are you sure you want to delete this message?');">
+                        {% csrf_token %}
+
+                        <button type="submit"
+                            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">
+                            🗑 Delete Message
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

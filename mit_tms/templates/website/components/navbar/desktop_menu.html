@@ -1,0 +1,20 @@
+<nav class="hidden md:flex items-center gap-8 font-medium">
+
+    <div class="flex items-center gap-6">
+
+        {% for item in website.navigation %}
+
+            <a href="{% url item.url %}"
+               class="nav-link">
+
+                {{ item.name }}
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% include 'website/components/navbar/auth_buttons.html' %}
+
+</nav>

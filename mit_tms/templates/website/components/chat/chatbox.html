@@ -1,0 +1,30 @@
+<div id="chatBox"
+     class="fixed bottom-24 right-5 w-80 bg-white shadow-2xl rounded-2xl hidden flex-col overflow-hidden z-50">
+
+    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 font-semibold">
+
+        MIT Assistant 🤖
+
+    </div>
+
+    <div id="messages"
+         class="p-4 h-72 overflow-y-auto text-sm bg-gray-50">
+
+    </div>
+
+    <div class="p-3 border-t flex items-center gap-2">
+
+        <input id="userInput"
+               class="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               placeholder="Ask something...">
+
+        <button onclick="sendMessage()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition">
+
+            Send
+
+        </button>
+
+    </div>
+
+</div>

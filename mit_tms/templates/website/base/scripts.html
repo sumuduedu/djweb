@@ -1,0 +1,39 @@
+{% load static %}
+
+<!-- ========================================= -->
+<!-- ALPINE JS -->
+<!-- ========================================= -->
+
+<script
+    defer
+    src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js">
+</script>
+
+
+<!-- ========================================= -->
+<!-- LUCIDE ICONS -->
+<!-- ========================================= -->
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            lucide.createIcons();
+
+        }
+    );
+
+</script>
+
+
+<!-- ========================================= -->
+<!-- CUSTOM JS -->
+<!-- ========================================= -->
+
+<script src="{% static 'js/main.js' %}"></script>
+
+<script src="{% static 'js/chat.js' %}"></script>

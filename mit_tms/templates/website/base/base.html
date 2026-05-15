@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% include 'website/base/head.html' %}
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    {% include 'website/components/navbar/navbar.html' %}
+
+    <main class="flex-grow">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+    {% include 'website/base/footer.html' %}
+
+    {% include 'website/components/chat/chatbox.html' %}
+    {% include 'website/components/chat/chat_toggle.html' %}
+
+    {% include 'website/base/scripts.html' %}
+
+</body>
+</html>

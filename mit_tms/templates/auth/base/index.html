@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            MIT System
+        {% endblock %}
+    </title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Extra Head -->
+    {% block extra_head %}{% endblock %}
+
+</head>
+
+<body class="min-h-screen bg-gray-100 text-gray-800">
+
+    <!-- Page Wrapper -->
+    <div class="min-h-screen flex flex-col">
+
+        <!-- Content -->
+        <main class="flex-1">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+    <!-- Extra Scripts -->
+    {% block extra_scripts %}
+    {% endblock %}
+
+</body>
+
+</html>

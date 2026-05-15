@@ -1,0 +1,30 @@
+{% extends "website/base.html" %}
+
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+
+    <div class="bg-white p-8 rounded-2xl shadow text-center max-w-md">
+
+        <h2 class="text-xl font-bold mb-4">
+            Sign In via Google
+        </h2>
+
+        <p class="text-gray-500 mb-6">
+            You are about to sign in using your Google account.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Continue
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

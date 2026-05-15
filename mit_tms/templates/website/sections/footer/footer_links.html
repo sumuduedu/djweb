@@ -1,0 +1,26 @@
+<div>
+
+    <h3 class="text-white text-lg font-semibold mb-4">
+        Explore
+    </h3>
+
+    <ul class="space-y-3 text-sm text-white/80">
+
+        {% for item in website.navigation %}
+
+            <li>
+
+                <a href="{% url item.url %}"
+                   class="footer-link">
+
+                    {{ item.name }}
+
+                </a>
+
+            </li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
