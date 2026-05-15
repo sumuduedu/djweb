@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load ui_components %}
+
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+
+<div class="grid grid-cols-4 gap-4 mb-6">
+
+    {% render_card "Courses" total_courses icon="📚" url="/dashboard/courses/" %}
+    {% render_card "Modules" total_modules icon="📦" %}
+    {% render_card "Students" total_students color="success" icon="🎓" %}
+    {% render_card "Dropouts" risk_students color="danger" icon="⚠️" %}
+
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+
+    {% render_chart_card "Engagement Trend" 85 labels engagement_data "chart1" "📈" %}
+    {% render_chart_card "Completion Rate" 72 labels completion_data "chart2" "✅" %}
+
+</div>
+
+{% endblock %}

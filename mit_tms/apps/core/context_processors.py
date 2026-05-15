@@ -8,6 +8,9 @@ from .menu import (
     GUEST_MENU,
 )
 
+from apps.core.menus import (
+       WEBSITE_CONFIG,
+)
 
 def user_roles(request):
     user = request.user
@@ -101,4 +104,12 @@ def sidebar_menu(request):
     return {
         "sidebar_items": remove_duplicates(menu),
         "user_role": role,  # useful in templates
+    }
+
+def website_navigation(request):
+
+    return {
+
+        "website": WEBSITE_CONFIG,
+
     }

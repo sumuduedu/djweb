@@ -1,68 +1,262 @@
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from django.contrib.auth.models import User
+import uuid
+import logging
+
+from django.contrib.auth import (
+    get_user_model
+)
+
+from django.db import transaction
+
+from django.shortcuts import redirect
+
+from django.contrib import messages
+
+from allauth.socialaccount.adapter import (
+    DefaultSocialAccountAdapter
+)
+
+from allauth.account.adapter import (
+    DefaultAccountAdapter
+)
+
+from .models import Profile
 
 
-class MySocialAccountAdapter(DefaultSocialAccountAdapter):
+User = get_user_model()
 
-    def populate_user(self, request, sociallogin, data):
-        user = super().populate_user(request, sociallogin, data)
+logger = logging.getLogger(__name__)
+
+
+# =========================================================
+# SOCIAL ACCOUNT ADAPTER
+# =========================================================
+
+class MySocialAccountAdapter(
+    DefaultSocialAccountAdapter
+):
+
+    # =====================================================
+    # POPULATE USER
+    # =====================================================
+
+    def populate_user(
+        self,
+        request,
+        sociallogin,
+        data
+    ):
+
+        user = super().populate_user(
+            request,
+            sociallogin,
+            data
+        )
 
         email = data.get('email')
 
         if email:
-            user.email = email   # 🔥 ensure email is set
 
-            base_username = email.split('@')[0]
-            username = base_username
-            counter = 1
+            # =============================================
+            # NORMALIZE EMAIL
+            # =============================================
 
-            # 🔥 ensure unique username
-            while User.objects.filter(username=username).exists():
-                username = f"{base_username}{counter}"
-                counter += 1
+            email = (
+                email
+                .lower()
+                .strip()
+            )
+
+            user.email = email
+
+            # =============================================
+            # CREATE SAFE BASE USERNAME
+            # =============================================
+
+            base_username = (
+                email
+                .split('@')[0]
+                .replace(' ', '')
+                .replace('.', '_')
+            )
+
+            # fallback safety
+            if not base_username:
+                base_username = 'user'
+
+            # =============================================
+            # GENERATE UNIQUE USERNAME
+            # =============================================
+
+            while True:
+
+                username = (
+                    f'{base_username}_'
+                    f'{uuid.uuid4().hex[:6]}'
+                )
+
+                if not User.objects.filter(
+                    username=username
+                ).exists():
+
+                    break
 
             user.username = username
 
         return user
+    # =====================================================
+    # AUTO SIGNUP
+    # =====================================================
 
-    def is_auto_signup_allowed(self, request, sociallogin):
-        return True   # 🔥 always allow auto signup
+    def is_auto_signup_allowed(
+        self,
+        request,
+        sociallogin
+    ):
 
-    def pre_social_login(self, request, sociallogin):
-        """
-        🔥 CONNECT EXISTING USERS (VERY IMPORTANT)
-        Prevent duplicate accounts
-        """
+        return True
 
-        email = sociallogin.account.extra_data.get('email') or sociallogin.user.email
+    # =====================================================
+    # PRE SOCIAL LOGIN
+    # =====================================================
+
+    @transaction.atomic
+    def pre_social_login(
+        self,
+        request,
+        sociallogin
+    ):
+
+        if sociallogin.is_existing:
+            return
+
+        email = (
+            sociallogin.account
+            .extra_data
+            .get('email')
+            or sociallogin.user.email
+        )
 
         if not email:
             return
 
-        try:
-            user = User.objects.get(email=email)
-
-            # 🔥 connect Google account to existing user
-            sociallogin.connect(request, user)
-
-        except User.DoesNotExist:
-            pass
-
-
-# apps/accounts/adapter.py
-
-from allauth.account.adapter import DefaultAccountAdapter
-from django.shortcuts import redirect
-from django.contrib import messages
-
-
-class CustomAccountAdapter(DefaultAccountAdapter):
-
-    def respond_user_inactive(self, request, user):
-        messages.error(
-            request,
-            "Your account is inactive. Please check your email or contact admin."
+        email = (
+            email
+            .lower()
+            .strip()
         )
 
-        # 🔥 YOUR CUSTOM REDIRECT HERE
-        return redirect('accounts:login')   # or any page you want this adapter
+        # ================================================
+        # SECURITY CHECK
+        # ================================================
+
+        email_verified = (
+            sociallogin.account
+            .extra_data
+            .get(
+                'email_verified',
+                False
+            )
+        )
+
+        if not email_verified:
+
+            logger.warning(
+                (
+                    'Unverified social '
+                    f'login attempt: {email}'
+                )
+            )
+
+            return
+
+        try:
+
+            user = User.objects.get(
+                email__iexact=email
+            )
+
+            # ============================================
+            # CONNECT SOCIAL ACCOUNT
+            # ============================================
+
+            sociallogin.connect(
+                request,
+                user
+            )
+
+            logger.info(
+                (
+                    'Connected social '
+                    f'account for {email}'
+                )
+            )
+
+        except User.DoesNotExist:
+
+            logger.info(
+                (
+                    'New social signup '
+                    f'for {email}'
+                )
+            )
+
+    # =====================================================
+    # SAVE USER
+    # =====================================================
+
+    @transaction.atomic
+    def save_user(
+        self,
+        request,
+        sociallogin,
+        form=None
+    ):
+
+        user = super().save_user(
+            request,
+            sociallogin,
+            form
+        )
+
+        Profile.objects.get_or_create(
+            user=user,
+            defaults={
+                'role': (
+                    Profile.ROLE_GUEST
+                )
+            }
+        )
+
+        return user
+
+
+# =========================================================
+# ACCOUNT ADAPTER
+# =========================================================
+
+class CustomAccountAdapter(
+    DefaultAccountAdapter
+):
+
+    # =====================================================
+    # INACTIVE USER
+    # =====================================================
+
+    def respond_user_inactive(
+        self,
+        request,
+        user
+    ):
+
+        messages.error(
+            request,
+            (
+                'Your account is inactive. '
+                'Please activate your '
+                'account or contact admin.'
+            )
+        )
+
+        return redirect(
+            'accounts:login'
+        )

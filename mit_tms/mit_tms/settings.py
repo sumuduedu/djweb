@@ -103,6 +103,7 @@ TEMPLATES = [
                 # ✅ YOUR CUSTOM
                 'apps.core.context_processors.user_roles',
                 'apps.core.context_processors.sidebar_menu',
+                'apps.core.context_processors.website_navigation',
             ],
         },
     },
@@ -211,3 +212,10 @@ SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.MySocialAccountAdapter'
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+SOCIALACCOUNT_ADAPTER = (
+    'apps.accounts.adapters.MySocialAccountAdapter'
+)
+
+ACCOUNT_ADAPTER = (
+    'apps.accounts.adapters.CustomAccountAdapter'
+)

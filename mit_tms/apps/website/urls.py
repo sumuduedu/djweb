@@ -1,50 +1,114 @@
 from django.urls import path
+
 from .views import (
-    HomeView, AboutView, ContactView,
-    PublicCourseListView, EnrollView, chat_api,
+
+    HomeView,
+    AboutView,
+    ContactView,
+
+    PublicCourseListView,
     PublicCourseDetailView,
-    InboxView, SentView, MessageDetailView,
-    ReplyMessageView, DeleteMessageView,
-    ComposeMessageView, SentMessageDetailView,
-    PublicBlogListView, PublicBlogDetailView,
-        BlogListView,
-    BlogDetailView,
-    BlogCreateView,
-    BlogUpdateView,
-    BlogDeleteView
+
+    EnrollView,
+
+    PublicBlogListView,
+    PublicBlogDetailView,
+
+    chat_api,
 )
 
+# =====================================================
+# APP NAMESPACE
+# =====================================================
+
+app_name = "website"
+
+# =====================================================
+# URL PATTERNS
+# =====================================================
+
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
-    path('about/', AboutView.as_view(), name='about'),
-    path('contact/', ContactView.as_view(), name='contact'),
 
-    # Courses
-    path('courses/<int:pk>/', PublicCourseDetailView.as_view(), name='course_detail'),
-    path('courses/', PublicCourseListView.as_view(), name='public_courses'),
+    # =================================================
+    # HOME
+    # =================================================
 
-    # Blog (FIXED)
-    path('blog/', PublicBlogListView.as_view(), name='blog_list'),
-    path('blog/<slug:slug>/', PublicBlogDetailView.as_view(), name='blog_detail'),
+    path(
+        "",
+        HomeView.as_view(),
+        name="home"
+    ),
 
-    # Chat
-    path('chat/', chat_api, name='chat_api'),
+    # =================================================
+    # ABOUT
+    # =================================================
 
-    # Messaging
-    path('messages/inbox/', InboxView.as_view(), name='inbox'),
-    path('messages/sent/', SentView.as_view(), name='sent'),
-    path('messages/<int:pk>/', MessageDetailView.as_view(), name='message_detail'),
-    path('messages/<int:pk>/reply/', ReplyMessageView.as_view(), name='reply_message'),
-    path('messages/<int:pk>/delete/', DeleteMessageView.as_view(), name='delete_message'),
-    path('messages/sent/<int:pk>/', SentMessageDetailView.as_view(), name='sent_detail'),
+    path(
+        "about/",
+        AboutView.as_view(),
+        name="about"
+    ),
 
-    path('compose/', ComposeMessageView.as_view(), name='compose'),
+    # =================================================
+    # CONTACT
+    # =================================================
 
-    path('enroll/', EnrollView.as_view(), name='enroll'),
+    path(
+        "contact/",
+        ContactView.as_view(),
+        name="contact"
+    ),
 
-    path('user/blog/', BlogListView.as_view(), name='user_blog_list'),
-    path('create/', BlogCreateView.as_view(), name='user_blog_create'),
-    path('<slug:slug>/', BlogDetailView.as_view(), name='user_blog_detail'),
-    path('<slug:slug>/edit/', BlogUpdateView.as_view(), name='user_blog_update'),
-    path('<slug:slug>/delete/', BlogDeleteView.as_view(), name='user_blog_delete'),
+    # =================================================
+    # COURSES
+    # =================================================
+
+    path(
+        "courses/",
+        PublicCourseListView.as_view(),
+        name="public_course_list"
+    ),
+
+    path(
+        "courses/<int:pk>/",
+        PublicCourseDetailView.as_view(),
+        name="public_course_detail"
+    ),
+
+    # =================================================
+    # ENROLLMENT
+    # =================================================
+
+    path(
+        "enroll/",
+        EnrollView.as_view(),
+        name="enroll"
+    ),
+
+    # =================================================
+    # BLOG
+    # =================================================
+
+    path(
+        "blog/",
+        PublicBlogListView.as_view(),
+        name="blog_list"
+    ),
+
+    path(
+        "blog/<slug:slug>/",
+        PublicBlogDetailView.as_view(),
+        name="blog_detail"
+    ),
+
+    # =================================================
+    # AI CHAT API
+    # =================================================
+
+    path(
+        "chat/",
+        chat_api,
+        name="chat_api"
+    ),
+
 ]

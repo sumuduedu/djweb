@@ -1,163 +1,147 @@
-from django.db.models.signals import post_save, pre_save
-from django.contrib.auth.models import User
+from django.db.models.signals import (
+    post_save,
+    pre_save
+)
+
 from django.dispatch import receiver
 
-from allauth.account.signals import user_signed_up
+from django.contrib.auth import (
+    get_user_model
+)
 
-from .models import Profile, Student, Teacher, Staff, Parent
-from django.contrib.auth.models import Group
+from allauth.account.signals import (
+    user_signed_up
+)
 
-ROLE_GROUP_MAP = {
-    'ADMIN': 'Admin',
-    'STAFF': 'Staff',
-    'TEACHER': 'Teacher',
-    'STUDENT': 'Student',
-    'PARENT': 'Parent',
-    'ALUMNI': 'Alumni',
-    'GUEST': 'Guest',
-}
+from .models import (
+    Profile
+)
 
-# ================================
-# 🔷 CREATE PROFILE (DEFAULT = GUEST)
-# ================================
+from .services.role_service import (
+    handle_role_change,
+    sync_full_names
+)
+
+
+User = get_user_model()
+
+
+# =========================================================
+# CREATE PROFILE
+# =========================================================
+
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_profile(
+    sender,
+    instance,
+    created,
+    **kwargs
+):
+
     if created:
-        Profile.objects.create(
+
+        Profile.objects.get_or_create(
             user=instance,
-            role='GUEST'   # 🔥 DEFAULT ROLE
+            defaults={
+                'role': Profile.ROLE_GUEST
+            }
         )
 
 
-# ================================
-# 🔷 GOOGLE / SOCIAL LOGIN
-# ================================
+# =========================================================
+# SOCIAL LOGIN PROFILE
+# =========================================================
+
 @receiver(user_signed_up)
-def assign_role_social_login(request, user, **kwargs):
-    profile, _ = Profile.objects.get_or_create(user=user)
+def assign_role_social_login(
+    request,
+    user,
+    **kwargs
+):
 
-    # 🔥 ensure role exists
-    if not profile.role:
-        profile.role = 'GUEST'
-        profile.save()
+    Profile.objects.get_or_create(
+        user=user,
+        defaults={
+            'role': Profile.ROLE_GUEST
+        }
+    )
 
 
-# ================================
-# 🔷 STORE OLD ROLE (FOR CHANGE DETECTION)
-# ================================
+# =========================================================
+# STORE OLD ROLE
+# =========================================================
+
 @receiver(pre_save, sender=Profile)
-def store_previous_role(sender, instance, **kwargs):
+def store_previous_role(
+    sender,
+    instance,
+    **kwargs
+):
+
     if instance.pk:
+
         try:
-            instance._previous_role = Profile.objects.get(pk=instance.pk).role
+
+            old_profile = (
+                Profile.objects.get(
+                    pk=instance.pk
+                )
+            )
+
+            instance._previous_role = (
+                old_profile.role
+            )
+
         except Profile.DoesNotExist:
+
             instance._previous_role = None
+
     else:
+
         instance._previous_role = None
 
 
-# ================================
-# 🔷 CREATE / REMOVE ROLE MODELS
-# ================================
+# =========================================================
+# HANDLE ROLE CHANGE
+# =========================================================
+
 @receiver(post_save, sender=Profile)
-def create_role_models(sender, instance, created, **kwargs):
-
-    user = instance.user
-
-    # 🔥 skip superuser
-    if user.is_superuser:
-        return
+def manage_role_models(
+    sender,
+    instance,
+    created,
+    **kwargs
+):
 
     role_changed = (
-        created or
-        getattr(instance, "_previous_role", None) != instance.role
+        created
+        or
+        getattr(
+            instance,
+            '_previous_role',
+            None
+        ) != instance.role
     )
 
     if not role_changed:
         return
 
-    full_name = user.get_full_name() or user.username
-
-    # ============================
-    # 🎓 STUDENT
-    # ============================
-    if instance.role == 'STUDENT':
-        Student.objects.get_or_create(
-            user=user,
-            defaults={"full_name": full_name}
-        )
-
-        Teacher.objects.filter(user=user).delete()
-        Staff.objects.filter(user=user).delete()
-        Parent.objects.filter(user=user).delete()
-
-    # ============================
-    # 👨‍🏫 TEACHER
-    # ============================
-    elif instance.role == 'TEACHER':
-        Teacher.objects.get_or_create(
-            user=user,
-            defaults={"full_name": full_name}
-        )
-
-        Student.objects.filter(user=user).delete()
-        Staff.objects.filter(user=user).delete()
-        Parent.objects.filter(user=user).delete()
-
-    # ============================
-    # 🧑‍💼 STAFF
-    # ============================
-    elif instance.role == 'STAFF':
-        Staff.objects.get_or_create(
-            user=user,
-            defaults={"full_name": full_name}
-        )
-
-        Student.objects.filter(user=user).delete()
-        Teacher.objects.filter(user=user).delete()
-        Parent.objects.filter(user=user).delete()
-
-    # ============================
-    # 👨‍👩‍👧 PARENT
-    # ============================
-    elif instance.role == 'PARENT':
-        Parent.objects.get_or_create(
-            user=user
-        )
-
-        Student.objects.filter(user=user).delete()
-        Teacher.objects.filter(user=user).delete()
-        Staff.objects.filter(user=user).delete()
-
-    # ============================
-    # 👤 GUEST / 🎓 ALUMNI
-    # ============================
-    elif instance.role in ['GUEST', 'ALUMNI']:
-        Student.objects.filter(user=user).delete()
-        Teacher.objects.filter(user=user).delete()
-        Staff.objects.filter(user=user).delete()
-        Parent.objects.filter(user=user).delete()
+    handle_role_change(
+        profile=instance
+    )
 
 
-# ================================
-# 🔷 SYNC NAME WHEN USER UPDATED
-# ================================
+# =========================================================
+# SYNC FULL NAMES
+# =========================================================
+
 @receiver(post_save, sender=User)
-def update_names(sender, instance, **kwargs):
+def sync_user_full_names(
+    sender,
+    instance,
+    **kwargs
+):
 
-    full_name = instance.get_full_name() or instance.username
-
-    student = getattr(instance, "student", None)
-    if student:
-        student.full_name = full_name
-        student.save()
-
-    teacher = getattr(instance, "teacher", None)
-    if teacher:
-        teacher.full_name = full_name
-        teacher.save()
-
-    staff = getattr(instance, "staff", None)
-    if staff:
-        staff.full_name = full_name
-        staff.save()
+    sync_full_names(
+        user=instance
+    )
